@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credit Karma Insurance - KDS Prototype</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            national: ['"National 2"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --kds-color-background: #ffffff;
+      --kds-color-text-primary: #000000;
+      --kds-color-text-secondary: #55595b;
+      --kds-color-text-disabled: #c7cdd1;
+      --kds-color-text-primary-inverse: #ffffff;
+      --kds-color-divider-item: #d9dfe2;
+      --kds-color-divider-section: #e9eef0;
+      --kds-color-action-fill: #008600;
+      --kds-color-action-fill-hover: #00670d;
+      --kds-color-action-fill-press: #00670d;
+      --kds-color-forms-border: #6e7376;
+      --kds-color-forms-choice-bg-selected: #e3f1e6;
+      --kds-color-forms-choice-border-selected: #008600;
+      --kds-color-palette-neutral-10: #f7f9fa;
+      --kds-color-palette-neutral-70: #6e7376;
+      --kds-color-palette-green-20: #e3f1e6;
+      --kds-policy-pro-bg: #006a57;
+      --kds-risk-yellow: #ffdc00;
+      --kds-risk-light-green: #7fd000;
+      --kds-risk-dark-green: #008600;
+      --kds-shadow-level2: 0 2px 8px rgba(0,0,0,0.2);
+      --kds-shadow-level3: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "National 2", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .sim-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .sim-topbar {
+      height: 56px;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .sim-topbar-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: #000;
+      padding: 6px 12px;
+      border: 1px solid #d9dfe2;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .sim-topbar-tabs {
+      display: flex;
+      gap: 0;
+      margin-left: 32px;
+    }
+
+    .sim-topbar-tab {
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #55595b;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: inherit;
+      border-radius: 6px;
+    }
+
+    .sim-topbar-tab.active {
+      background: #008600;
+      color: #fff;
+    }
+
+    .sim-topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sim-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .sim-canvas {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px;
+      overflow: auto;
+    }
+
+    .sim-sidebar {
+      width: 300px;
+      background: #fff;
+      border-left: 1px solid #e0e0e0;
+      flex-shrink: 0;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .sim-sidebar-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .sim-sidebar-section {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #55595b;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e9eef0;
+    }
+
+    .sim-sidebar-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #000;
+      margin-bottom: 8px;
+    }
+
+    .sim-sidebar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .sim-toggle-group {
+      display: flex;
+      border: 1px solid #d9dfe2;
+      border-radius: 50px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .sim-toggle-btn {
+      flex: 1;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      background: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      color: #000;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .sim-toggle-btn.active {
+      background: #008600;
+      color: #fff;
+    }
+
+    .sim-settings-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e9eef0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .phone-bezel {
+      width: 391px;
+      height: 844px;
+      background: #1a1b1d;
+      border-radius: 44px;
+      padding: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+    }
+
+    .phone-screen {
+      width: 375px;
+      height: 828px;
+      background: #ffffff;
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scroll-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .scroll-content::-webkit-scrollbar { display: none; }
+
+    .h-scroll {
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .h-scroll::-webkit-scrollbar { display: none; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .screen-fade-in { animation: fadeIn 200ms ease forwards; }
+
+    .press-btn { transition: all 0.15s ease; }
+    .press-btn:active { transform: scale(0.97); opacity: 0.85; }
+
+    @keyframes typingDot {
+      0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+      30% { opacity: 1; transform: translateY(-4px); }
+    }
+    .typing-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #6e7376; display: inline-block;
+      animation: typingDot 1.4s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes chatBubbleIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .chat-bubble-in { animation: chatBubbleIn 300ms ease forwards; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    /* ─── SVG Icons ─── */
+    const Icons = {
+      Signal: ({ color = 'currentColor', size = 17 }) => (
+        <svg width={size} height={size} viewBox="0 0 17 12" fill="none">
+          <rect x="0" y="8" width="3" height="4" rx="0.5" fill={color}/>
+          <rect x="4.5" y="5" width="3" height="7" rx="0.5" fill={color}/>
+          <rect x="9" y="2.5" width="3" height="9.5" rx="0.5" fill={color}/>
+          <rect x="13.5" y="0" width="3" height="12" rx="0.5" fill={color}/>
+        </svg>
+      ),
+      Wifi: ({ color = 'currentColor', size = 16 }) => (
+        <svg width={size} height={size} viewBox="0 0 16 12" fill="none">
+          <path d="M8 10.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" fill={color}/>
+          <path d="M4.46 8.46a5 5 0 017.08 0" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+          <path d="M1.64 5.64a9 9 0 0112.72 0" stroke={color} strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+        </svg>
+      ),
+      Battery: ({ color = 'currentColor', size = 25 }) => (
+        <svg width={size} height={size * 0.48} viewBox="0 0 25 12" fill="none">
+          <rect x="0.5" y="0.5" width="21" height="11" rx="2" stroke={color} strokeOpacity="0.35"/>
+          <rect x="2" y="2" width="18" height="8" rx="1" fill={color}/>
+          <path d="M23 4v4a2 2 0 000-4z" fill={color} fillOpacity="0.35"/>
+        </svg>
+      ),
+      ChevronRight: ({ color = '#008600', size = 20 }) => (
+        <svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+          <path d="M7.5 4l6 6-6 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      ChevronLeft: ({ color = '#000', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M15 6l-6 6 6 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      Menu: ({ color = '#000', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ),
+      Send: ({ color, size = 24 }) => (
+        <img src="Assets/send.png" alt="" style={{ width: size, height: size, objectFit: 'contain' }}/>
+      ),
+      Sparkle: ({ color = 'currentColor', size = 20 }) => {
+        const isWhite = color === '#fff' || color === 'white' || color === '#ffffff';
+        const isGreen = color === '#008600';
+        const isGrey = color === '#55595b' || color === '#6e7376';
+        const src = isWhite ? 'Assets/ai-sparkles.png' : 'Assets/ai-sparkles-1.png';
+        const filter = isGreen ? 'invert(27%) sepia(96%) saturate(1900%) hue-rotate(110deg) brightness(92%) contrast(106%)' : isGrey ? 'invert(36%) sepia(3%) saturate(500%) hue-rotate(160deg) brightness(90%) contrast(90%)' : undefined;
+        return <img src={src} alt="" style={{ width: size, height: size, objectFit: 'contain', filter }}/>;
+      },
+      Plus: ({ color = '#008600', size = 16 }) => (
+        <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+          <path d="M8 2v12M2 8h12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ),
+      Check: ({ color = '#008600', size = 16 }) => (
+        <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+          <path d="M3 8.5l3 3 7-7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      Shield: ({ color = '#6e7376', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M12 3l7 3.5v5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5v-5L12 3z" stroke={color} strokeWidth="1.5" fill="none"/>
+          <path d="M9.5 12l2 2 3.5-3.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      ShieldFilled: ({ color = '#008600', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M12 3l7 3.5v5c0 4.5-3 8-7 9.5-4-1.5-7-5-7-9.5v-5L12 3z" fill={color}/>
+          <path d="M9.5 12l2 2 3.5-3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ),
+      Agenda: ({ color = '#6e7376', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <rect x="4" y="3" width="16" height="18" rx="2" stroke={color} strokeWidth="1.5" fill="none"/>
+          <path d="M8 7h8M8 11h8M8 15h5" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      ),
+      CreditCard: ({ color = '#6e7376', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="5" width="20" height="14" rx="2" stroke={color} strokeWidth="1.5" fill="none"/>
+          <path d="M2 10h20" stroke={color} strokeWidth="1.5"/>
+          <path d="M6 15h4" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      ),
+      MoneyBag: ({ color = '#6e7376', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <path d="M9.5 4h5l2 3H7.5l2-3z" stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+          <path d="M6 10c0-1.5 1.5-3 6-3s6 1.5 6 3c0 5-2 11-6 11S6 15 6 10z" stroke={color} strokeWidth="1.5" fill="none"/>
+          <path d="M12 11v5M10.5 13.5h3" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+      ),
+      Money: ({ color = '#6e7376', size = 24 }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="5" width="20" height="14" rx="2" stroke={color} strokeWidth="1.5" fill="none"/>
+          <circle cx="12" cy="12" r="3" stroke={color} strokeWidth="1.5" fill="none"/>
+          <path d="M5 8v0M19 16v0" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ),
+      Car: ({ color = 'white', size = 20 }) => (
+        <svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+          <path d="M3 12l1.5-5h11L17 12" stroke={color} strokeWidth="1.5" strokeLinejoin="round" fill="none"/>
+          <rect x="2" y="12" width="16" height="4" rx="1" stroke={color} strokeWidth="1.5" fill="none"/>
+          <circle cx="6" cy="16" r="1.5" fill={color}/>
+          <circle cx="14" cy="16" r="1.5" fill={color}/>
+        </svg>
+      ),
+      Home: ({ color = 'white', size = 20 }) => (
+        <svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+          <path d="M3 8l7-5 7 5v8a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" fill="none"/>
+          <path d="M8 17v-5h4v5" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+        </svg>
+      ),
+      Lightning: ({ color, size = 16 }) => (
+        <img src="KDS Icon art/Lightning bolt.png" alt="" style={{ width: size, height: size, objectFit: 'contain' }}/>
+      ),
+    };
+
+    /* ─── Brand Logos ─── */
+    function LibertyMutualLogo({ size = 32 }) {
+      return (
+        <img src="Assets/KDS Brand avatar.png" alt="Liberty Mutual" style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+      );
+    }
+
+    function GeicoLogo({ size = 32 }) {
+      return (
+        <img src={size > 20 ? 'Assets/geico-logo.jpg' : 'Assets/KDS Brand avatar-1.png'} alt="GEICO" style={{ width: size, height: size, borderRadius: size <= 20 ? 4 : '50%', objectFit: 'cover', flexShrink: 0 }}/>
+      );
+    }
+
+    function GeicoLogoWide() {
+      return (
+        <img src="Assets/Geico.png" alt="GEICO" style={{ height: 24, objectFit: 'contain' }}/>
+      );
+    }
+
+    /* ─── Shared Components ─── */
+    function StatusBar() {
+      return (
+        <div style={{ height: 54, padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <span style={{ fontSize: 17, fontWeight: 600, fontFamily: '"SF Pro", -apple-system, system-ui, sans-serif' }}>9:41</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Icons.Signal size={17}/>
+            <Icons.Wifi size={16}/>
+            <Icons.Battery size={25}/>
+          </div>
+        </div>
+      );
+    }
+
+    function TabGroup({ selected, onSelect }) {
+      const tabs = ['My policies', 'Find a policy', 'Drive score'];
+      return (
+        <div style={{ position: 'relative', display: 'flex', width: '100%', flexShrink: 0, paddingLeft: 16, paddingRight: 16 }}>
+          {tabs.map((label, i) => (
+            <button key={label} onClick={() => onSelect(i)} style={{
+              flex: '1 0 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+              paddingTop: 8, paddingBottom: 0, paddingLeft: 0, paddingRight: 0,
+              background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+              minWidth: 0,
+            }}>
+              <span style={{ fontSize: 15, fontWeight: 400, color: selected === i ? '#000' : '#55595b', whiteSpace: 'nowrap', padding: '8px 0', transition: 'color 250ms ease' }}>{label}</span>
+              <div style={{ height: 4, width: '100%', background: '#d9dfe2', borderRadius: 2 }}/>
+            </button>
+          ))}
+          {/* Sliding green indicator */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 16, right: 16,
+            height: 4, pointerEvents: 'none', zIndex: 2,
+          }}>
+            <div style={{
+              width: `${100 / tabs.length}%`,
+              height: '100%',
+              background: '#008600',
+              borderRadius: 2,
+              transform: `translateX(${selected * 100}%)`,
+              transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)',
+            }}/>
+          </div>
+        </div>
+      );
+    }
+
+    function BottomTabBar() {
+      const tabs = [
+        { label: 'For you', img: 'Assets/Icon.png' },
+        { label: 'Cards', img: 'Assets/Icon-1.png' },
+        { label: 'Loans', img: 'Assets/Icon-2.png' },
+        { label: 'Insurance', img: 'Assets/Icon-3.png', selected: true },
+        { label: 'Money', img: 'Assets/Icon-4.png' },
+      ];
+      return (
+        <div style={{ flexShrink: 0, background: '#fff', borderTop: '1px solid #d9dfe2' }}>
+          <div style={{ display: 'flex', padding: '10px 16px 8px' }}>
+            {tabs.map(t => (
+              <div key={t.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, height: 44 }}>
+                <img src={t.img} alt={t.label} style={{ width: 24, height: 24, objectFit: 'contain' }}/>
+                <span style={{ fontSize: 13, fontWeight: 500, color: t.selected ? '#008600' : '#6e7376' }}>{t.label}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8, paddingTop: 8 }}>
+            <div style={{ width: 139, height: 5, background: '#000', borderRadius: 100 }}/>
+          </div>
+        </div>
+      );
+    }
+
+    function FilterChip({ label, selected, onClick, icon }) {
+      return (
+        <button className="press-btn" onClick={onClick} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 6,
+          padding: '8px 16px', fontSize: 15, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap',
+          fontFamily: 'inherit', border: 'none',
+          background: selected ? '#e3f1e6' : 'transparent',
+          boxShadow: selected ? 'inset 0 0 0 2px #008600' : 'inset 0 0 0 1px #6e7376',
+          color: '#000',
+        }}>
+          {icon && <span>{icon}</span>}
+          {label}
+        </button>
+      );
+    }
+
+    function ChatInputBar({ placeholder = "What does my policy cover?", variant = "default", onSend }) {
+      const [val, setVal] = useState('');
+      const handleSend = () => { if (val.trim() && onSend) { onSend(val.trim()); setVal(''); } };
+      return (
+        <div style={{
+          border: variant === 'comparison' ? '1px solid #000' : '2px solid #006a57',
+          borderRadius: 78, padding: 16,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        }}>
+          {variant === 'comparison' && (
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Icons.Plus size={20} color="#000"/>
+            </div>
+          )}
+          <input type="text" value={val} onChange={e => setVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleSend(); }} placeholder={placeholder} style={{ fontSize: 17, color: '#000', flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', padding: 0 }}/>
+          <div onClick={handleSend} style={{ width: 24, height: 24, flexShrink: 0, cursor: 'pointer' }}>
+            <Icons.Send color="#008600"/>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── SCREEN 1: My Policies ─── */
+    function MyPoliciesScreen({ onTabChange, chip1, setChip1, policyCount = 1, openChat }) {
+      const chips1 = ['Dashboard', 'Drivers', 'Vehicles', 'Documents'];
+      const chips2 = ['All policies', 'Claims', 'Documents', 'Suggestions'];
+      const chips3 = ['All policies', 'Claims', 'Documents'];
+      const chips = policyCount === 3 ? chips3 : policyCount === 2 ? chips2 : chips1;
+
+      return (
+        <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <StatusBar/>
+          {/* Header */}
+          <div style={{ padding: '0 16px 8px' }}>
+            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+          </div>
+          <TabGroup selected={0} onSelect={(i) => { if (i === 1) onTabChange('findPolicy'); if (i === 2) onTabChange('driveScore'); }}/>
+
+          <div className="scroll-content">
+            {policyCount === 0 ? (
+              /* ─── 0-POLICY EMPTY STATE ─── */
+              <>
+                <div style={{ padding: '16px 16px 32px' }}>
+                  <div style={{ background: '#f7f9fa', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.2)', overflow: 'hidden', paddingBottom: 0 }}>
+                    {/* Policy Pro conversation hero */}
+                    <div style={{ padding: 16 }}>
+                      <div style={{ background: 'rgba(0,106,87,0.8)', borderRadius: '12px 12px 0 0', padding: 16, paddingBottom: 0 }}>
+                        <div style={{ background: '#fff', borderRadius: '12px 12px 0 0', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', padding: '16px 16px 8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <div style={{ background: '#e9eef0', borderRadius: '50px 16px 50px 50px', padding: '8px 24px 8px 16px', width: '100%' }}>
+                              <p style={{ fontSize: 15, lineHeight: 1.4 }}>Am I covered if a rock hit my windshield?</p>
+                            </div>
+                          </div>
+                          <div style={{ paddingTop: 16, paddingRight: 16 }}>
+                            <div style={{ height: 21, borderRadius: 40, width: '100%', background: 'linear-gradient(173deg, #cde7ef 29%, #d6ebe6 49%, #cfe8d4 69%)' }}/>
+                          </div>
+                          <div style={{ paddingTop: 8, paddingBottom: 16 }}>
+                            <div style={{ height: 21, borderRadius: 40, width: 140, background: 'linear-gradient(169deg, #cde7ef 29%, #d6ebe6 49%, #cfe8d4 69%)' }}/>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 24 }}>
+                        <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Ask anything about insurance</p>
+                        <p style={{ fontSize: 15, lineHeight: 1.4 }}>Connect or upload your policies to get personalized coverage guidance</p>
+                      </div>
+                    </div>
+
+                    {/* Policy Pro + Add policy */}
+                    <div style={{ borderTop: '1px solid #e9eef0', boxShadow: '0 -1px 4px rgba(0,0,0,0.25)', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#006a57', borderRadius: 8, padding: '4px 8px' }}>
+                        <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.15 }}>Policy pro</span>
+                        <Icons.Sparkle color="#fff" size={24}/>
+                      </div>
+                      <button className="press-btn" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                        <Icons.Plus color="#006a57" size={16}/>
+                        <span style={{ fontSize: 17, fontWeight: 500, color: '#006a57' }}>Add policy</span>
+                      </button>
+                    </div>
+
+                    {/* Chat input */}
+                    <div style={{ padding: '0 16px 16px' }}>
+                      <ChatInputBar placeholder="Ask about insurance" onSend={openChat}/>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section divider */}
+                <div style={{ width: '100%', height: 8, background: '#e9eef0' }}/>
+
+                {/* Discover section */}
+                <div style={{ padding: '32px 16px 4px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Discover</p>
+                  <p style={{ fontSize: 17, lineHeight: 1.4, marginTop: 4 }}>From monitoring to discounts</p>
+                </div>
+
+                {/* Nudge cards */}
+                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {/* Vehicle monitoring card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0 1px 3px rgba(0,0,0,0.4)', display: 'flex', gap: 16, padding: 16, alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Vehicle monitoring</p>
+                      <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginTop: 4 }}>Market value, safety recalls, etc.</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                        <img src="Assets/Clock icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
+                        <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>1 min</span>
+                      </div>
+                    </div>
+                    <button className="press-btn" style={{ height: 40, padding: '0 16px', borderRadius: 6, border: 'none', background: '#008600', color: '#fff', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>Start</button>
+                  </div>
+
+                  {/* Earn lower rates card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0 1px 3px rgba(0,0,0,0.4)', display: 'flex', gap: 16, padding: 16, alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Earn a lower rates</p>
+                      <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginTop: 4 }}>Drive for ~30 days to see if you qualify for lower insurance rates</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                        <img src="Assets/Clock icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
+                        <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>30 days</span>
+                      </div>
+                    </div>
+                    <button className="press-btn" style={{ height: 40, padding: '0 16px', borderRadius: 6, border: 'none', background: '#008600', color: '#fff', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>Start</button>
+                  </div>
+                </div>
+              </>
+            ) : (
+            <>
+            {/* Policy Card Section */}
+            <div style={{ padding: '16px 16px 32px' }}>
+              <div style={{ background: '#f7f9fa', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.2)', overflow: 'visible', paddingBottom: 16 }}>
+
+                {policyCount === 3 ? (
+                  <>
+                    {/* 3 stacked policy cards — wallet pattern */}
+                    <div style={{ padding: '16px 16px 0' }}>
+                      {/* Back card (Auto) — full rounded, bottom overlapped */}
+                      <div style={{ marginBottom: -29 }}>
+                        <div style={{
+                          background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12,
+                          height: 94, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                        }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual auto: 3228</p>
+                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>2 vehicles • 2 drivers</p>
+                          </div>
+                          <LibertyMutualLogo size={32}/>
+                        </div>
+                      </div>
+                      {/* Middle card (Home) — rounded top, overlaps Auto */}
+                      <div style={{ marginBottom: -29 }}>
+                        <div style={{
+                          background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
+                          borderBottom: 'none', borderRadius: '12px 12px 0 0',
+                          padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                        }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Geico home: 9899</p>
+                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>1 home • dwelling coverage $455K</p>
+                          </div>
+                          <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                        </div>
+                      </div>
+                      {/* Front card (Life) — rounded top, overlaps Home */}
+                      <div style={{ marginBottom: -29 }}>
+                        <div style={{
+                          background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
+                          borderBottom: 'none', borderRadius: '12px 12px 0 0',
+                          padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                        }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>State Farm life: 1954</p>
+                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>Up $1M coverage</p>
+                          </div>
+                          <img src="Assets/State farm logo.png" alt="State Farm" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : policyCount === 2 ? (
+                  <>
+                    {/* 2 stacked policy cards — wallet pattern */}
+                    <div style={{ padding: '16px 16px 0' }}>
+                      {/* Back card (Auto) — full rounded card, bottom overlapped */}
+                      <div style={{ marginBottom: -29 }}>
+                        <div style={{
+                          background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12,
+                          height: 94, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                        }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual Auto: 3228</p>
+                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>2 vehicles • 2 drivers</p>
+                          </div>
+                          <LibertyMutualLogo size={32}/>
+                        </div>
+                      </div>
+                      {/* Front card (Home) — rounded top, no bottom border, overlaps back card */}
+                      <div style={{ marginBottom: -29 }}>
+                        <div style={{
+                          background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
+                          borderBottom: 'none', borderRadius: '12px 12px 0 0',
+                          padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                        }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual Home: 9899</p>
+                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>1 home • dwelling coverage $455K</p>
+                          </div>
+                          <LibertyMutualLogo size={32}/>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Single policy card (1-policy state) */}
+                    <div style={{ background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12, overflow: 'hidden' }}>
+                      {/* Policy header */}
+                      <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual Auto: 3228</p>
+                          <p style={{ fontSize: 13, color: '#55595b', marginTop: 2, lineHeight: 1.4 }}>2 vehicles • 2 drivers</p>
+                        </div>
+                        <LibertyMutualLogo size={32}/>
+                      </div>
+                      {/* Key value grid */}
+                      <div style={{ borderTop: '1px solid #e9eef0', padding: '0 16px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                          {[
+                            { key: '6 mo premium', value: '$1,134' },
+                            { key: 'Next renewal', value: '36 days' },
+                            { key: 'Status', value: 'Active' },
+                            { key: 'Location', value: 'NC' },
+                          ].map((item, i) => (
+                            <div key={i} style={{
+                              padding: '16px 16px 16px 0', display: 'flex', flexDirection: 'column', gap: 6,
+                              borderBottom: i < 2 ? '1px solid #d9dfe2' : 'none',
+                              borderRight: i % 2 === 0 ? '1px solid #d9dfe2' : 'none',
+                              paddingLeft: i % 2 === 1 ? 16 : 0,
+                            }}>
+                              <span style={{ fontSize: 15, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>{item.key}</span>
+                              <span style={{ fontSize: 20, fontWeight: 700, color: '#000', lineHeight: 1.15 }}>{item.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      {/* See policy details */}
+                      <div style={{ borderTop: '1px solid #d9dfe2', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                        <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', lineHeight: 1.15 }}>See policy details</span>
+                        <Icons.ChevronRight size={20} color="#008600"/>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Policy Pro + Add Policy row */}
+                <div style={{
+                  padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  ...(policyCount >= 2 ? { background: '#f7f9fa', borderTop: '1px solid #e9eef0', borderBottom: 'none', boxShadow: '0px -1px 4px rgba(0,0,0,0.25)', clipPath: 'inset(-4px 0px 0px 0px)', position: 'relative', zIndex: 3 } : {}),
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#006a57', borderRadius: 8, padding: '4px 8px' }}>
+                    <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.15 }}>Policy pro</span>
+                    <Icons.Sparkle color="#fff" size={24}/>
+                  </div>
+                  <button className="press-btn" style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <Icons.Plus color="#006a57" size={16}/>
+                    <span style={{ fontSize: 17, fontWeight: 500, color: '#006a57' }}>Add policy</span>
+                  </button>
+                </div>
+
+                {/* Total cost (multi-policy state) */}
+                {policyCount >= 2 && (
+                  <div style={{ padding: '0 16px' }}>
+                    <p style={{ fontSize: 15, fontWeight: 500, color: '#55595b', lineHeight: 1.15, marginBottom: 4 }}>Total cost</p>
+                    <p style={{ lineHeight: 1.15, marginBottom: 8 }}>
+                      <span style={{ fontSize: 51, fontWeight: 700 }}>{policyCount === 3 ? '$498' : '$325'}</span>
+                      <span style={{ fontSize: 24, fontWeight: 400, color: '#55595b' }}>/mo</span>
+                    </p>
+                  </div>
+                )}
+
+                {/* Chat input */}
+                <div style={{ padding: '0 16px' }}>
+                  <ChatInputBar onSend={openChat}/>
+                </div>
+
+                {/* Connected text */}
+                <div style={{ padding: '4px 16px 0', textAlign: 'center' }}>
+                  <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>
+                    {policyCount === 3 ? '3 polices connected  •  23 documents added' : policyCount === 2 ? '2 polices connected  •  16 documents added' : 'One policy connected  •  8 documents added'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter chips */}
+            <div className="h-scroll" style={{ display: 'flex', gap: 8, padding: '0 16px', marginBottom: 16 }}>
+              {chips.map((c, i) => (
+                <FilterChip key={c} label={c} selected={chip1 === i} onClick={() => setChip1(i)}
+                  icon={
+                    policyCount >= 2 && i === 0
+                      ? <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      : (policyCount < 2 && i === 0 ? <Icons.Sparkle size={20} color={chip1 === 0 ? '#008600' : '#6e7376'}/> : null)
+                  }/>
+              ))}
+            </div>
+
+            {/* ─── Filter Content Area ─── */}
+            {policyCount === 3 ? (
+              /* 3-POLICY STATE chip content */
+              chip1 === 0 ? (
+                /* All policies */
+                <>
+                  <div style={{ padding: '0 16px 8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Summary</p>
+                    <Icons.Sparkle size={20} color="#55595b"/>
+                  </div>
+                  <div style={{ padding: '0 16px' }}>
+                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>
+                      Your coverage is looking great! You're well protected
+                    </p>
+                    <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, padding: 16, marginBottom: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4 }}>Risk rating</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ fontSize: 17, color: '#55595b', lineHeight: 1.4 }}>Low</span>
+                          <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', height: 12, borderRadius: 99, overflow: 'hidden', marginBottom: 16 }}>
+                        <div style={{ flex: '0 0 15%', background: '#ffdc00' }}/>
+                        <div style={{ flex: '0 0 40%', background: '#7fd000' }}/>
+                        <div style={{ flex: '0 0 45%', background: '#008600' }}/>
+                      </div>
+                      <p style={{ fontSize: 17, lineHeight: 1.4 }}>
+                        You could save more with safe driving discounts.{' '}
+                        <span onClick={() => openChat && openChat('Learn more')} style={{ color: '#008600', fontWeight: 500, cursor: 'pointer' }}>Learn more</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Section divider */}
+                  <div style={{ height: 8, background: '#e9eef0' }}/>
+
+                  {/* Discover section */}
+                  <div style={{ padding: '32px 16px 0' }}>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Discover</p>
+                    <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>From monitoring to discounts</p>
+                    {[
+                      { title: 'Vehicle monitoring', desc: 'Market value, safety recalls, etc.', time: '1 min', btn: 'Add' },
+                      { title: 'Earn a lower rates', desc: 'Drive for ~30 days to see if you qualify for lower insurance rates', time: '30 days', btn: 'Start' },
+                    ].map((card, i) => (
+                      <div key={i} style={{ border: '1px solid #d9dfe2', borderRadius: 12, padding: 16, marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>{card.title}</p>
+                          <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginBottom: 8 }}>{card.desc}</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <img src="Assets/Clock icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
+                            <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>{card.time}</span>
+                          </div>
+                        </div>
+                        <button className="press-btn" style={{ height: 40, padding: '0 16px', borderRadius: 6, border: 'none', background: '#008600', color: '#fff', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>{card.btn}</button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : chip1 === 1 ? (
+                /* Claims */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Claims</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 32 }}>No claims filed across your connected policies.</p>
+                </div>
+              ) : (
+                /* Documents */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Documents</p>
+                  <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
+                    {[
+                      { name: 'Auto declarations page', date: 'Updated Dec 1, 2025', policy: 'Auto: 3228' },
+                      { name: 'Home declarations page', date: 'Updated Nov 15, 2025', policy: 'Home: 9899' },
+                      { name: 'Life policy summary', date: 'Updated Jan 3, 2026', policy: 'Life: 1954' },
+                      { name: 'Proof of insurance', date: 'Updated Dec 1, 2025', policy: 'Auto: 3228' },
+                    ].map((doc, i, arr) => (
+                      <div key={i} style={{ padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: i < arr.length - 1 ? '1px solid #d9dfe2' : 'none', cursor: 'pointer' }}>
+                        <div>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{doc.name}</p>
+                          <p style={{ fontSize: 13, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>{doc.policy} • {doc.date}</p>
+                        </div>
+                        <Icons.ChevronRight size={20} color="#55595b"/>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 32 }}>Showing 23 documents across your connected policies.</p>
+                </div>
+              )
+            ) : policyCount === 2 ? (
+              /* 2-POLICY STATE chip content */
+              chip1 === 0 ? (
+                /* All policies */
+                <>
+                  <div style={{ padding: '0 16px 8px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Summary</p>
+                    <Icons.Sparkle size={24} color="#55595b"/>
+                  </div>
+                  <div style={{ padding: '0 16px' }}>
+                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>
+                      Hey — I took a look at your policies and found a couple areas where you might be underprotected.
+                    </p>
+                    <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, padding: 16, marginBottom: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4 }}>Risk rating</span>
+                        <span style={{ fontSize: 17, color: '#55595b', lineHeight: 1.4 }}>Moderate</span>
+                      </div>
+                      <div style={{ position: 'relative', marginBottom: 4 }}>
+                        <div style={{ marginLeft: '32%' }}>
+                          <svg width="15" height="9" viewBox="0 0 15 9"><polygon points="7.5,9 0,0 15,0" fill="#000"/></svg>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', height: 12, borderRadius: 99, overflow: 'hidden', marginBottom: 16 }}>
+                        <div style={{ flex: '0 0 20%', background: '#ffdc00' }}/>
+                        <div style={{ flex: '0 0 55%', background: '#7fd000' }}/>
+                        <div style={{ flex: '0 0 25%', background: '#008600' }}/>
+                      </div>
+                      <p style={{ fontSize: 17, lineHeight: 1.4 }}>
+                        We spotted 1 gap in your coverage—want help fixing them?{' '}
+                        <span onClick={() => openChat && openChat('See what to do')} style={{ color: '#008600', fontWeight: 500, cursor: 'pointer' }}>See what to do</span>
+                      </p>
+                    </div>
+                    <div style={{ marginBottom: 16 }}>
+                      <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 12 }}>The biggest gaps are:</p>
+                      <ul style={{ marginLeft: 24, marginBottom: 12, listStyleType: 'disc' }}>
+                        <li style={{ fontSize: 17, lineHeight: 1.4 }}>Your liability coverage is lower than recommended for your profile</li>
+                      </ul>
+                      <p style={{ fontSize: 17, lineHeight: 1.4 }}>I can walk you through what each of these means and how to fix them. Where would you like to start?</p>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 32 }}>
+                      {['Assess my current policy', 'Explain liability coverage', 'Walk me through your plan'].map(text => (
+                        <button key={text} className="press-btn" onClick={() => openChat && openChat(text)} style={{
+                          background: '#008600', color: '#fff', border: 'none', borderRadius: 50,
+                          padding: '8px 16px', fontSize: 17, fontWeight: 400, cursor: 'pointer',
+                          fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.4, alignSelf: 'flex-start',
+                        }}>{text}</button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : chip1 === 1 ? (
+                /* Claims */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Claims</p>
+                  <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
+                    <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #d9dfe2' }}>
+                      <div>
+                        <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Windshield replacement</p>
+                        <p style={{ fontSize: 13, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>Auto: 3228 • Filed Jan 15, 2026</p>
+                      </div>
+                      <div style={{ background: '#e3f1e6', borderRadius: 6, padding: '2px 8px' }}>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: '#008600' }}>Resolved</span>
+                      </div>
+                    </div>
+                    <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Water damage — kitchen</p>
+                        <p style={{ fontSize: 13, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>Home: 9899 • Filed Mar 2, 2026</p>
+                      </div>
+                      <div style={{ background: '#ffc402', borderRadius: 6, padding: '2px 8px' }}>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: '#000' }}>In progress</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 32 }}>Showing 2 claims across your connected policies.</p>
+                </div>
+              ) : chip1 === 2 ? (
+                /* Documents */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Documents</p>
+                  <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
+                    {[
+                      { name: 'Auto declarations page', date: 'Updated Dec 1, 2025', policy: 'Auto: 3228' },
+                      { name: 'Home declarations page', date: 'Updated Nov 15, 2025', policy: 'Home: 9899' },
+                      { name: 'Proof of insurance', date: 'Updated Dec 1, 2025', policy: 'Auto: 3228' },
+                      { name: 'Home inventory', date: 'Uploaded Oct 3, 2025', policy: 'Home: 9899' },
+                    ].map((doc, i, arr) => (
+                      <div key={i} style={{ padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: i < arr.length - 1 ? '1px solid #d9dfe2' : 'none', cursor: 'pointer' }}>
+                        <div>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{doc.name}</p>
+                          <p style={{ fontSize: 13, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>{doc.policy} • {doc.date}</p>
+                        </div>
+                        <Icons.ChevronRight size={20} color="#55595b"/>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 32 }}>16 documents total across 2 policies.</p>
+                </div>
+              ) : (
+                /* Suggestions */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Suggestions</p>
+                  <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>Based on your profile and current coverage, here are some ways to improve your protection:</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+                    {[
+                      { title: 'Increase liability coverage', desc: 'Your current limits are below the recommended amount for your assets.' },
+                      { title: 'Bundle and save', desc: 'Switching both policies to one provider could save you up to $47/mo.' },
+                      { title: 'Add umbrella policy', desc: 'Extra liability protection beyond your auto and home limits.' },
+                    ].map((item, i) => (
+                      <div key={i} style={{ border: '1px solid #d9dfe2', borderRadius: 6, padding: 16, cursor: 'pointer' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{item.title}</p>
+                          <Icons.ChevronRight size={20} color="#008600"/>
+                        </div>
+                        <p style={{ fontSize: 15, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            ) : (
+              /* 1-POLICY STATE chip content */
+              chip1 === 0 ? (
+                /* Dashboard */
+                <>
+                  {/* Divider */}
+                  <div style={{ padding: '0 16px' }}>
+                    <div style={{ height: 1, background: '#d9dfe2' }}/>
+                  </div>
+                  {/* Dashboard key-value grid */}
+                  <div style={{ padding: '0 16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                      {/* Payment rating */}
+                      <div style={{ padding: '16px 16px 16px 0', borderRight: '1px solid #d9dfe2' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Payment rating</span>
+                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Fair</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                          <div style={{ paddingLeft: '55%' }}>
+                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
+                          </div>
+                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, background: '#c74900', borderRadius: '99px 0 0 99px' }}/>
+                            <div style={{ flex: 1, background: '#ffca00' }}/>
+                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
+                          </div>
+                        </div>
+                        <p onClick={() => openChat && openChat('See alternatives')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See alternatives</p>
+                      </div>
+                      {/* Coverage rating */}
+                      <div style={{ padding: '16px 0 16px 16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Coverage rating</span>
+                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Needs work</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                          <div style={{ paddingLeft: '12%' }}>
+                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
+                          </div>
+                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
+                            <div style={{ flex: 1, background: '#7fd000' }}/>
+                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
+                          </div>
+                        </div>
+                        <p onClick={() => openChat && openChat('See what you to do')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See what you to do</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section divider */}
+                  <div style={{ height: 8, background: '#e9eef0' }}/>
+
+                  {/* Savings opportunity */}
+                  <div style={{ padding: '32px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Savings opportunity</p>
+                      <Icons.Sparkle size={20} color="#55595b"/>
+                    </div>
+                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 8 }}>
+                      We've found savings for your 2008 Toyota 4Runner with comparable coverage
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 16 }}>
+                      <svg width="12" height="10" viewBox="0 0 12 10"><polygon points="6,10 0,0 12,0" fill="#008600"/></svg>
+                      <span style={{ fontSize: 15, fontWeight: 500, color: '#008600' }}>$50</span>
+                      <span style={{ fontSize: 15, color: '#55595b' }}>est monthly savings</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 4 }}>
+                      <div>
+                        <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4 }}>Current policy</p>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }}/>
+                        <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4 }}>GEICO</span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>$249.00/mo</p>
+                      <span style={{ fontSize: 17, color: '#55595b' }}>→</span>
+                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Est $199.00/mo</p>
+                    </div>
+                    <button className="press-btn" style={{
+                      width: '100%', height: 40, background: '#008600', color: '#fff', border: 'none',
+                      borderRadius: 50, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                    }}>See offer</button>
+                  </div>
+
+                  {/* Section divider */}
+                  <div style={{ height: 8, background: '#e9eef0' }}/>
+
+                  {/* Coverage recommendations */}
+                  <div style={{ padding: '32px 16px' }}>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Coverage recommendations</p>
+                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>
+                      There are a couple of areas where you might be underprotected.
+                    </p>
+                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 12 }}>The biggest gaps are:</p>
+                    <ul style={{ marginLeft: 24, marginBottom: 12, listStyleType: 'disc' }}>
+                      <li style={{ fontSize: 17, lineHeight: 1.4 }}>Your liability coverage is lower than recommended for your profile</li>
+                    </ul>
+                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>I can walk you through what each of these means and how to fix them. Where would you like to start?</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {['Walk me through what to do', 'Walk me through your plan', 'Explain'].map(text => (
+                        <button key={text} className="press-btn" onClick={() => openChat && openChat(text)} style={{
+                          background: '#008600', color: '#fff', border: 'none', borderRadius: 50,
+                          padding: '8px 16px', fontSize: 17, fontWeight: 400, cursor: 'pointer',
+                          fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.4,
+                        }}>{text}</button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : chip1 === 1 ? (
+                /* Drivers */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Drivers</p>
+                  <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
+                    {[
+                      { name: 'James Cunningham', role: 'Primary driver', age: 'Age 32' },
+                      { name: 'Sarah Cunningham', role: 'Secondary driver', age: 'Age 30' },
+                    ].map((driver, i, arr) => (
+                      <div key={i} style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 12, borderBottom: i < arr.length - 1 ? '1px solid #d9dfe2' : 'none' }}>
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#e3f1e6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span style={{ fontSize: 17, fontWeight: 700, color: '#008600' }}>{driver.name.charAt(0)}</span>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{driver.name}</p>
+                          <p style={{ fontSize: 13, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>{driver.role} • {driver.age}</p>
+                        </div>
+                        <Icons.ChevronRight size={20} color="#55595b"/>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : chip1 === 2 ? (
+                /* Vehicles */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Vehicles</p>
+                  <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
+                    {[
+                      { name: '2022 Toyota Camry', vin: 'VIN ••••7842', coverage: 'Comprehensive + Collision' },
+                      { name: '2020 Honda CR-V', vin: 'VIN ••••3195', coverage: 'Comprehensive + Collision' },
+                    ].map((vehicle, i, arr) => (
+                      <div key={i} style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 12, borderBottom: i < arr.length - 1 ? '1px solid #d9dfe2' : 'none' }}>
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <Icons.Car color="#55595b" size={20}/>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{vehicle.name}</p>
+                          <p style={{ fontSize: 13, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>{vehicle.vin} • {vehicle.coverage}</p>
+                        </div>
+                        <Icons.ChevronRight size={20} color="#55595b"/>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Documents */
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Documents</p>
+                  <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', marginBottom: 16 }}>
+                    {[
+                      { name: 'Declarations page', date: 'Updated Dec 1, 2025' },
+                      { name: 'Proof of insurance', date: 'Updated Dec 1, 2025' },
+                      { name: 'ID cards', date: 'Updated Dec 1, 2025' },
+                      { name: 'Billing statements', date: 'Updated Nov 15, 2025' },
+                    ].map((doc, i, arr) => (
+                      <div key={i} style={{ padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: i < arr.length - 1 ? '1px solid #d9dfe2' : 'none', cursor: 'pointer' }}>
+                        <div>
+                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{doc.name}</p>
+                          <p style={{ fontSize: 13, color: '#55595b', marginTop: 4, lineHeight: 1.4 }}>{doc.date}</p>
+                        </div>
+                        <Icons.ChevronRight size={20} color="#55595b"/>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 32 }}>8 documents connected to this policy.</p>
+                </div>
+              )
+            )}
+            </>
+            )}
+          </div>
+
+          <BottomTabBar/>
+        </div>
+      );
+    }
+
+    /* ─── SCREEN 2: Find a Policy ─── */
+    function FindPolicyScreen({ onTabChange, onCompare, chip2, setChip2 }) {
+      const chips = ['For you', 'Auto', 'Home', 'Life'];
+      return (
+        <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <StatusBar/>
+          <div style={{ padding: '0 16px 8px' }}>
+            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+          </div>
+          <TabGroup selected={1} onSelect={(i) => { if (i === 0) onTabChange('myPolicies'); if (i === 2) onTabChange('driveScore'); }}/>
+
+          <div className="scroll-content">
+            {/* Filter chips */}
+            <div className="h-scroll" style={{ display: 'flex', gap: 8, padding: '16px 16px 0' }}>
+              {chips.map((c, i) => (
+                <FilterChip key={c} label={c} selected={chip2 === i} onClick={() => setChip2(i)}
+                  icon={i === 0 ? <Icons.Sparkle size={18} color={chip2 === 0 ? '#008600' : '#6e7376'}/> : null}/>
+              ))}
+            </div>
+
+            {/* Recommended bundles */}
+            <div style={{ padding: '24px 16px 0' }}>
+              <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Recommended bundles</p>
+            </div>
+
+            {/* Bundle cards - horizontal scroll */}
+            <div className="h-scroll" style={{ display: 'grid', gridAutoFlow: 'column', gridAutoColumns: 'max-content', gap: 12, padding: '0 16px 24px', scrollSnapType: 'x mandatory', scrollPaddingLeft: 16, overflowX: 'auto' }}>
+              {/* Card 1 - GEICO bundle */}
+              <div style={{ width: 311, maxWidth: 311, background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12, padding: 16, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'inline-flex', alignSelf: 'flex-start', background: '#008600', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>
+                  Cheapest with similar coverage
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <GeicoLogoWide/>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icons.Car color="#55595b" size={20}/>
+                    </div>
+                    <span style={{ color: '#55595b', fontSize: 15, margin: '0 4px' }}>+</span>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icons.Home color="#55595b" size={20}/>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: 15, fontWeight: 500, color: '#55595b', lineHeight: 1.15 }}>Est mo payment</p>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>$356.56</p>
+                  <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>Includes both policies</p>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[
+                    'Unified billing — one simple monthly payment',
+                    'Multi-policy savings — automatic 25% discount applied',
+                    '24/7 concierge',
+                    '98% claims rating',
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      <div style={{ marginTop: 2, flexShrink: 0 }}><Icons.Check size={16}/></div>
+                      <span style={{ fontSize: 15, lineHeight: 1.4 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                  <button className="press-btn" onClick={onCompare} style={{
+                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    height: 40, borderRadius: 6, border: '2px solid #008600', background: 'transparent',
+                    color: '#008600', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                  }}>
+                    <Icons.Sparkle size={16} color="#008600"/>
+                    Compare
+                  </button>
+                  <button className="press-btn" style={{
+                    flex: 1, height: 40, borderRadius: 6, border: 'none', background: '#008600',
+                    color: '#fff', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                  }}>Continue</button>
+                </div>
+              </div>
+
+              {/* Card 2 - Peek card */}
+              <div style={{ width: 311, maxWidth: 311, background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12, padding: 16, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'inline-flex', alignSelf: 'flex-start', background: '#008600', color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>
+                  Also recommended
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <img src="Assets/Progressive.png" alt="Progressive" style={{ height: 20, objectFit: 'contain' }}/>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icons.Car color="#55595b" size={20}/>
+                    </div>
+                    <span style={{ color: '#55595b', fontSize: 15, margin: '0 4px' }}>+</span>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icons.Home color="#55595b" size={20}/>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: 15, fontWeight: 500, color: '#55595b', lineHeight: 1.15 }}>Est mo payment</p>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>$382.00</p>
+                  <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>Includes both policies</p>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {['Snapshot® safe driver discount', 'Name Your Price® tool', '24/7 support', '95% claims rating'].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      <div style={{ marginTop: 2, flexShrink: 0 }}><Icons.Check size={16}/></div>
+                      <span style={{ fontSize: 15, lineHeight: 1.4 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                  <button className="press-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, height: 40, borderRadius: 6, border: '2px solid #008600', background: 'transparent', color: '#008600', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <Icons.Sparkle size={16} color="#008600"/>Compare
+                  </button>
+                  <button className="press-btn" style={{ flex: 1, height: 40, borderRadius: 6, border: 'none', background: '#008600', color: '#fff', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div style={{ width: '100%', height: 8, background: '#e9eef0' }}/>
+
+            {/* Top auto insurance */}
+            <div style={{ padding: '24px 16px 0' }}>
+              <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Top auto insurance</p>
+              <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Based on your profile and coverage needs</p>
+            </div>
+
+            <div className="h-scroll" style={{ display: 'grid', gridAutoFlow: 'column', gridAutoColumns: 'max-content', gap: 12, padding: '0 16px 24px', scrollSnapType: 'x mandatory', scrollPaddingLeft: 16, overflowX: 'auto' }}>
+              {/* GEICO Auto card */}
+              <div style={{ width: 311, maxWidth: 311, background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12, padding: 16, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <GeicoLogoWide/>
+                <div style={{ display: 'flex', gap: 32 }}>
+                  <div>
+                    <p style={{ fontSize: 15, fontWeight: 500, color: '#55595b', lineHeight: 1.15, display: 'flex', alignItems: 'center', gap: 4 }}>Est mo payment <span style={{ width: 14, height: 14, borderRadius: '50%', border: '1px solid #c7cdd1', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#55595b' }}>i</span></p>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>$187.56</p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 15, fontWeight: 500, color: '#55595b', lineHeight: 1.15, display: 'flex', alignItems: 'center', gap: 4 }}>Coverage <span style={{ width: 14, height: 14, borderRadius: '50%', border: '1px solid #c7cdd1', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: '#55595b' }}>i</span></p>
+                    <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>Standard</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {['$50K/$100K liability limits', '$1K comprehensive and collision deductible'].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      <div style={{ marginTop: 2, flexShrink: 0 }}><Icons.Check size={16}/></div>
+                      <span style={{ fontSize: 15, lineHeight: 1.4 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>Estimated rate includes liability coverage based on your [Make, Model]. Comprehensive and collision is provided in most cases. Click "Continue" to learn more.</p>
+                <button className="press-btn" style={{
+                  width: '100%', height: 40, borderRadius: 6, border: 'none', background: '#008600',
+                  color: '#fff', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                }}>Continue</button>
+              </div>
+
+              {/* Peek card 2 */}
+              <div style={{ width: 311, maxWidth: 311, background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12, padding: 16, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <img src="Assets/Progressive.png" alt="Progressive" style={{ height: 20, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                <div style={{ display: 'flex', gap: 32 }}>
+                  <div>
+                    <p style={{ fontSize: 15, fontWeight: 500, color: '#55595b', lineHeight: 1.15 }}>Est mo payment</p>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>$195.00</p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 15, fontWeight: 500, color: '#55595b', lineHeight: 1.15 }}>Coverage</p>
+                    <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>Standard</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {['$50K/$100K liability limits', '$1K comprehensive and collision deductible'].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                      <div style={{ marginTop: 2, flexShrink: 0 }}><Icons.Check size={16}/></div>
+                      <span style={{ fontSize: 15, lineHeight: 1.4 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <button className="press-btn" style={{ width: '100%', height: 40, borderRadius: 6, border: 'none', background: '#008600', color: '#fff', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div style={{ width: '100%', height: 8, background: '#e9eef0' }}/>
+
+            {/* Top home insurance header */}
+            <div style={{ padding: '24px 16px 32px' }}>
+              <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Top home insurance</p>
+              <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Protect what matters most</p>
+            </div>
+          </div>
+
+          <BottomTabBar/>
+        </div>
+      );
+    }
+
+    /* ─── SCREEN 3: Policy Comparison ─── */
+    function ComparisonScreen({ onBack }) {
+      const autoRows = [
+        { label: 'Premium/mo', v1: '$162', v2: '$128', highlight: 2 },
+        { label: 'Deductible', v1: '$1,000', v2: '$1,000', highlight: 0 },
+        { label: 'Collision coverage limit', v1: '$100,000', v2: '$100,000', highlight: 0 },
+      ];
+      const homeRows = [
+        { label: 'Premium/mo', v1: '$120', v2: '$95', highlight: 2 },
+        { label: 'Deductible', v1: '$1,000', v2: '$2,500', highlight: 1 },
+        { label: 'Coverage limit', v1: '$300K', v2: '$450K', highlight: 2 },
+      ];
+
+      function TableRow({ label, v1, v2, highlight }) {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', borderTop: '1px solid #d9dfe2', minHeight: 53 }}>
+            <div style={{ flex: 1, padding: '16px 8px 16px 0' }}>
+              <span style={{ fontSize: 15, lineHeight: 1.4 }}>{label}</span>
+            </div>
+            <div style={{ flex: 1, textAlign: 'right', padding: '16px 8px' }}>
+              <span style={{ fontSize: 15, lineHeight: 1.4, fontWeight: highlight === 1 ? 700 : 400, color: highlight === 1 ? '#008600' : '#000' }}>{v1}</span>
+            </div>
+            <div style={{ flex: 1, textAlign: 'right', padding: '16px 8px' }}>
+              <span style={{ fontSize: 15, lineHeight: 1.4, fontWeight: highlight === 2 ? 700 : 400, color: highlight === 2 ? '#008600' : '#000' }}>{v2}</span>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="screen-root" style={{ position: 'relative', height: '100%' }}>
+          {/* Fixed bottom bar - absolutely positioned */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
+            background: '#fff',
+          }}>
+            <div style={{ padding: '8px 16px', borderTop: '1px solid #e9eef0' }}>
+              <ChatInputBar variant="comparison" placeholder="Ask anything"/>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8, paddingTop: 8 }}>
+              <div style={{ width: 139, height: 5, background: '#000', borderRadius: 100 }}/>
+            </div>
+          </div>
+
+          {/* Scrollable area with bottom padding to clear the fixed bar */}
+          <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch' }} className="scroll-content">
+            <StatusBar/>
+            {/* Header with back + menu */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 48 }}>
+              <button className="press-btn" onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                <Icons.ChevronLeft size={24}/>
+              </button>
+              <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                <Icons.Menu size={24}/>
+              </button>
+            </div>
+            <div style={{ padding: '0 16px' }}>
+              {/* Policy Pro badge */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#006a57', borderRadius: 50, padding: '3px 12px', marginBottom: 8 }}>
+                <span style={{ fontSize: 17, fontWeight: 500, color: '#fff', lineHeight: 1.15 }}>Policy Pro</span>
+                <Icons.Sparkle color="#fff" size={20}/>
+              </div>
+
+              {/* Title */}
+              <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>Policy comparison</p>
+
+              {/* Subtitle */}
+              <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 32, marginBottom: 8 }}>Liberty Mutual vs Geico bundle comparison</p>
+
+              {/* Summary */}
+              <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 24 }}>
+                Overall, Geico is the smart move because is has comparable coverage with lower cost.
+              </p>
+
+              {/* Brand logos */}
+              <div style={{ padding: '10px 0' }}>
+                {/* Table header with avatars */}
+                <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: 53 }}>
+                  <div style={{ flex: 1 }}/>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, padding: '16px 8px' }}>
+                    <LibertyMutualLogo size={32}/>
+                    <span style={{ fontSize: 15, fontWeight: 500, textAlign: 'right' }}>Liberty Mutual</span>
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, padding: '16px 8px' }}>
+                    <GeicoLogo size={32}/>
+                    <span style={{ fontSize: 15, fontWeight: 500, textAlign: 'right' }}>Geico</span>
+                  </div>
+                </div>
+
+                {/* Auto policy section */}
+                <div style={{ borderTop: '1px solid #d9dfe2', padding: '16px 0 8px' }}>
+                  <span style={{ fontSize: 15, fontWeight: 500 }}>Auto policy</span>
+                </div>
+                {autoRows.map((r, i) => <TableRow key={i} {...r}/>)}
+
+                {/* Home policy section */}
+                <div style={{ borderTop: '1px solid #d9dfe2', padding: '16px 0 8px' }}>
+                  <span style={{ fontSize: 15, fontWeight: 500 }}>Home policy</span>
+                </div>
+                {homeRows.map((r, i) => <TableRow key={i} {...r}/>)}
+              </div>
+
+              {/* Switch CTA card */}
+              <div style={{ background: '#f7f9fa', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', padding: 16, marginTop: 32, marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <GeicoLogo size={48}/>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#008600', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: -10, zIndex: 1 }}>
+                      <Icons.Car color="#fff" size={20}/>
+                    </div>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#008600', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icons.Home color="#fff" size={20}/>
+                    </div>
+                  </div>
+                </div>
+                <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Would you like to switch your home & auto bundle to Geico?</p>
+
+                {/* Pricing comparison */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                      <span style={{ fontSize: 15, fontWeight: 400, color: '#55595b' }}>Current policy</span>
+                    </div>
+                    <span style={{ fontSize: 17, fontWeight: 500 }}>$248.98/mo</span>
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 8px' }}>
+                    <div style={{ width: 40, borderTop: '2px dashed #c7cdd1' }}/>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end', marginBottom: 4 }}>
+                      <GeicoLogo size={16}/>
+                      <span style={{ fontSize: 15, fontWeight: 400, color: '#55595b' }}>GEICO</span>
+                    </div>
+                    <span style={{ fontSize: 17, fontWeight: 500 }}>Est $201.22/mo</span>
+                  </div>
+                </div>
+
+                <button className="press-btn" style={{
+                  width: '100%', height: 48, borderRadius: 6, border: 'none', background: '#008600',
+                  color: '#fff', fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}>
+                  <Icons.Lightning color="#fff" size={16}/>
+                  Switch and cancel
+                </button>
+                <button className="press-btn" style={{
+                  width: '100%', height: 40, background: 'transparent', border: 'none',
+                  color: '#008600', fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginTop: 8,
+                }}>No thanks</button>
+              </div>
+
+              {/* Suggestion pills */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24, marginTop: 16 }}>
+                {['Why is the deductible higher?', 'Tell me more', 'Why is bundling a good idea?'].map(text => (
+                  <button key={text} className="press-btn" style={{
+                    background: '#008600', color: '#fff', border: 'none', borderRadius: 50,
+                    padding: '8px 16px', fontSize: 17, fontWeight: 400, cursor: 'pointer',
+                    fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.4, alignSelf: 'flex-start',
+                  }}>{text}</button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ height: 24 }}/>
+            {/* Spacer to clear the fixed bottom bar */}
+            <div style={{ height: 100 }}/>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── SCREEN: Drive Score (placeholder) ─── */
+    function DriveScoreScreen({ onTabChange }) {
+      return (
+        <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <StatusBar/>
+          <div style={{ padding: '0 16px 8px' }}>
+            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+          </div>
+          <TabGroup selected={2} onSelect={(i) => { if (i === 0) onTabChange('myPolicies'); if (i === 1) onTabChange('findPolicy'); }}/>
+          <div className="scroll-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ padding: 32, textAlign: 'center' }}>
+              <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#e3f1e6', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <Icons.Car color="#008600" size={32}/>
+              </div>
+              <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>Drive score</p>
+              <p style={{ fontSize: 17, lineHeight: 1.4, color: '#55595b' }}>Coming soon</p>
+            </div>
+          </div>
+          <BottomTabBar/>
+        </div>
+      );
+    }
+
+    /* ─── Simulator Sidebar ─── */
+    function SimSidebar({ policyCount, setPolicyCount }) {
+      return (
+        <div className="sim-sidebar">
+          <div className="sim-sidebar-title">Settings</div>
+
+          <div className="sim-sidebar-section">Prototype</div>
+
+          <div className="sim-sidebar-label">Policies connected</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#008600' }}>{policyCount}</span>
+          </div>
+          <div style={{ display: 'flex', gap: 0, marginBottom: 24 }}>
+            {[0, 1, 2, 3].map(n => (
+              <button key={n} onClick={() => setPolicyCount(n)} style={{
+                flex: 1, height: 36, border: '1px solid #d9dfe2', background: policyCount === n ? '#008600' : '#fff',
+                color: policyCount === n ? '#fff' : '#000', fontSize: 14, fontWeight: 500, cursor: 'pointer',
+                fontFamily: 'inherit',
+                borderRadius: n === 0 ? '50px 0 0 50px' : n === 3 ? '0 50px 50px 0' : 0,
+                marginLeft: n > 0 ? -1 : 0,
+              }}>{n}</button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── Policy Pro Chat ─── */
+    const CHAT_RESPONSES = {
+      'Assess my current policy': { text: "I've reviewed your Liberty Mutual Auto policy (3228). Your coverage is solid overall, but I noticed your liability limits are below what I'd recommend for your profile. With 2 vehicles and 2 drivers, you may want higher protection.", pills: ['Increase liability', 'Compare rates', "What's my risk?"] },
+      'Explain liability coverage': { text: "Liability coverage protects you if you're at fault in an accident. It pays for the other person's medical bills and property damage. Your current limits are $50K/$100K — that means up to $50K per person and $100K per accident.", pills: ['What limits do I need?', 'How much more?', 'Show me options'] },
+      'Walk me through your plan': { text: "Here's what I'd recommend: First, let's increase your liability from $50K/$100K to $100K/$300K. This typically adds about $15-20/mo but significantly reduces your financial risk in a serious accident.", pills: ['Sounds good', 'Show me costs', 'Other options'] },
+      'Walk me through what to do': { text: "Let's start with the biggest gap — your liability coverage. Right now you have $50K/$100K, but based on your assets and profile, I'd recommend at least $100K/$300K. Want me to show you what that would cost?", pills: ['Yes, show costs', 'Why this amount?', 'Other gaps'] },
+      'See alternatives': { text: "I found 3 alternatives that could save you money with comparable coverage. GEICO offers the lowest rate at $199/mo vs your current $249/mo, with similar liability and comprehensive coverage.", pills: ['Compare GEICO', 'See all options', 'Keep current'] },
+      'See what you to do': { text: "Based on your coverage rating, here are the top actions to improve your protection: 1) Increase liability limits, 2) Add umbrella coverage, 3) Review your deductibles.", pills: ['Start with #1', 'Tell me more', 'See costs'] },
+      'Learn more': { text: "Safe driving discounts can reduce your premium by up to 25%. Programs like GEICO's DriveEasy or Progressive's Snapshot track your driving habits for 30 days and reward safe behavior.", pills: ['Sign me up', 'Which program?', 'How much savings?'] },
+      'Explain': { text: "Your coverage has two main areas that need attention: liability limits and gap coverage. Liability protects you from lawsuits after an accident, and gap coverage pays the difference if your car is totaled.", pills: ['Fix liability', 'What is gap?', 'Show costs'] },
+      'See what to do': { text: "Here are the top actions to improve your coverage: 1) Increase your liability limits to at least $100K/$300K, 2) Consider adding an umbrella policy for extra protection, 3) Review your deductibles — lowering them could save you in a claim.", pills: ['Start with #1', 'Tell me more', 'See costs'] },
+    };
+    const DEFAULT_RESPONSE = { text: "Great question! Let me look into that for you based on your connected policies. I can help with coverage questions, policy comparisons, savings opportunities, and more.", pills: ['See my coverage', 'Compare options', 'Find savings'] };
+    const FOLLOWUP_RESPONSE = { text: "I can help with that. Based on your current policies, here are some options I'd recommend exploring. Would you like me to go into detail on any of these?", pills: ['Yes, tell me more', 'Show me numbers', 'Go back'] };
+
+    function PolicyProChat({ chatContext, onBack }) {
+      const [messages, setMessages] = useState([]);
+      const [isTyping, setIsTyping] = useState(false);
+      const [inputVal, setInputVal] = useState('');
+      const scrollRef = useRef(null);
+      const initRef = useRef(false);
+
+      const scrollToBottom = () => {
+        if (scrollRef.current) {
+          setTimeout(() => { scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, 50);
+        }
+      };
+
+      const addAiResponse = (userText) => {
+        setIsTyping(true);
+        scrollToBottom();
+        setTimeout(() => {
+          const resp = CHAT_RESPONSES[userText] || DEFAULT_RESPONSE;
+          setMessages(prev => [...prev, { role: 'ai', text: resp.text, pills: resp.pills }]);
+          setIsTyping(false);
+          scrollToBottom();
+        }, 1200);
+      };
+
+      useEffect(() => {
+        if (chatContext && !initRef.current) {
+          initRef.current = true;
+          const msg = chatContext.initialMessage || 'Hi';
+          setMessages([{ role: 'user', text: msg }]);
+          setTimeout(() => addAiResponse(msg), 300);
+        }
+      }, [chatContext]);
+
+      const sendMessage = (text) => {
+        if (!text.trim()) return;
+        setMessages(prev => [...prev, { role: 'user', text: text.trim() }]);
+        setInputVal('');
+        scrollToBottom();
+        setTimeout(() => {
+          setIsTyping(true);
+          scrollToBottom();
+          setTimeout(() => {
+            const resp = CHAT_RESPONSES[text.trim()] || FOLLOWUP_RESPONSE;
+            setMessages(prev => [...prev, { role: 'ai', text: resp.text, pills: resp.pills }]);
+            setIsTyping(false);
+            scrollToBottom();
+          }, 1000);
+        }, 200);
+      };
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff' }}>
+          {/* Header */}
+          <div style={{ flexShrink: 0, background: '#006a57', padding: '0 16px', display: 'flex', flexDirection: 'column' }}>
+            <StatusBar/>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 12 }}>
+              <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.15 }}>Policy Pro</span>
+                <Icons.Sparkle color="#fff" size={20}/>
+              </div>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {messages.map((msg, i) => (
+              <div key={i} className="chat-bubble-in" style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                {msg.role === 'ai' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#006a57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <img src="Assets/ai-sparkles.png" alt="" style={{ width: 12, height: 12, objectFit: 'contain' }}/>
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#55595b' }}>Policy Pro</span>
+                  </div>
+                )}
+                <div style={{
+                  maxWidth: '85%',
+                  padding: '12px 16px',
+                  borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                  background: msg.role === 'user' ? '#008600' : '#f7f9fa',
+                  color: msg.role === 'user' ? '#fff' : '#000',
+                }}>
+                  <p style={{ fontSize: 15, lineHeight: 1.4 }}>{msg.text}</p>
+                </div>
+                {msg.pills && msg.role === 'ai' && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                    {msg.pills.map(pill => (
+                      <button key={pill} className="press-btn" onClick={() => sendMessage(pill)} style={{
+                        background: 'transparent', border: '1.5px solid #008600', borderRadius: 50,
+                        padding: '6px 14px', fontSize: 13, fontWeight: 500, color: '#008600',
+                        cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1.4,
+                      }}>{pill}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            {isTyping && (
+              <div className="chat-bubble-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#006a57', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src="Assets/ai-sparkles.png" alt="" style={{ width: 12, height: 12, objectFit: 'contain' }}/>
+                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#55595b' }}>Policy Pro</span>
+                </div>
+                <div style={{ padding: '12px 20px', borderRadius: '16px 16px 16px 4px', background: '#f7f9fa', display: 'flex', gap: 4 }}>
+                  <span className="typing-dot"/><span className="typing-dot"/><span className="typing-dot"/>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Input bar */}
+          <div style={{ flexShrink: 0, padding: '8px 16px 16px', borderTop: '1px solid #e9eef0', background: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}>
+                <Icons.Plus size={18} color="#55595b"/>
+              </div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1.5px solid #d9dfe2', borderRadius: 50, padding: '8px 12px', gap: 8 }}>
+                <input
+                  type="text" value={inputVal} onChange={e => setInputVal(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') sendMessage(inputVal); }}
+                  placeholder="Ask anything"
+                  style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 15, fontFamily: 'inherit', padding: 0 }}
+                />
+                <div onClick={() => sendMessage(inputVal)} style={{ width: 24, height: 24, flexShrink: 0, cursor: 'pointer' }}>
+                  <Icons.Send color="#008600"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── App ─── */
+    function App() {
+      const [screen, setScreen] = useState('myPolicies');
+      const [chip1, setChip1] = useState(0);
+      const [chip2, setChip2] = useState(0);
+      const [policyCount, setPolicyCount] = useState(1);
+      const [chatContext, setChatContext] = useState(null);
+      const [prevScreen, setPrevScreen] = useState('myPolicies');
+
+      const openChat = (message) => {
+        setPrevScreen(screen);
+        setChatContext({ initialMessage: message, id: Date.now() });
+        setScreen('chat');
+      };
+
+      const navTabs = ['My Policies', 'Find a Policy', 'Comparison'];
+
+      return (
+        <div className="sim-layout">
+          {/* Top nav bar */}
+          <div className="sim-topbar">
+            <div className="sim-topbar-logo">Show Code</div>
+            <div className="sim-topbar-tabs">
+              {navTabs.map(tab => (
+                <button key={tab} className={'sim-topbar-tab' + (
+                  (tab === 'My Policies' && screen === 'myPolicies') ||
+                  (tab === 'Find a Policy' && (screen === 'findPolicy' || screen === 'driveScore')) ||
+                  (tab === 'Comparison' && screen === 'comparison')
+                    ? ' active' : ''
+                )} onClick={() => {
+                  if (tab === 'My Policies') setScreen('myPolicies');
+                  if (tab === 'Find a Policy') setScreen('findPolicy');
+                  if (tab === 'Comparison') setScreen('comparison');
+                }}>{tab}</button>
+              ))}
+            </div>
+            <div className="sim-topbar-right">
+              <div className="sim-settings-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="#55595b" strokeWidth="1.5"/>
+                  <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="#55595b" strokeWidth="1.5"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Body: canvas + sidebar */}
+          <div className="sim-body">
+            <div className="sim-canvas">
+              <div className="phone-bezel">
+                <div className="phone-screen" style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', inset: 0, opacity: screen === 'myPolicies' ? 1 : 0, pointerEvents: screen === 'myPolicies' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
+                    <MyPoliciesScreen onTabChange={setScreen} chip1={chip1} setChip1={setChip1} policyCount={policyCount} openChat={openChat}/>
+                  </div>
+                  <div style={{ position: 'absolute', inset: 0, opacity: screen === 'findPolicy' ? 1 : 0, pointerEvents: screen === 'findPolicy' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
+                    <FindPolicyScreen onTabChange={setScreen} onCompare={() => setScreen('comparison')} chip2={chip2} setChip2={setChip2}/>
+                  </div>
+                  <div style={{ position: 'absolute', inset: 0, opacity: screen === 'comparison' ? 1 : 0, pointerEvents: screen === 'comparison' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
+                    <ComparisonScreen onBack={() => setScreen('findPolicy')}/>
+                  </div>
+                  <div style={{ position: 'absolute', inset: 0, opacity: screen === 'driveScore' ? 1 : 0, pointerEvents: screen === 'driveScore' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
+                    <DriveScoreScreen onTabChange={setScreen}/>
+                  </div>
+                  <div style={{ position: 'absolute', inset: 0, opacity: screen === 'chat' ? 1 : 0, pointerEvents: screen === 'chat' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
+                    {screen === 'chat' && <PolicyProChat key={chatContext?.id} chatContext={chatContext} onBack={() => setScreen(prevScreen)}/>}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <SimSidebar policyCount={policyCount} setPolicyCount={setPolicyCount}/>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App/>);
+  </script>
+</body>
+</html>
