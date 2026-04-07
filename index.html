@@ -267,6 +267,29 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .chat-bubble-in { animation: chatBubbleIn 300ms ease forwards; }
+
+    @keyframes cardExpand {
+      from { opacity: 0; transform: translateY(40px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .card-expand { animation: cardExpand 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+    .sidebar-overlay {
+      position: absolute; inset: 0; z-index: 50;
+      background: rgba(0,0,0,0.4);
+      opacity: 0; transition: opacity 300ms ease;
+      pointer-events: none;
+    }
+    .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .sidebar-panel {
+      position: absolute; top: 0; right: 0; bottom: 0; width: 80%;
+      background: #fff; z-index: 51;
+      transform: translateX(100%); transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      box-shadow: -4px 0 16px rgba(0,0,0,0.1);
+    }
+    .sidebar-panel.open { transform: translateX(0); }
   </style>
 </head>
 <body>
@@ -524,10 +547,18 @@
 
     /* ─── SCREEN 1: My Policies ─── */
     function MyPoliciesScreen({ onTabChange, chip1, setChip1, policyCount = 1, openChat }) {
+      const [expandedPolicy, setExpandedPolicy] = useState(null);
+
+      const policies3 = [
+        { name: 'Liberty Mutual auto: 3228', subtitle: '2 vehicles • 2 drivers', logo: 'liberty', grid: [{ key: '6 mo premium', value: '$1,134' }, { key: 'Next renewal', value: '36 days' }, { key: 'Status', value: 'Active' }, { key: 'Location', value: 'NC' }] },
+        { name: 'Geico home: 9899', subtitle: '1 home • dwelling coverage $455K', logo: 'geico', grid: [{ key: 'Annual premium', value: '$2,400' }, { key: 'Next renewal', value: '84 days' }, { key: 'Status', value: 'Active' }, { key: 'Coverage', value: '$455K' }] },
+        { name: 'State Farm life: 1954', subtitle: 'Up $1M coverage', logo: 'statefarm', grid: [{ key: 'Monthly premium', value: '$85' }, { key: 'Coverage', value: '$1M' }, { key: 'Status', value: 'Active' }, { key: 'Term', value: '20 years' }] },
+      ];
+
       const chips1 = ['Dashboard', 'Drivers', 'Vehicles', 'Documents'];
       const chips2 = ['All policies', 'Claims', 'Documents', 'Suggestions'];
       const chips3 = ['All policies', 'Claims', 'Documents'];
-      const chips = policyCount === 3 ? chips3 : policyCount === 2 ? chips2 : chips1;
+      const chips = (expandedPolicy !== null && policyCount >= 2) ? chips1 : policyCount === 3 ? chips3 : policyCount === 2 ? chips2 : chips1;
 
       return (
         <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -632,83 +663,179 @@
 
                 {policyCount === 3 ? (
                   <>
-                    {/* 3 stacked policy cards — wallet pattern */}
-                    <div style={{ padding: '16px 16px 0' }}>
-                      {/* Back card (Auto) — full rounded, bottom overlapped */}
-                      <div style={{ marginBottom: -29 }}>
-                        <div style={{
-                          background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12,
-                          height: 94, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-                        }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual auto: 3228</p>
-                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>2 vehicles • 2 drivers</p>
+                    {expandedPolicy === null ? (
+                      /* ── Wallet stack (collapsed) ── */
+                      <div style={{ padding: '16px 16px 0' }}>
+                        {/* Back card (Auto) */}
+                        <div style={{ marginBottom: -29, cursor: 'pointer' }} onClick={() => setExpandedPolicy(0)}>
+                          <div className="press-btn" style={{
+                            background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12,
+                            height: 94, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                          }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{policies3[0].name}</p>
+                              <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>{policies3[0].subtitle}</p>
+                            </div>
+                            <LibertyMutualLogo size={32}/>
                           </div>
-                          <LibertyMutualLogo size={32}/>
+                        </div>
+                        {/* Middle card (Home) */}
+                        <div style={{ marginBottom: -29, cursor: 'pointer' }} onClick={() => setExpandedPolicy(1)}>
+                          <div className="press-btn" style={{
+                            background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
+                            borderBottom: 'none', borderRadius: '12px 12px 0 0',
+                            padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                          }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{policies3[1].name}</p>
+                              <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>{policies3[1].subtitle}</p>
+                            </div>
+                            <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                          </div>
+                        </div>
+                        {/* Front card (Life) */}
+                        <div style={{ marginBottom: -29, cursor: 'pointer' }} onClick={() => setExpandedPolicy(2)}>
+                          <div className="press-btn" style={{
+                            background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
+                            borderBottom: 'none', borderRadius: '12px 12px 0 0',
+                            padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                          }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{policies3[2].name}</p>
+                              <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>{policies3[2].subtitle}</p>
+                            </div>
+                            <img src="Assets/State farm logo.png" alt="State Farm" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                          </div>
                         </div>
                       </div>
-                      {/* Middle card (Home) — rounded top, overlaps Auto */}
-                      <div style={{ marginBottom: -29 }}>
-                        <div style={{
-                          background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
-                          borderBottom: 'none', borderRadius: '12px 12px 0 0',
-                          padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-                        }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Geico home: 9899</p>
-                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>1 home • dwelling coverage $455K</p>
+                    ) : (
+                      /* ── Expanded single policy view ── */
+                      <div className="card-expand">
+                        {/* X close button — above card */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 0 8px' }}>
+                          <button onClick={() => { setExpandedPolicy(null); setChip1(0); }} style={{
+                            width: 32, height: 32, borderRadius: '50%', background: '#f7f9fa', border: '1px solid #d9dfe2',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                          }}>
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="#000" strokeWidth="2" strokeLinecap="round"/></svg>
+                          </button>
+                        </div>
+                        {/* Expanded card */}
+                        <div style={{ background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12, overflow: 'hidden' }}>
+                          {/* Header */}
+                          <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{policies3[expandedPolicy].name}</p>
+                              <p style={{ fontSize: 13, color: '#55595b', marginTop: 2, lineHeight: 1.4 }}>{policies3[expandedPolicy].subtitle}</p>
+                            </div>
+                            {expandedPolicy === 0 ? <LibertyMutualLogo size={32}/> :
+                             expandedPolicy === 1 ? <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/> :
+                             <img src="Assets/State farm logo.png" alt="State Farm" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>}
                           </div>
-                          <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                          {/* Key-value grid */}
+                          <div style={{ borderTop: '1px solid #e9eef0', padding: '0 16px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                              {policies3[expandedPolicy].grid.map((item, i) => (
+                                <div key={i} style={{
+                                  padding: '16px 16px 16px 0', display: 'flex', flexDirection: 'column', gap: 6,
+                                  borderBottom: i < 2 ? '1px solid #d9dfe2' : 'none',
+                                  borderRight: i % 2 === 0 ? '1px solid #d9dfe2' : 'none',
+                                  paddingLeft: i % 2 === 1 ? 16 : 0,
+                                }}>
+                                  <span style={{ fontSize: 15, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>{item.key}</span>
+                                  <span style={{ fontSize: 20, fontWeight: 700, color: '#000', lineHeight: 1.15 }}>{item.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          {/* See policy details */}
+                          <div style={{ borderTop: '1px solid #d9dfe2', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                            <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', lineHeight: 1.15 }}>See policy details</span>
+                            <Icons.ChevronRight size={20} color="#008600"/>
+                          </div>
                         </div>
                       </div>
-                      {/* Front card (Life) — rounded top, overlaps Home */}
-                      <div style={{ marginBottom: -29 }}>
-                        <div style={{
-                          background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
-                          borderBottom: 'none', borderRadius: '12px 12px 0 0',
-                          padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-                        }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>State Farm life: 1954</p>
-                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>Up $1M coverage</p>
-                          </div>
-                          <img src="Assets/State farm logo.png" alt="State Farm" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </>
                 ) : policyCount === 2 ? (
                   <>
-                    {/* 2 stacked policy cards — wallet pattern */}
-                    <div style={{ padding: '16px 16px 0' }}>
-                      {/* Back card (Auto) — full rounded card, bottom overlapped */}
-                      <div style={{ marginBottom: -29 }}>
-                        <div style={{
-                          background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12,
-                          height: 94, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-                        }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual Auto: 3228</p>
-                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>2 vehicles • 2 drivers</p>
+                    {expandedPolicy === null ? (
+                      /* ── 2-policy wallet stack (collapsed) ── */
+                      <div style={{ padding: '16px 16px 0' }}>
+                        {/* Back card (Auto) */}
+                        <div style={{ marginBottom: -29, cursor: 'pointer' }} onClick={() => setExpandedPolicy(0)}>
+                          <div className="press-btn" style={{
+                            background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12,
+                            height: 94, padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                          }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual Auto: 3228</p>
+                              <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>2 vehicles • 2 drivers</p>
+                            </div>
+                            <LibertyMutualLogo size={32}/>
                           </div>
-                          <LibertyMutualLogo size={32}/>
+                        </div>
+                        {/* Front card (Home) */}
+                        <div style={{ marginBottom: -29, cursor: 'pointer' }} onClick={() => setExpandedPolicy(1)}>
+                          <div className="press-btn" style={{
+                            background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
+                            borderBottom: 'none', borderRadius: '12px 12px 0 0',
+                            padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                          }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual Home: 9899</p>
+                              <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>1 home • dwelling coverage $455K</p>
+                            </div>
+                            <LibertyMutualLogo size={32}/>
+                          </div>
                         </div>
                       </div>
-                      {/* Front card (Home) — rounded top, no bottom border, overlaps back card */}
-                      <div style={{ marginBottom: -29 }}>
-                        <div style={{
-                          background: '#fff', borderTop: '1px solid #d9dfe2', borderLeft: '1px solid #d9dfe2', borderRight: '1px solid #d9dfe2',
-                          borderBottom: 'none', borderRadius: '12px 12px 0 0',
-                          padding: '16px 16px 37px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-                        }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Liberty Mutual Home: 9899</p>
-                            <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>1 home • dwelling coverage $455K</p>
+                    ) : (
+                      /* ── 2-policy expanded view ── */
+                      <div className="card-expand">
+                        {/* X close button — above card */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 16px 8px' }}>
+                          <button onClick={() => { setExpandedPolicy(null); setChip1(0); }} style={{
+                            width: 32, height: 32, borderRadius: '50%', background: '#f7f9fa', border: '1px solid #d9dfe2',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                          }}>
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="#000" strokeWidth="2" strokeLinecap="round"/></svg>
+                          </button>
+                        </div>
+                        {/* Expanded card */}
+                        <div style={{ background: '#fff', border: '1px solid #d9dfe2', borderRadius: 12, overflow: 'hidden' }}>
+                          <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{expandedPolicy === 0 ? 'Liberty Mutual Auto: 3228' : 'Liberty Mutual Home: 9899'}</p>
+                              <p style={{ fontSize: 13, color: '#55595b', marginTop: 2, lineHeight: 1.4 }}>{expandedPolicy === 0 ? '2 vehicles • 2 drivers' : '1 home • dwelling coverage $455K'}</p>
+                            </div>
+                            <LibertyMutualLogo size={32}/>
                           </div>
-                          <LibertyMutualLogo size={32}/>
+                          <div style={{ borderTop: '1px solid #e9eef0', padding: '0 16px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                              {(expandedPolicy === 0
+                                ? [{ key: '6 mo premium', value: '$1,134' }, { key: 'Next renewal', value: '36 days' }, { key: 'Status', value: 'Active' }, { key: 'Location', value: 'NC' }]
+                                : [{ key: 'Annual premium', value: '$2,760' }, { key: 'Next renewal', value: '120 days' }, { key: 'Status', value: 'Active' }, { key: 'Dwelling', value: '$455K' }]
+                              ).map((item, i) => (
+                                <div key={i} style={{
+                                  padding: '16px 16px 16px 0', display: 'flex', flexDirection: 'column', gap: 6,
+                                  borderBottom: i < 2 ? '1px solid #d9dfe2' : 'none',
+                                  borderRight: i % 2 === 0 ? '1px solid #d9dfe2' : 'none',
+                                  paddingLeft: i % 2 === 1 ? 16 : 0,
+                                }}>
+                                  <span style={{ fontSize: 15, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>{item.key}</span>
+                                  <span style={{ fontSize: 20, fontWeight: 700, color: '#000', lineHeight: 1.15 }}>{item.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div style={{ borderTop: '1px solid #d9dfe2', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                            <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', lineHeight: 1.15 }}>See policy details</span>
+                            <Icons.ChevronRight size={20} color="#008600"/>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </>
                 ) : (
                   <>
@@ -797,16 +924,79 @@
               {chips.map((c, i) => (
                 <FilterChip key={c} label={c} selected={chip1 === i} onClick={() => setChip1(i)}
                   icon={
-                    policyCount >= 2 && i === 0
+                    (policyCount >= 2 && expandedPolicy === null && i === 0)
                       ? <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5l5 5 5-5" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      : (policyCount < 2 && i === 0 ? <Icons.Sparkle size={20} color={chip1 === 0 ? '#008600' : '#6e7376'}/> : null)
+                      : ((policyCount < 2 || expandedPolicy !== null) && i === 0 ? <Icons.Sparkle size={20} color={chip1 === 0 ? '#008600' : '#6e7376'}/> : null)
                   }/>
               ))}
             </div>
 
             {/* ─── Filter Content Area ─── */}
-            {policyCount === 3 ? (
-              /* 3-POLICY STATE chip content */
+            {(policyCount === 3 && expandedPolicy !== null) ? (
+              /* 3-POLICY EXPANDED — show 1-policy style Dashboard content */
+              chip1 === 0 ? (
+                /* Dashboard — reuse 1-policy Dashboard content */
+                <>
+                  <div style={{ padding: '0 16px' }}>
+                    <div style={{ height: 1, background: '#d9dfe2' }}/>
+                  </div>
+                  <div style={{ padding: '0 16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                      <div style={{ padding: '16px 16px 16px 0', borderRight: '1px solid #d9dfe2' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Payment rating</span>
+                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Good</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                          <div style={{ paddingLeft: '65%' }}>
+                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
+                          </div>
+                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
+                            <div style={{ flex: 1, background: '#7fd000' }}/>
+                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
+                          </div>
+                        </div>
+                        <p style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See details</p>
+                      </div>
+                      <div style={{ padding: '16px 0 16px 16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Coverage rating</span>
+                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Good</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                          <div style={{ paddingLeft: '60%' }}>
+                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
+                          </div>
+                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
+                            <div style={{ flex: 1, background: '#7fd000' }}/>
+                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
+                          </div>
+                        </div>
+                        <p onClick={() => openChat && openChat('See what you to do')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See details</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : chip1 === 1 ? (
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Drivers</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Driver details for this policy.</p>
+                </div>
+              ) : chip1 === 2 ? (
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Vehicles</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Vehicle details for this policy.</p>
+                </div>
+              ) : (
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Documents</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Documents for this policy.</p>
+                </div>
+              )
+            ) : policyCount === 3 ? (
+              /* 3-POLICY STATE chip content (collapsed wallet) */
               chip1 === 0 ? (
                 /* All policies */
                 <>
@@ -892,8 +1082,70 @@
                   <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 32 }}>Showing 23 documents across your connected policies.</p>
                 </div>
               )
+            ) : (policyCount === 2 && expandedPolicy !== null) ? (
+              /* 2-POLICY EXPANDED — show 1-policy Dashboard */
+              chip1 === 0 ? (
+                <>
+                  <div style={{ padding: '0 16px' }}>
+                    <div style={{ height: 1, background: '#d9dfe2' }}/>
+                  </div>
+                  <div style={{ padding: '0 16px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                      <div style={{ padding: '16px 16px 16px 0', borderRight: '1px solid #d9dfe2' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Payment rating</span>
+                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Fair</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                          <div style={{ paddingLeft: '55%' }}>
+                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
+                          </div>
+                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, background: '#c74900', borderRadius: '99px 0 0 99px' }}/>
+                            <div style={{ flex: 1, background: '#ffca00' }}/>
+                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
+                          </div>
+                        </div>
+                        <p onClick={() => openChat && openChat('See alternatives')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See alternatives</p>
+                      </div>
+                      <div style={{ padding: '16px 0 16px 16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Coverage rating</span>
+                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Needs work</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                          <div style={{ paddingLeft: '12%' }}>
+                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
+                          </div>
+                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
+                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
+                            <div style={{ flex: 1, background: '#7fd000' }}/>
+                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
+                          </div>
+                        </div>
+                        <p onClick={() => openChat && openChat('See what you to do')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See what to do</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : chip1 === 1 ? (
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Drivers</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Driver details for this policy.</p>
+                </div>
+              ) : chip1 === 2 ? (
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Vehicles</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Vehicle details for this policy.</p>
+                </div>
+              ) : (
+                <div style={{ padding: '0 16px' }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Documents</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Documents for this policy.</p>
+                </div>
+              )
             ) : policyCount === 2 ? (
-              /* 2-POLICY STATE chip content */
+              /* 2-POLICY STATE chip content (collapsed wallet) */
               chip1 === 0 ? (
                 /* All policies */
                 <>
@@ -1621,23 +1873,74 @@
 
     /* ─── Policy Pro Chat ─── */
     const CHAT_RESPONSES = {
-      'Assess my current policy': { text: "I've reviewed your Liberty Mutual Auto policy (3228). Your coverage is solid overall, but I noticed your liability limits are below what I'd recommend for your profile. With 2 vehicles and 2 drivers, you may want higher protection.", pills: ['Increase liability', 'Compare rates', "What's my risk?"] },
-      'Explain liability coverage': { text: "Liability coverage protects you if you're at fault in an accident. It pays for the other person's medical bills and property damage. Your current limits are $50K/$100K — that means up to $50K per person and $100K per accident.", pills: ['What limits do I need?', 'How much more?', 'Show me options'] },
-      'Walk me through your plan': { text: "Here's what I'd recommend: First, let's increase your liability from $50K/$100K to $100K/$300K. This typically adds about $15-20/mo but significantly reduces your financial risk in a serious accident.", pills: ['Sounds good', 'Show me costs', 'Other options'] },
-      'Walk me through what to do': { text: "Let's start with the biggest gap — your liability coverage. Right now you have $50K/$100K, but based on your assets and profile, I'd recommend at least $100K/$300K. Want me to show you what that would cost?", pills: ['Yes, show costs', 'Why this amount?', 'Other gaps'] },
-      'See alternatives': { text: "I found 3 alternatives that could save you money with comparable coverage. GEICO offers the lowest rate at $199/mo vs your current $249/mo, with similar liability and comprehensive coverage.", pills: ['Compare GEICO', 'See all options', 'Keep current'] },
-      'See what you to do': { text: "Based on your coverage rating, here are the top actions to improve your protection: 1) Increase liability limits, 2) Add umbrella coverage, 3) Review your deductibles.", pills: ['Start with #1', 'Tell me more', 'See costs'] },
-      'Learn more': { text: "Safe driving discounts can reduce your premium by up to 25%. Programs like GEICO's DriveEasy or Progressive's Snapshot track your driving habits for 30 days and reward safe behavior.", pills: ['Sign me up', 'Which program?', 'How much savings?'] },
-      'Explain': { text: "Your coverage has two main areas that need attention: liability limits and gap coverage. Liability protects you from lawsuits after an accident, and gap coverage pays the difference if your car is totaled.", pills: ['Fix liability', 'What is gap?', 'Show costs'] },
-      'See what to do': { text: "Here are the top actions to improve your coverage: 1) Increase your liability limits to at least $100K/$300K, 2) Consider adding an umbrella policy for extra protection, 3) Review your deductibles — lowering them could save you in a claim.", pills: ['Start with #1', 'Tell me more', 'See costs'] },
+      /* ── Primary entry points ── */
+      'Assess my current policy': { text: "I've pulled up your Liberty Mutual Auto policy (3228). Here's a quick snapshot:\n\n• Payment rating: Fair\n• Coverage rating: Needs work\n• Premium: $189/mo\n• Deductible: $1,000\n\nYour liability limits ($50K/$100K) are below what I'd recommend for your profile. This is your biggest gap right now.", pills: ['What should my limits be?', 'How do recent changes affect me?', 'Compare rates'] },
+      'Explain liability coverage': { text: "Liability coverage has two parts:\n\n1. Bodily injury — pays for the other person's medical bills if you cause an accident\n2. Property damage — pays for damage to their car or property\n\nYour current limits: $50K per person / $100K per accident. The average lawsuit settlement in NC is $85K, so you'd be personally responsible for anything above your limits.", pills: ['What limits do I need?', 'What is an umbrella policy?', 'How much would it cost?'] },
+      'Walk me through your plan': { text: "Here's my 3-step plan to strengthen your coverage:\n\n1️⃣ Increase liability to $100K/$300K (+$18/mo)\n2️⃣ Add umbrella policy for $1M extra protection (+$22/mo)\n3️⃣ Lower your deductible from $1,000 to $500 (+$8/mo)\n\nTotal impact: ~$48/mo more, but significantly better protection. Want to start with step 1?", pills: ['Start with step 1', 'Show me the top offer', 'Is it worth it?'] },
+      'Walk me through what to do': { sequence: [
+        { text: "Sure thing! Let me pull up your coverage details and walk you through everything." },
+        { text: "Here's an overview of your current situation:\n\n📋 Liberty Mutual Auto: 3228\n• Payment rating: ⚠️ Expensive\n• Coverage rating: ⚠️ Needs work\n• Premium: $249/mo\n• 2 vehicles • 2 drivers" },
+        { text: "💰 What you're paying\n\nYou're currently paying $249/mo. That's in the top 30% for your profile in NC. Similar drivers are paying $185-$215/mo for comparable or better coverage." },
+        { text: "⚠️ Your liability limits are way too low\n\nYou currently have:\n• Bodily injury: $50K/$100K\n• Property damage: $50K\n\nThis is the minimum for NC — but for someone with your assets, this leaves you exposed. A single accident lawsuit could exceed your limits by $200K+." },
+        { text: "🛡️ What someone like you should actually carry\n\n• Bodily injury: $100K/$300K\n• Property damage: $100K\n• Umbrella: $1M\n\nThis protects your home equity (~$180K) and savings (~$50K). The total cost increase is about $40/mo — but it protects $275K in assets." },
+        { text: "📊 Your deductibles\n\nCurrent: $1,000 comprehensive / $1,000 collision\n\nThis is reasonable. If you want lower out-of-pocket costs per claim, you could drop to $500 for about $8/mo more. But your current deductibles are fine for now." },
+        { text: "✅ Recommended next steps\n\n1. Increase liability to 100/300/100 — this is urgent\n2. Add $1M umbrella policy — best value protection\n3. Shop rates — you're likely overpaying by $35-50/mo\n\nThe fastest way to fix all of this? Switch to GEICO at $199/mo with 100/300 liability already included. You'd get better coverage AND save $50/mo.", pills: ['Confirm this change', 'Show me the GEICO offer', 'I have questions'] },
+      ]},
+      'See alternatives': { text: "I found 3 alternatives with comparable coverage that could save you money:\n\n🏆 GEICO — $199/mo (save $50)\n   Similar liability + comprehensive\n\n📊 Progressive — $215/mo (save $34)\n   Includes Snapshot discount potential\n\n🛡️ State Farm — $228/mo (save $21)\n   Best claims satisfaction rating\n\nAll include matching or better liability limits.", pills: ['Tell me more about GEICO', 'Compare all side by side', 'Keep my current policy'] },
+      'See what you to do': { text: "Based on your coverage rating of \"Needs work\", here are the top 3 actions ranked by impact:\n\n1. Increase liability limits — biggest risk reduction\n2. Add umbrella coverage — protects assets beyond auto limits\n3. Review deductibles — lower out-of-pocket in a claim\n\nWhich would you like to explore first?", pills: ['Start with liability', 'Tell me about umbrella', 'Review deductibles'] },
+      'Learn more': { text: "Safe driving programs can reduce your premium by 10-25%. Here's how they work:\n\n📱 You install an app or plug-in device\n⏱️ It monitors driving for 30-90 days\n📉 Safe habits = lower rates\n\nPrograms available to you:\n• GEICO DriveEasy — up to 25% off\n• Progressive Snapshot — up to 20% off\n• State Farm Drive Safe — up to 15% off", pills: ['Sign up for DriveEasy', 'How is driving scored?', 'What if I drive poorly?'] },
+      'Explain': { text: "Your coverage has two areas that need attention:\n\n⚠️ Liability limits ($50K/$100K)\nThis protects you from lawsuits after an at-fault accident. Your current limits are below the recommended minimums for NC homeowners.\n\n⚠️ No umbrella policy\nAn umbrella extends your liability protection beyond your auto and home policies — usually $1-5M in additional coverage for $15-30/mo.", pills: ['Fix liability first', 'What is umbrella coverage?', 'Show me the costs'] },
+      'See what to do': { text: "Here are the top actions to improve your coverage, ranked by impact:\n\n1. Increase liability to $100K/$300K — closes your biggest gap\n2. Add $1M umbrella policy — protects your assets\n3. Lower deductible to $500 — reduces out-of-pocket costs\n\nTotal estimated impact: +$48/mo for significantly better protection.", pills: ['Start with #1', 'Is it worth the cost?', 'Show me alternatives'] },
+
+      /* ── Deep conversation follow-ups ── */
+      'What should my limits be?': { text: "For your profile (homeowner, 2 vehicles, NC), I'd recommend:\n\n• Bodily injury: $100K per person / $300K per accident\n• Property damage: $100K\n\nThis is the \"100/300/100\" standard that most financial advisors recommend. It costs about $18/mo more than your current plan.", pills: ['Update my limits', 'Show me the top offer', 'What about umbrella?'] },
+      'How do recent changes affect me?': { text: "Recent changes that may affect your policy:\n\n📈 NC average premiums rose 8% this year\n🏠 Your home value increased ~$45K since last renewal\n🚗 Your 2022 Camry depreciated, which could lower comp/collision needs\n\nThe good news: your clean driving record qualifies you for discounts with several carriers.", pills: ['Get deeper insights', 'See top offer', 'Review my full coverage'] },
+      'Compare rates': { text: "Here's how your current rate compares to what's available:\n\n📊 Your current: $249/mo (Liberty Mutual)\n\n🏆 Best rate found:\n   GEICO — $199/mo\n   Same coverage, $50/mo savings\n   $600/year back in your pocket\n\n📈 Best value:\n   Progressive — $215/mo\n   Includes Snapshot safe driver discount potential\n   Could drop to $172/mo with good driving", pills: ['Switch to GEICO', 'Try Progressive Snapshot', 'Why is mine higher?'] },
+      'Yes, show costs': { text: "Here's what increased coverage would cost:\n\n📋 Current plan: $249/mo\n   $50K/$100K liability, $1K deductible\n\n⬆️ Recommended plan: $267/mo (+$18)\n   $100K/$300K liability, $1K deductible\n\n🛡️ Premium plan: $289/mo (+$40)\n   $100K/$300K liability, $500 deductible\n   + $1M umbrella policy\n\nThe premium plan gives you the best protection for about $1.30/day more.", pills: ['Go with recommended', 'Go with premium', 'Can I save elsewhere?'] },
+      'Why this amount?': { text: "Here's why $100K/$300K is the sweet spot:\n\n💰 The average auto injury claim in NC is $85K\n⚖️ If you're sued and lose, you pay the difference above your limits\n🏠 As a homeowner, your house could be at risk in a judgment\n📊 92% of claims are fully covered at 100/300 limits\n\nThink of it as protecting your biggest asset (your home) for $18/mo.", pills: ['That makes sense, update it', 'What about umbrella on top?', 'Show me alternatives'] },
+      'What about other gaps?': { text: "Beyond liability, here are your other coverage gaps:\n\n🔍 Gap coverage: Not included\n   If your car is totaled, gap covers the difference between what insurance pays and what you owe\n\n🏥 Medical payments: $5K (low)\n   Consider increasing to $25K for better protection\n\n🚗 Rental reimbursement: Not included\n   Covers a rental car while yours is being repaired (~$5/mo)", pills: ['Add gap coverage', 'Increase medical payments', 'Go back to liability'] },
+
+      /* ── Rate comparison deep dives ── */
+      'Tell me more about GEICO': { text: "Here's the full GEICO comparison:\n\n🏆 GEICO Auto — $199/mo\n\n✅ $100K/$300K liability (upgrade!)\n✅ $500 deductible (lower!)\n✅ Comprehensive + collision\n✅ 24/7 claims support\n✅ Mobile app with ID cards\n\n💰 Savings vs current: $50/mo ($600/year)\n📊 Claims satisfaction: 4.2/5 stars\n\nGEICO also offers a multi-policy discount if you bundle home insurance.", pills: ['Start the switch', 'Compare side by side', 'What about Progressive?'] },
+      'Compare all side by side': { text: "Side-by-side comparison:\n\n             Current  |  GEICO  |  Progressive\nMonthly:    $249     |  $199   |  $215\nLiability:  50/100   |  100/300|  100/300\nDeductible: $1,000   |  $500   |  $750\nClaims:     4.0⭐    |  4.2⭐  |  4.1⭐\nDiscount:   —        |  Multi  |  Snapshot\n\nBest price: GEICO\nBest potential: Progressive (with Snapshot)", pills: ['Go with GEICO', 'Try Progressive', 'Keep current for now'] },
+      'Switch to GEICO': { text: "Great choice! Here's what happens next:\n\n1️⃣ I'll help you start the GEICO application\n2️⃣ Your driving history transfers automatically\n3️⃣ New policy starts when current one ends\n4️⃣ Liberty Mutual cancellation is handled for you\n\n⚠️ Important: Don't cancel your current policy until the new one is active.\n\nReady to begin?", pills: ['Yes, start application', 'I need more time', 'Any other questions'] },
+
+      /* ── Coverage education ── */
+      'What limits do I need?': { text: "Here's a simple rule of thumb:\n\n📏 Your liability limits should cover your total assets\n\nYour estimated assets:\n🏠 Home equity: ~$180K\n💰 Savings/investments: ~$50K\n🚗 Vehicles: ~$45K\nTotal: ~$275K\n\nThat's why I recommend $100K/$300K auto liability PLUS a $1M umbrella policy. This protects everything you've built.", pills: ['Update my liability', 'Add umbrella coverage', 'What if I rent instead?'] },
+      'What is an umbrella policy?': { text: "An umbrella policy is like an extra layer of protection on top of your auto and home insurance.\n\n☂️ How it works:\n• Kicks in after your auto/home liability is maxed out\n• Covers lawsuits, libel, and some things other policies don't\n• Usually $1M-$5M in additional coverage\n\n💰 Cost: $15-30/mo for $1M\n\nExample: You cause a $400K accident. Your auto pays $300K, umbrella covers the remaining $100K. Without it, you pay that $100K yourself.", pills: ['Add umbrella coverage', 'How much does it cost?', 'Do I really need it?'] },
+      'How much would it cost?': { text: "Here's the cost breakdown for recommended upgrades:\n\n📊 Liability upgrade ($50K→$100K/$300K)\n   +$18/mo\n\n☂️ Umbrella policy ($1M)\n   +$22/mo\n\n📉 Lower deductible ($1K→$500)\n   +$8/mo\n\nTotal: +$48/mo ($537/mo vs current $489/mo)\n\nBut if you switch to GEICO with these upgrades, you'd actually pay $247/mo — saving $2/mo while getting BETTER coverage.", pills: ['Switch to GEICO', 'Just upgrade current policy', 'Let me think about it'] },
+
+      /* ── Deductible & other topics ── */
+      'Review deductibles': { text: "Your current deductible is $1,000. Here's what that means:\n\n💵 Deductible = what you pay before insurance kicks in\n\nIf you lower it to $500:\n• You pay $500 less out of pocket per claim\n• Monthly premium increases ~$8\n• Break-even: one claim every 5 years\n\nIf you raise it to $2,000:\n• You save ~$12/mo on premiums\n• But pay $1,000 more per claim\n• Only worth it if you rarely file claims", pills: ['Lower to $500', 'Keep at $1,000', 'What about my home deductible?'] },
+      'Start with liability': { text: "Smart choice — liability is your biggest gap.\n\nHere's the upgrade path:\n\n📋 Current: $50K per person / $100K per accident\n⬆️ Recommended: $100K per person / $300K per accident\n\n💰 Additional cost: ~$18/mo\n🛡️ Protection increase: 3x more coverage\n\nThis single change moves your coverage rating from \"Needs work\" to \"Fair\". Want me to start the update?", pills: ['Yes, update my limits', 'Show me the savings if I switch carriers', 'What else should I fix?'] },
+      'Tell me about umbrella': { text: "An umbrella policy is your best value for protection:\n\n☂️ $1M umbrella policy\n• Cost: ~$22/mo ($264/year)\n• Covers: auto + home + personal liability\n• Protects against lawsuits exceeding your other policies\n\n🏠 Example scenarios it covers:\n• Dog bites a neighbor\n• Guest injured at your home\n• Major car accident exceeding auto limits\n• Social media defamation claim\n\nIt's the single best way to protect your assets.", pills: ['Add umbrella now', 'How does it work with auto?', 'Is $1M enough?'] },
+
+      /* ── Wrap-up responses ── */
+      'Start with step 1': { text: "Let's increase your liability to $100K/$300K.\n\nI can help you do this two ways:\n\n1️⃣ Update with Liberty Mutual directly\n   • Call: 1-800-290-8711\n   • Or update in their app\n   • Cost: +$18/mo\n\n2️⃣ Switch to GEICO (recommended)\n   • Get 100/300 included at $199/mo\n   • That's $50/mo LESS than you pay now\n   • Better coverage for less money\n\nWhich would you prefer?", pills: ['Switch to GEICO', 'Update with Liberty Mutual', 'I need to think about it'] },
+      'Show me the top offer': { text: "🏆 Top offer for your profile:\n\nGEICO Auto Insurance\n$199/mo (save $50/mo vs current)\n\n✅ $100K/$300K liability\n✅ $500 deductible\n✅ Comprehensive + collision\n✅ Roadside assistance included\n✅ Multi-policy discount available\n\n💰 Annual savings: $600\n📊 Claims rating: 4.2/5\n\nThis gives you better coverage at a lower price.", pills: ['Start the switch', 'Any catches?', 'Compare with Progressive'] },
+      'Is it worth it?': { text: "Let me put it in perspective:\n\n💰 Cost of upgrading: ~$48/mo ($576/year)\n\n⚖️ Cost of NOT upgrading:\n• Average at-fault accident claim: $85K\n• Your current max payout: $100K\n• Potential out-of-pocket: $35K+\n• Could lose your home in a lawsuit\n\n📊 The math:\n$576/year in premiums vs $35,000+ risk\nThat's 1.6% of your potential exposure\n\nMost financial advisors call this a no-brainer.", pills: ['You convinced me, upgrade', 'Show me the cheapest option', 'What are the odds of needing it?'] },
+      'Get deeper insights': { text: "Here's a deeper look at how recent changes affect your policy:\n\n📈 Market trends:\n• NC auto premiums up 8.2% this year\n• Your carrier increased rates 12% (above average)\n• Competitors averaged only 5-6% increases\n\n🚗 Your driving profile:\n• Clean record (3 years)\n• Low mileage (~8K mi/year)\n• Qualifies for safe driver discounts\n\n💡 Insight: You're overpaying relative to your risk profile. Carriers like GEICO and Progressive would likely offer better rates.", pills: ['See best rates for me', 'Why is Liberty Mutual more expensive?', 'How is my driving scored?'] },
+
+      /* ── Generic follow-ups ── */
+      'Confirm this change': { sequence: [
+        { text: "✅ Change complete!\n\nI've submitted the request to update your liability limits to $100K/$300K with Liberty Mutual.\n\n📋 Summary:\n• Old limits: $50K/$100K\n• New limits: $100K/$300K\n• Additional cost: ~$18/mo\n• Effective: Next billing cycle" },
+        { text: "Your coverage rating just improved from \"Needs work\" to \"Fair\" 🎉\n\nWhat would you like to do next?", pills: ['Add umbrella coverage', 'Shop for better rates', 'I\'m done for now'] },
+      ]},
+      'Show me the GEICO offer': { text: "🏆 GEICO Auto — $199/mo\n\nHere's what you'd get:\n✅ $100K/$300K liability (3x your current!)\n✅ $500 deductible ($500 lower!)\n✅ Comprehensive + collision\n✅ Roadside assistance\n✅ Rental reimbursement\n\n💰 vs your current Liberty Mutual:\n• Save $50/mo ($600/year)\n• Better liability coverage\n• Lower deductible\n• More included features\n\nThis is genuinely a better deal in every way.", pills: ['Switch to GEICO', 'Any downsides?', 'Compare with Progressive'] },
+      'I have questions': { text: "Of course! Here are the most common questions people have at this stage:\n\n❓ Will I have a gap in coverage?\n   No — new policy starts the day old one ends\n\n❓ Is switching complicated?\n   GEICO handles most of the paperwork\n\n❓ What about my clean driving discount?\n   It transfers to your new carrier\n\n❓ Can I switch back?\n   Yes, anytime — no lock-in period\n\nWhat else would you like to know?", pills: ['I\'m ready to switch', 'What about my home policy?', 'Go back to the plan'] },
+      'I\'m done for now': { text: "Sounds good! Here's a summary of what we covered today:\n\n✅ Completed:\n• Updated liability to $100K/$300K\n\n📋 Still recommended:\n• Add $1M umbrella policy (~$22/mo)\n• Shop rates — GEICO could save you $50/mo\n\nI'll be here whenever you want to continue. Just tap the chat or ask me anything!", pills: ['Thanks!', 'Actually, one more thing'] },
+      'I need more time': { text: "No rush at all! Here's a quick summary you can come back to:\n\n📋 Your action items:\n1. Consider increasing liability to 100/300\n2. Look into GEICO for potential $600/year savings\n3. Think about umbrella coverage for asset protection\n\nI'll be here whenever you're ready. You can also ask me anything else about your coverage anytime.", pills: ['Thanks, go back', 'Actually, one more question', 'Set a reminder'] },
+      'Any other questions': { text: "I'm here to help! Common things people ask about:\n\n• 🚗 How to read their policy\n• 💰 Ways to lower premiums\n• 🛡️ What's covered vs what's not\n• 📋 How to file a claim\n• 🔄 Switching carriers safely\n\nWhat would you like to know?", pills: ['How do I read my policy?', 'Ways to lower premiums', 'How to file a claim'] },
+      'How is driving scored?': { text: "Safe driving programs score you on:\n\n📱 Hard braking — sudden stops (biggest factor)\n🔄 Sharp turns — aggressive cornering\n📱 Phone usage — distracted driving detection\n⏰ Time of day — late night driving is riskier\n🚗 Speed — consistently going over the limit\n\n💡 Tips for a great score:\n• Leave extra following distance\n• Put your phone in Do Not Disturb\n• Avoid driving between midnight-4am\n• Use cruise control on highways", pills: ['Sign up for a program', 'What if my score is bad?', 'Go back to coverage'] },
     };
-    const DEFAULT_RESPONSE = { text: "Great question! Let me look into that for you based on your connected policies. I can help with coverage questions, policy comparisons, savings opportunities, and more.", pills: ['See my coverage', 'Compare options', 'Find savings'] };
-    const FOLLOWUP_RESPONSE = { text: "I can help with that. Based on your current policies, here are some options I'd recommend exploring. Would you like me to go into detail on any of these?", pills: ['Yes, tell me more', 'Show me numbers', 'Go back'] };
+    const DEFAULT_RESPONSE = { text: "Great question! Let me look into that based on your connected policies.\n\nI can help with:\n• 📋 Policy reviews and coverage gaps\n• 💰 Rate comparisons and savings\n• 📖 Insurance terms explained simply\n• 🔄 Switching carriers safely\n\nWhat would you like to explore?", pills: ['Review my coverage', 'Find savings', 'Explain something'] };
+    const FOLLOWUP_RESPONSE = { text: "I can help with that! Based on your current policies and profile, here are some directions we could go:\n\n• Review your coverage gaps and fix them\n• Compare rates to find savings\n• Understand your policy details better\n\nWhat interests you most?", pills: ['Review coverage gaps', 'Compare rates', 'Explain my policy'] };
 
     function PolicyProChat({ chatContext, onBack }) {
       const [messages, setMessages] = useState([]);
       const [isTyping, setIsTyping] = useState(false);
       const [inputVal, setInputVal] = useState('');
+      const [sidebarOpen, setSidebarOpen] = useState(false);
       const scrollRef = useRef(null);
       const initRef = useRef(false);
 
@@ -1648,14 +1951,30 @@
       };
 
       const addAiResponse = (userText) => {
-        setIsTyping(true);
-        scrollToBottom();
-        setTimeout(() => {
-          const resp = CHAT_RESPONSES[userText] || DEFAULT_RESPONSE;
-          setMessages(prev => [...prev, { role: 'ai', text: resp.text, pills: resp.pills }]);
-          setIsTyping(false);
+        const resp = CHAT_RESPONSES[userText] || DEFAULT_RESPONSE;
+        if (resp.sequence) {
+          // Multi-message sequence — deliver messages one by one
+          let delay = 0;
+          resp.sequence.forEach((msg, i) => {
+            delay += (i === 0 ? 800 : 1200);
+            const d = delay;
+            setTimeout(() => { setIsTyping(true); scrollToBottom(); }, d - 800);
+            setTimeout(() => {
+              setMessages(prev => [...prev, { role: 'ai', text: msg.text, pills: msg.pills }]);
+              if (i === resp.sequence.length - 1) setIsTyping(false);
+              scrollToBottom();
+            }, d);
+          });
+        } else {
+          // Single message
+          setIsTyping(true);
           scrollToBottom();
-        }, 1200);
+          setTimeout(() => {
+            setMessages(prev => [...prev, { role: 'ai', text: resp.text, pills: resp.pills }]);
+            setIsTyping(false);
+            scrollToBottom();
+          }, 1200);
+        }
       };
 
       useEffect(() => {
@@ -1685,18 +2004,58 @@
       };
 
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', position: 'relative', overflow: 'hidden' }}>
           {/* Header */}
-          <div style={{ flexShrink: 0, background: '#006a57', padding: '0 16px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flexShrink: 0, background: '#fff', padding: '0 16px', display: 'flex', flexDirection: 'column', borderBottom: '1px solid #d9dfe2' }}>
             <StatusBar/>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 12 }}>
               <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <img src="Assets/BACK.png" alt="Back" style={{ width: 24, height: 24, objectFit: 'contain' }}/>
               </button>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.15 }}>Policy Pro</span>
-                <Icons.Sparkle color="#fff" size={20}/>
+                <span style={{ fontSize: 20, fontWeight: 700, color: '#000', lineHeight: 1.15 }}>Policy Pro</span>
+                <img src="Assets/ai-sparkles-1.png" alt="" style={{ width: 20, height: 20, objectFit: 'contain' }}/>
               </div>
+              <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+                <img src="Assets/MENU.png" alt="Menu" style={{ width: 24, height: 24, objectFit: 'contain' }}/>
+              </button>
+            </div>
+          </div>
+
+          {/* Sidebar overlay + panel */}
+          <div className={'sidebar-overlay' + (sidebarOpen ? ' open' : '')} onClick={() => setSidebarOpen(false)}/>
+          <div className={'sidebar-panel' + (sidebarOpen ? ' open' : '')}>
+            <div style={{ padding: '16px', borderBottom: '1px solid #d9dfe2', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 20, fontWeight: 700 }}>Conversations</span>
+              <button onClick={() => setSidebarOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                <svg width="20" height="20" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="#000" strokeWidth="2" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+              {[
+                { title: 'Assess my current policy', date: 'Today', preview: 'Your liability limits are below recommended...' },
+                { title: 'Compare GEICO rates', date: 'Yesterday', preview: 'GEICO offers $199/mo vs your current $249...' },
+                { title: 'What is umbrella coverage?', date: 'Apr 3', preview: 'An umbrella policy adds extra liability...' },
+                { title: 'Walk me through what to do', date: 'Apr 1', preview: 'Let\'s start with your biggest gap...' },
+                { title: 'Explain deductibles', date: 'Mar 28', preview: 'Your current deductible is $1,000...' },
+                { title: 'Safe driving discounts', date: 'Mar 25', preview: 'Programs can reduce premium by 10-25%...' },
+              ].map((convo, i) => (
+                <div key={i} className="press-btn" onClick={() => setSidebarOpen(false)} style={{
+                  padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f0f2f3',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                    <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>{convo.title}</p>
+                    <span style={{ fontSize: 12, color: '#6e7376', flexShrink: 0, marginLeft: 8 }}>{convo.date}</span>
+                  </div>
+                  <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{convo.preview}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: 16, borderTop: '1px solid #d9dfe2' }}>
+              <button className="press-btn" style={{
+                width: '100%', height: 40, background: '#008600', color: '#fff', border: 'none',
+                borderRadius: 50, fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+              }}>New conversation</button>
             </div>
           </div>
 
@@ -1719,7 +2078,7 @@
                   background: msg.role === 'user' ? '#008600' : '#f7f9fa',
                   color: msg.role === 'user' ? '#fff' : '#000',
                 }}>
-                  <p style={{ fontSize: 15, lineHeight: 1.4 }}>{msg.text}</p>
+                  <p style={{ fontSize: 15, lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{msg.text}</p>
                 </div>
                 {msg.pills && msg.role === 'ai' && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
@@ -1795,7 +2154,7 @@
           <div className="sim-topbar">
             <div className="sim-topbar-logo">Show Code</div>
             <div className="sim-topbar-tabs">
-              {navTabs.map(tab => (
+              {false && navTabs.map(tab => (
                 <button key={tab} className={'sim-topbar-tab' + (
                   (tab === 'My Policies' && screen === 'myPolicies') ||
                   (tab === 'Find a Policy' && (screen === 'findPolicy' || screen === 'driveScore')) ||
