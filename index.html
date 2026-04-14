@@ -294,6 +294,15 @@
     .stack-close-btn {
       transition: opacity 250ms ease;
     }
+    .screen-slide {
+      position: absolute; inset: 0; z-index: 30;
+      transform: translateX(100%);
+      transition: transform 350ms cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform;
+    }
+    .screen-slide.active {
+      transform: translateX(0);
+    }
 
     .sidebar-overlay {
       position: absolute; inset: 0; z-index: 50;
@@ -722,7 +731,7 @@
     }
 
     /* ─── SCREEN 1: My Policies ─── */
-    function MyPoliciesScreen({ onTabChange, chip1, setChip1, policyCount = 1, openChat }) {
+    function MyPoliciesScreen({ onTabChange, chip1, setChip1, policyCount = 1, openChat, onAddPolicy, onViewDetails }) {
       const [expandedPolicy, setExpandedPolicy] = useState(null);
 
       const policies3 = [
@@ -793,7 +802,7 @@
                         <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.15 }}>Policy pro</span>
                         <Icons.Sparkle color="#fff" size={24}/>
                       </div>
-                      <KDSButton appearance="text" icon={<Icons.Plus color="#006a57" size={16}/>} style={{ color: '#006a57' }}>Add policy</KDSButton>
+                      <KDSButton appearance="text" onClick={onAddPolicy} icon={<Icons.Plus color="#006a57" size={16}/>} style={{ color: '#006a57', padding: 0 }}>Add policy</KDSButton>
                     </div>
 
                     {/* Chat input */}
@@ -936,7 +945,7 @@
                                   ))}
                                 </div>
                               </div>
-                              <div style={{ borderTop: '1px solid #d9dfe2', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                              <div onClick={() => onViewDetails && onViewDetails(idx, policies3)} style={{ borderTop: '1px solid #d9dfe2', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
                                 <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', lineHeight: 1.15 }}>See policy details</span>
                                 <Icons.ChevronRight size={20} color="#008600"/>
                               </div>
@@ -1011,7 +1020,7 @@
                                   ))}
                                 </div>
                               </div>
-                              <div style={{ borderTop: '1px solid #d9dfe2', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                              <div onClick={() => onViewDetails && onViewDetails(idx, policies2)} style={{ borderTop: '1px solid #d9dfe2', padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
                                 <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', lineHeight: 1.15 }}>See policy details</span>
                                 <Icons.ChevronRight size={20} color="#008600"/>
                               </div>
@@ -1055,7 +1064,7 @@
                         </div>
                       </div>
                       {/* See policy details */}
-                      <div style={{ borderTop: '1px solid #d9dfe2', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                      <div onClick={() => onViewDetails && onViewDetails(0, [{ name: 'Liberty Mutual: 3228', subtitle: 'Auto • 2 vehicles • 2 drivers', logo: 'liberty', grid: [{ key: '6 mo premium', value: '$1,134' }, { key: 'Next renewal', value: '36 days' }, { key: 'Deductible', value: '$500 / $1,000' }, { key: 'Liability limits', value: '100/300/100' }] }])} style={{ borderTop: '1px solid #d9dfe2', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
                         <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', lineHeight: 1.15 }}>See policy details</span>
                         <Icons.ChevronRight size={20} color="#008600"/>
                       </div>
@@ -1072,7 +1081,7 @@
                     <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.15 }}>Policy pro</span>
                     <Icons.Sparkle color="#fff" size={24}/>
                   </div>
-                  <KDSButton appearance="text" icon={<Icons.Plus color="#006a57" size={16}/>} style={{ color: '#006a57' }}>Add policy</KDSButton>
+                  <KDSButton appearance="text" onClick={onAddPolicy} icon={<Icons.Plus color="#006a57" size={16}/>} style={{ color: '#006a57', padding: 0 }}>Add policy</KDSButton>
                 </div>
 
                 {/* Total cost (multi-policy state, hidden when a card is expanded) */}
@@ -1997,6 +2006,213 @@
       );
     }
 
+    /* ─── Policy Details Screen ─── */
+    function PolicyDetailsScreen({ policy, onBack }) {
+      if (!policy) return null;
+
+      const mascots = {
+        liberty: 'Assets/Prototype for claude/cursor/Liberty mutual - mascot.png',
+        geico: 'Assets/Prototype for claude/cursor/Geico - mascot.png',
+        statefarm: 'Assets/Prototype for claude/cursor/State farm mascot.png',
+      };
+
+      const isAuto = policy.subtitle.includes('Auto');
+      const isHome = policy.subtitle.includes('Home');
+      const isLife = policy.subtitle.includes('Life');
+
+      const coverageSections = isAuto ? [
+        { title: 'Vehicles', items: [
+          { label: '2019 Honda Accord', detail: 'VIN ending 4829 • Comprehensive + collision' },
+          { label: '2022 Toyota Camry', detail: 'VIN ending 7153 • Comprehensive + collision' },
+        ]},
+        { title: 'Drivers', items: [
+          { label: 'James Cunningham', detail: 'Primary driver • Clean record' },
+          { label: 'Sarah Cunningham', detail: 'Secondary driver • Clean record' },
+        ]},
+        { title: 'Payment schedule', items: [
+          { label: 'Next payment', detail: 'Apr 15, 2026 • $189.00' },
+          { label: 'Payment method', detail: 'Visa ending 4242 • Autopay on' },
+          { label: 'Billing cycle', detail: 'Monthly • 6 month term' },
+        ]},
+      ] : isHome ? [
+        { title: 'Property', items: [
+          { label: '1234 Oak Ridge Dr', detail: 'Raleigh, NC 27615 • Single family' },
+          { label: 'Dwelling coverage', detail: '$455,000' },
+          { label: 'Personal property', detail: '$227,500 (50% of dwelling)' },
+        ]},
+        { title: 'Additional coverage', items: [
+          { label: 'Liability', detail: '$300,000 per occurrence' },
+          { label: 'Medical payments', detail: '$5,000 per person' },
+          { label: 'Loss of use', detail: '20% of dwelling coverage' },
+        ]},
+        { title: 'Payment schedule', items: [
+          { label: 'Next payment', detail: 'May 1, 2026 • $208.00' },
+          { label: 'Payment method', detail: 'Checking account ending 8891' },
+          { label: 'Billing cycle', detail: 'Monthly • Annual term' },
+        ]},
+      ] : [
+        { title: 'Policy overview', items: [
+          { label: 'Coverage amount', detail: '$1,000,000 term life' },
+          { label: 'Term length', detail: '20 years (2018-2038)' },
+          { label: 'Policy status', detail: 'Active • In good standing' },
+        ]},
+        { title: 'Beneficiaries', items: [
+          { label: 'Sarah Cunningham', detail: 'Primary • Spouse • 100%' },
+          { label: 'James Cunningham Jr.', detail: 'Contingent • Child • 100%' },
+        ]},
+        { title: 'Payment schedule', items: [
+          { label: 'Next payment', detail: 'May 18, 2026 • $85.00' },
+          { label: 'Payment method', detail: 'Visa ending 4242 • Autopay on' },
+          { label: 'Billing cycle', detail: 'Monthly' },
+        ]},
+      ];
+
+      return (
+        <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff' }}>
+          <StatusBar/>
+          {/* Header nav */}
+          <div style={{ padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+              <Icons.ChevronLeft size={24} color="#000"/>
+            </button>
+            <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+              <Icons.Menu size={24} color="#000"/>
+            </button>
+          </div>
+
+          <div className="scroll-content" style={{ flex: 1 }}>
+            {/* Hero section with mascot */}
+            <div style={{ padding: '8px 16px 0', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>{policy.name.split(':')[0].trim()}</p>
+                <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginTop: 4 }}>{isAuto ? 'Auto policy' : isHome ? 'Home policy' : 'Life policy'}: {policy.name.split(':')[1]?.trim()}</p>
+              </div>
+              <img src={mascots[policy.logo]} alt="" style={{ height: 80, objectFit: 'contain', flexShrink: 0 }}/>
+            </div>
+
+            {/* Divider */}
+            <div style={{ height: 4, background: '#008600', margin: '16px 16px 0', borderRadius: 2 }}/>
+
+            {/* Key stats grid */}
+            <div style={{ padding: '0 16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+                {policy.grid.map((item, i) => (
+                  <div key={i} style={{
+                    padding: '16px 16px 16px 0', display: 'flex', flexDirection: 'column', gap: 6,
+                    borderBottom: '1px solid #d9dfe2',
+                    borderRight: i % 2 === 0 ? '1px solid #d9dfe2' : 'none',
+                    paddingLeft: i % 2 === 1 ? 16 : 0,
+                  }}>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>{item.key}</span>
+                    <span style={{ fontSize: 20, fontWeight: 700, color: '#000', lineHeight: 1.15 }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Coverage sections */}
+            {coverageSections.map((section, si) => (
+              <div key={si}>
+                <div style={{ width: '100%', height: 8, background: '#e9eef0', marginTop: si === 0 ? 8 : 0 }}/>
+                <div style={{ padding: '20px 16px 8px' }}>
+                  <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>{section.title}</p>
+                </div>
+                {section.items.map((item, ii) => (
+                  <div key={ii} style={{
+                    padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 2,
+                    borderBottom: ii < section.items.length - 1 ? '1px solid #e9eef0' : 'none',
+                  }}>
+                    <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{item.label}</p>
+                    <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+            ))}
+
+            {/* Documents section */}
+            <div style={{ width: '100%', height: 8, background: '#e9eef0' }}/>
+            <div style={{ padding: '20px 16px 8px' }}>
+              <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Documents</p>
+            </div>
+            {[
+              { name: 'Declarations page', date: 'Updated Jan 12, 2026' },
+              { name: 'ID card', date: 'Updated Jan 12, 2026' },
+              { name: 'Policy contract', date: 'Effective Jul 15, 2025' },
+            ].map((doc, i) => (
+              <div key={i} style={{
+                padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                borderBottom: i < 2 ? '1px solid #e9eef0' : 'none', cursor: 'pointer',
+              }}>
+                <div>
+                  <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{doc.name}</p>
+                  <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginTop: 2 }}>{doc.date}</p>
+                </div>
+                <Icons.ChevronRight size={20} color="#55595b"/>
+              </div>
+            ))}
+
+            {/* Actions */}
+            <div style={{ padding: '24px 16px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <KDSButton fullWidth appearance="outline">Contact {policy.name.split(':')[0].trim()}</KDSButton>
+              <KDSButton fullWidth appearance="text" usage="destructive">Remove policy</KDSButton>
+            </div>
+          </div>
+
+          <BottomTabBar/>
+        </div>
+      );
+    }
+
+    /* ─── Add Policy Screen ─── */
+    function AddPolicyScreen({ onBack }) {
+      const [selected, setSelected] = useState(null);
+      const options = [
+        { id: 'link', title: 'Link policy with Policy Pro', subtitle: 'Sign in to your insurance provider and Policy Pro will handle the rest', badge: true, icon: true },
+        { id: 'upload', title: 'Upload documents', subtitle: 'Upload a photo from your phone', badge: false, icon: false },
+        { id: 'photo', title: 'Take a picture of insurance card', subtitle: "Snap a photo with your phone and we'll upload the details to the app", badge: false, icon: false },
+      ];
+      return (
+        <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff' }}>
+          <StatusBar/>
+          <div style={{ padding: '0 16px' }}>
+            <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}>
+              <Icons.ChevronLeft size={24} color="#000"/>
+            </button>
+          </div>
+          <div style={{ flex: 1, padding: '16px 16px 0', overflow: 'auto' }}>
+            <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Choose how to get started</p>
+            <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4, marginTop: 8, color: '#000' }}>To analyze your coverage and find possible savings, we need a bit more information from you.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+              {options.map(opt => (
+                <div key={opt.id} className="press-btn" onClick={() => setSelected(opt.id)} style={{
+                  border: selected === opt.id ? '2px solid #008600' : '1px solid #868c90',
+                  borderRadius: 6, padding: '20px 24px', cursor: 'pointer',
+                  background: selected === opt.id ? '#e3f1e6' : '#fff',
+                }}>
+                  {opt.badge && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#008600', borderRadius: 6, padding: '2px 8px', marginBottom: 8 }}>
+                      <span style={{ fontSize: 15, fontWeight: 500, color: '#fff', lineHeight: 1.15 }}>Recommended</span>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
+                    <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, flex: 1 }}>{opt.title}</p>
+                    {opt.icon && <Icons.Sparkle size={20} color="#000"/>}
+                  </div>
+                  <p style={{ fontSize: 15, fontWeight: 400, color: '#000', lineHeight: 1.4, marginTop: 4 }}>{opt.subtitle}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ padding: 16, flexShrink: 0 }}>
+            <KDSButton fullWidth disabled={!selected}>Continue</KDSButton>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8, paddingTop: 8 }}>
+            <div style={{ width: 139, height: 5, background: '#000', borderRadius: 100 }}/>
+          </div>
+        </div>
+      );
+    }
+
     /* ─── Simulator Sidebar ─── */
     function SimSidebar({ policyCount, setPolicyCount }) {
       return (
@@ -2760,6 +2976,7 @@
       const [prevScreen, setPrevScreen] = useState('myPolicies');
       const [showLibrary, setShowLibrary] = useState(false);
       const [theme, setTheme] = useState({ ...DEFAULT_THEME });
+      const [policyDetail, setPolicyDetail] = useState(null);
 
       const openChat = (message) => {
         setPrevScreen(screen);
@@ -2784,23 +3001,37 @@
           {/* Top nav bar */}
           <div className="sim-topbar">
             <div className="sim-topbar-logo">Show Code</div>
-            <button onClick={() => setShowLibrary(!showLibrary)} style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '6px 14px', fontSize: 13, fontWeight: 500, marginLeft: 12,
-              border: showLibrary ? '1.5px solid #008600' : '1px solid #d9dfe2',
-              borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit',
-              background: showLibrary ? '#e3f1e6' : '#fff',
-              color: showLibrary ? '#008600' : '#000',
-              transition: 'all 150ms ease',
-            }}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-              </svg>
-              Components
-            </button>
+            <div style={{ display: 'flex', marginLeft: 12 }}>
+              <button onClick={() => setShowLibrary(false)} style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px', fontSize: 13, fontWeight: 500,
+                border: !showLibrary ? '1.5px solid #008600' : '1px solid #d9dfe2',
+                borderRadius: '6px 0 0 6px', cursor: 'pointer', fontFamily: 'inherit',
+                background: !showLibrary ? '#008600' : '#fff',
+                color: !showLibrary ? '#fff' : '#000',
+                transition: 'all 150ms ease',
+              }}>
+                <img src={!showLibrary ? 'Assets/ai-sparkles.png' : 'Assets/ai-sparkles-1.png'} alt="" style={{ width: 16, height: 16, objectFit: 'contain' }}/>
+                Policy Pro
+              </button>
+              <button onClick={() => setShowLibrary(true)} style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px', fontSize: 13, fontWeight: 500, marginLeft: -1,
+                border: showLibrary ? '1.5px solid #008600' : '1px solid #d9dfe2',
+                borderRadius: '0 6px 6px 0', cursor: 'pointer', fontFamily: 'inherit',
+                background: showLibrary ? '#008600' : '#fff',
+                color: showLibrary ? '#fff' : '#000',
+                transition: 'all 150ms ease',
+              }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                  <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                  <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                  <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                </svg>
+                Components
+              </button>
+            </div>
             <div className="sim-topbar-tabs">
               {false && navTabs.map(tab => (
                 <button key={tab} className={'sim-topbar-tab' + (
@@ -2834,8 +3065,8 @@
                 <div className="sim-canvas">
                   <div className="phone-bezel">
                     <div className="phone-screen" style={{ position: 'relative' }}>
-                      <div style={{ position: 'absolute', inset: 0, opacity: screen === 'myPolicies' ? 1 : 0, pointerEvents: screen === 'myPolicies' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
-                        <MyPoliciesScreen onTabChange={setScreen} chip1={chip1} setChip1={setChip1} policyCount={policyCount} openChat={openChat}/>
+                      <div style={{ position: 'absolute', inset: 0, opacity: screen === 'myPolicies' || screen === 'addPolicy' || screen === 'policyDetails' ? 1 : 0, pointerEvents: screen === 'myPolicies' || screen === 'addPolicy' || screen === 'policyDetails' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
+                        <MyPoliciesScreen onTabChange={setScreen} chip1={chip1} setChip1={setChip1} policyCount={policyCount} openChat={openChat} onAddPolicy={() => setScreen('addPolicy')} onViewDetails={(idx, policies) => { setPolicyDetail(policies[idx]); setScreen('policyDetails'); }}/>
                       </div>
                       <div style={{ position: 'absolute', inset: 0, opacity: screen === 'findPolicy' ? 1 : 0, pointerEvents: screen === 'findPolicy' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
                         <FindPolicyScreen onTabChange={setScreen} onCompare={() => setScreen('comparison')} chip2={chip2} setChip2={setChip2}/>
@@ -2848,6 +3079,14 @@
                       </div>
                       <div style={{ position: 'absolute', inset: 0, opacity: screen === 'chat' ? 1 : 0, pointerEvents: screen === 'chat' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
                         {screen === 'chat' && <PolicyProChat key={chatContext?.id} chatContext={chatContext} onBack={() => setScreen(prevScreen)}/>}
+                      </div>
+                      {/* Add Policy slide-in screen */}
+                      <div className={'screen-slide' + (screen === 'addPolicy' ? ' active' : '')}>
+                        <AddPolicyScreen onBack={() => setScreen('myPolicies')}/>
+                      </div>
+                      {/* Policy Details slide-in screen */}
+                      <div className={'screen-slide' + (screen === 'policyDetails' ? ' active' : '')}>
+                        <PolicyDetailsScreen policy={policyDetail} onBack={() => setScreen('myPolicies')}/>
                       </div>
                     </div>
                   </div>
