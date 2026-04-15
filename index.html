@@ -120,8 +120,6 @@
     .sim-canvas {
       flex: 1;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
       padding: 32px;
       overflow: auto;
     }
@@ -213,6 +211,8 @@
       border-radius: 44px;
       padding: 8px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+      flex-shrink: 0;
+      margin: auto;
     }
 
     .phone-screen {
@@ -762,7 +762,7 @@
         <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
           {/* Header */}
-          <div style={{ padding: '0 16px 8px' }}>
+          <div style={{ padding: '0 16px' }}>
             <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           <TabGroup selected={0} onSelect={(i) => { if (i === 1) onTabChange('findPolicy'); if (i === 2) onTabChange('driveScore'); }}/>
@@ -853,7 +853,7 @@
             ) : (
             <>
             {/* Policy Card Section */}
-            <div style={{ padding: '16px 16px 32px' }}>
+            <div style={{ padding: '24px 16px 32px' }}>
               {/* Close button (above gray container, in parent spacing) */}
               {policyCount >= 2 && (
                 <div style={{
@@ -1648,7 +1648,7 @@
       return (
         <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
-          <div style={{ padding: '0 16px 8px' }}>
+          <div style={{ padding: '0 16px' }}>
             <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           <TabGroup selected={1} onSelect={(i) => { if (i === 0) onTabChange('myPolicies'); if (i === 2) onTabChange('driveScore'); }}/>
@@ -1988,7 +1988,7 @@
       return (
         <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
-          <div style={{ padding: '0 16px 8px' }}>
+          <div style={{ padding: '0 16px' }}>
             <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           <TabGroup selected={2} onSelect={(i) => { if (i === 0) onTabChange('myPolicies'); if (i === 1) onTabChange('findPolicy'); }}/>
@@ -2973,7 +2973,7 @@
       return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
-          <div style={{ padding: '0 16px 8px' }}>
+          <div style={{ padding: '0 16px' }}>
             <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           {/* Tabs with sliding indicator */}
@@ -3671,7 +3671,7 @@
             <Q4FindPolicyAutoSpoke onBack={() => setFindPolicyRoute('hub')} variant={findPolicyExperimentVariant} />
           ) : (
           <>
-          <div style={{ padding: '0 16px 8px' }}>
+          <div style={{ padding: '0 16px' }}>
             <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           {/* Tabs with sliding indicator */}
@@ -3939,7 +3939,7 @@
                 <div style={{ height: 8, background: '#e9eef0' }}/>
 
                 {/* ── Other auto insurance offers section ── */}
-                <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ padding: '32px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Other auto insurance offers </p>
                   {/* GEICO compact card */}
                   <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -4149,7 +4149,7 @@
             <div className="sim-topbar-logo">Show Code</div>
             <div style={{ display: 'flex', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
               {[
-                { id: 'currentState', label: 'Current State', icon: null },
+                { id: 'currentState', label: 'Q3 FY2026', icon: null },
                 { id: 'q4fy2026', label: 'Q4 FY2026', icon: null },
                 { id: 'policyPro', label: 'Vision Prototype', icon: null },
               ].map((tab, i, arr) => {
