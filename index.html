@@ -2967,7 +2967,7 @@
     }
 
     /* ─── Current State (Production) Screen ─── */
-    function CurrentStateScreen() {
+    function CurrentStateScreen({ driveScoreActive, vehicleMonitoringActive }) {
       const [csTab, setCsTab] = useState(0);
       const tabs = ['Insurance', 'Find a policy'];
       return (
@@ -2998,16 +2998,103 @@
               /* ── Insurance tab ── */
               <>
                 {/* Drive score section */}
-                <div style={{ padding: '24px 16px' }}>
-                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Drive score</p>
-                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Monitor your drive score to get insights into your driving habits</p>
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-                    <img src="Assets/↳ Connected Policy Lite – 04/Drive score illustration img.png" alt="Drive score" style={{ width: 180, height: 'auto', objectFit: 'contain' }}/>
-                  </div>
-                  <button style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 12 }}>Activate drive score</button>
-                  <p style={{ textAlign: 'center', fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer' }}>How it works</p>
-                </div>
-                <div style={{ height: 8, background: '#e9eef0' }}/>
+                {driveScoreActive ? (
+                  <>
+                    {/* Drive Score chart card */}
+                    <div style={{ padding: '24px 16px 0', display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+                      {/* Key value header */}
+                      <div style={{ width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 0 }}>
+                          <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Drive Score</span>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1.2"/>
+                            <text x="8" y="11.5" textAnchor="middle" fontSize="10" fontWeight="600" fill="#55595b">i</text>
+                          </svg>
+                        </div>
+                        <p style={{ fontSize: 51, fontWeight: 700, lineHeight: 1.15 }}>92</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                              <path d="M6 1L11 9H1L6 1Z" fill="#008600"/>
+                            </svg>
+                            <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4, color: '#008600' }}>2 pts</span>
+                          </div>
+                          <span style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4, color: '#424747' }}>Checked daily</span>
+                        </div>
+                      </div>
+                      {/* Line chart */}
+                      <div style={{ width: '100%', position: 'relative', height: 211, marginTop: 8 }}>
+                        <svg width="100%" height="180" viewBox="0 0 315 180" preserveAspectRatio="none" style={{ position: 'absolute', left: 0, top: 0 }}>
+                          <polyline
+                            points="0,140 20,135 40,130 60,128 80,120 100,115 110,110 130,105 150,100 170,95 180,90 200,80 210,75 220,70 230,68 240,66 250,65 260,60 270,55 275,50 280,48 285,50 290,48 295,46 300,44 305,42 310,40 315,38"
+                            fill="none" stroke="#008600" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round"
+                          />
+                        </svg>
+                        {/* Y-axis labels */}
+                        <div style={{ position: 'absolute', right: 0, top: 0, bottom: 30, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          {[100, 90, 80, 70].map(v => (
+                            <span key={v} style={{ fontSize: 11, color: '#585e5f', lineHeight: 1 }}>{v}</span>
+                          ))}
+                        </div>
+                        {/* X-axis labels */}
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 40, display: 'flex', justifyContent: 'space-between' }}>
+                          {['5/17', '5/19', '5/21', '5/23'].map(d => (
+                            <span key={d} style={{ fontSize: 11, color: '#585e5f', lineHeight: 1 }}>{d}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    {/* See score details button */}
+                    <div style={{ padding: '16px 16px 32px' }}>
+                      <button style={{ width: '100%', height: 48, background: '#fff', color: '#008600', border: '2px solid #008600', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>See score details</button>
+                    </div>
+                    <div style={{ height: 8, background: '#edf1f3' }}/>
+                    {/* Drive Score factors */}
+                    <div style={{ padding: '32px 16px 8px' }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Drive Score factors</p>
+                      <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4, color: '#000' }}>Risky driving events this week that impacted your score</p>
+                    </div>
+                    <div style={{ padding: '0 16px' }}>
+                      {[
+                        { factor: 'Phone usage', impact: 'High impact', events: '+22 events', status: 'Needs work', dotColor: '#F2554B' },
+                        { factor: 'Sharp turn', impact: 'High impact', events: '+3 events', status: 'Good', dotColor: '#67CF1F' },
+                        { factor: 'Rapid acceleration', impact: 'Medium impact', events: '+0 event', status: 'Excellent', dotColor: '#359F37' },
+                        { factor: 'Hard braking', impact: 'Low impact', events: '+0 event', status: 'Excellent', dotColor: '#359F37' },
+                        { factor: 'Speeding', impact: 'Low impact', events: '+4 events', status: 'Fair', dotColor: '#FFC402' },
+                      ].map((row, i, arr) => (
+                        <div key={i} style={{ padding: '24px 0', borderBottom: i < arr.length - 1 ? '1px solid #d9dfe2' : 'none' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1 }}>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>{row.factor}</p>
+                              <p style={{ fontSize: 15, fontWeight: 400, lineHeight: 1.4, color: '#000' }}>{row.impact}</p>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                              <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{row.events}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: row.dotColor }}/>
+                                <span style={{ fontSize: 15, fontWeight: 400, lineHeight: 1.4 }}>{row.status}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ height: 8, background: '#edf1f3', marginTop: 8 }}/>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ padding: '32px 16px' }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Drive score</p>
+                      <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Monitor your drive score to get insights into your driving habits</p>
+                      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                        <img src="Assets/↳ Connected Policy Lite – 04/Drive score illustration img.png" alt="Drive score" style={{ width: 180, height: 'auto', objectFit: 'contain' }}/>
+                      </div>
+                      <button style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 12 }}>Activate drive score</button>
+                      <p style={{ textAlign: 'center', fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer' }}>How it works</p>
+                    </div>
+                    <div style={{ height: 8, background: '#e9eef0' }}/>
+                  </>
+                )}
                 {/* Coverage section */}
                 <div style={{ padding: '32px 16px' }}>
                   <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Coverage</p>
@@ -3016,12 +3103,40 @@
                 </div>
                 <div style={{ height: 8, background: '#e9eef0' }}/>
                 {/* Vehicles section */}
-                <div style={{ padding: '24px 16px' }}>
-                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Vehicles</p>
-                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>See your car value for changes</p>
-                  <button style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 400, cursor: 'pointer', fontFamily: 'inherit' }}>Link vehicle</button>
-                </div>
-                <div style={{ height: 8, background: '#e9eef0' }}/>
+                {vehicleMonitoringActive ? (
+                  <>
+                    <div style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Vehicles</p>
+                        <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', cursor: 'pointer' }}>Edit</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', padding: '24px 0' }}>
+                        <div style={{ width: 64, height: 48, flexShrink: 0, borderRadius: 20, overflow: 'hidden' }}>
+                          <img src="Assets/jeep-grand-cherokee.png" alt="2008 Jeep Grand Cherokee" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+                            <div style={{ flex: 1 }}>
+                              <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>2008 Jeep Grand Cherokee</p>
+                              <p style={{ fontSize: 15, fontWeight: 400, lineHeight: 1.4, color: '#000' }}>Estimated car value*</p>
+                            </div>
+                            <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, flexShrink: 0 }}>$10,035</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ height: 8, background: '#e9eef0' }}/>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ padding: '32px 16px' }}>
+                      <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Vehicles</p>
+                      <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>See your car value for changes</p>
+                      <button style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 400, cursor: 'pointer', fontFamily: 'inherit' }}>Link vehicle</button>
+                    </div>
+                    <div style={{ height: 8, background: '#e9eef0' }}/>
+                  </>
+                )}
                 {/* Tools section */}
                 <div style={{ padding: '24px 16px 32px' }}>
                   <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Tools</p>
@@ -3606,7 +3721,7 @@
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <span style={{ fontSize: 15, fontWeight: 500 }}>Payment rating</span>
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#55595b" strokeWidth="1"/><path d="M7 6v4M7 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                            <img src="Assets/Tool tip icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
                           </div>
                           <div style={{ width: 60, height: 8, borderRadius: 99, overflow: 'hidden', display: 'flex', gap: 1 }}>
                             <div style={{ flex: 1, background: '#c74900' }}/><div style={{ flex: 1, background: '#ffca00' }}/><div style={{ flex: 1, background: '#008600' }}/>
@@ -3629,7 +3744,7 @@
                     </div>
 
                     {/* Unlock policy monitoring CTA */}
-                    <div style={{ padding: '0 16px 24px' }}>
+                    <div style={{ padding: '0 16px 32px' }}>
                       <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Unlock policy monitoring and savings alerts</p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 16 }}>
                         <img src="Assets/Clock icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
@@ -3644,7 +3759,7 @@
                 <div style={{ height: 8, background: '#e9eef0' }}/>
 
                 {/* Vehicles section */}
-                <div style={{ padding: '24px 16px' }}>
+                <div style={{ padding: '32px 16px 24px' }}>
                   {vehicleMonitoring ? (
                     <>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -4002,6 +4117,8 @@
       const [driveScoreActive, setDriveScoreActive] = useState(false);
       const [q4FindPolicyExperimentVisible, setQ4FindPolicyExperimentVisible] = useState(false);
       const [q4FindPolicyExperimentVariant, setQ4FindPolicyExperimentVariant] = useState(1);
+      const [csDriveScore, setCsDriveScore] = useState(false);
+      const [csVehicleMonitoring, setCsVehicleMonitoring] = useState(false);
 
       useEffect(() => {
         if (activeTab !== 'q4fy2026') setQ4FindPolicyExperimentVisible(false);
@@ -4104,10 +4221,50 @@
                 <div className="sim-canvas">
                   <div className="phone-bezel">
                     <div className="phone-screen">
-                      <CurrentStateScreen/>
+                      <CurrentStateScreen driveScoreActive={csDriveScore} vehicleMonitoringActive={csVehicleMonitoring}/>
                     </div>
                   </div>
                 </div>
+                {showSettings && (
+                  <div className="sim-sidebar">
+                    <div className="sim-sidebar-title">Settings</div>
+                    <div className="sim-sidebar-section">Current State</div>
+                    <div className="sim-sidebar-label">Drive score</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                      <span style={{ fontSize: 13, color: csDriveScore ? '#008600' : '#55595b' }}>{csDriveScore ? 'On' : 'Off'}</span>
+                      <div onClick={() => setCsDriveScore(!csDriveScore)} style={{
+                        width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
+                        background: csDriveScore ? '#008600' : '#d9dfe2',
+                        position: 'relative', transition: 'background 200ms ease',
+                      }}>
+                        <div style={{
+                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                          position: 'absolute', top: 2,
+                          left: csDriveScore ? 22 : 2,
+                          transition: 'left 200ms ease',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                        }}/>
+                      </div>
+                    </div>
+                    <div className="sim-sidebar-label">Vehicle monitoring</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                      <span style={{ fontSize: 13, color: csVehicleMonitoring ? '#008600' : '#55595b' }}>{csVehicleMonitoring ? 'On' : 'Off'}</span>
+                      <div onClick={() => setCsVehicleMonitoring(!csVehicleMonitoring)} style={{
+                        width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
+                        background: csVehicleMonitoring ? '#008600' : '#d9dfe2',
+                        position: 'relative', transition: 'background 200ms ease',
+                      }}>
+                        <div style={{
+                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                          position: 'absolute', top: 2,
+                          left: csVehicleMonitoring ? 22 : 2,
+                          transition: 'left 200ms ease',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                        }}/>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : activeTab === 'q4fy2026' ? (
               <>
