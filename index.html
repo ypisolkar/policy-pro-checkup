@@ -3311,19 +3311,251 @@
       );
     }
 
+    /* ─── Q4 Find a policy — Auto insurance spoke (shared by experiment variants) ─── */
+    function Q4FindPolicyAutoSpoke({ onBack, variant = 1 }) {
+      if (variant === 2) {
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+            {/* Header: back + bell + overflow */}
+            <div style={{ flexShrink: 0, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
+              <button type="button" onClick={onBack} aria-label="Back" style={{ width: 48, height: 48, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <img src="Assets/BACK.png" alt="Back" style={{ width: 20, height: 20, objectFit: 'contain' }}/>
+              </button>
+              <div style={{ display: 'flex' }}>
+                <div style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                  <img src="Assets/Bell Icon.png" alt="Notifications" style={{ width: 20, height: 20, objectFit: 'contain' }}/>
+                  <div style={{ position: 'absolute', top: 11, right: 13, width: 6, height: 6, borderRadius: '50%', background: '#008600' }}/>
+                </div>
+                <div style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src="Assets/Kebab icon.png" alt="More" style={{ width: 20, height: 20, objectFit: 'contain' }}/>
+                </div>
+              </div>
+            </div>
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }} className="scroll-content">
+              {/* Main section */}
+              <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Auto insurance marketplace</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Offer terms are based on your profile data. Offer order is based on carrier availability.</p>
+                </div>
+                {/* Nudge card */}
+                <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+                    <path d="M14.166 2.5l3.334 3.333-10 10H4.166V12.5l10-10z" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>Your auto insurance profile</p>
+                    <p style={{ fontSize: 15, lineHeight: 1.4 }}>2 vehicles • 1 driver •  ZIP: 30315</p>
+                  </div>
+                </div>
+                {/* Advertiser disclosure */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <span style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Advertiser disclosure</span>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                </div>
+                {/* Personalized offers heading */}
+                <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Personalized offers</p>
+                {/* GEICO full card */}
+                <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'inline-flex', alignSelf: 'flex-start', background: '#f5a623', borderRadius: 4, padding: '4px 8px' }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                  </div>
+                  <img src="Assets/Geico.png" alt="GEICO" style={{ height: 28, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Est mo payment</span>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    </div>
+                    <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginTop: 8 }}>$187.56</p>
+                  </div>
+                  <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4, color: '#000' }}>Apply with the same vehicle and driver information from your Credit Karma profile to increase the likelihood of getting this rate</p>
+                  <p style={{ fontSize: 13, fontWeight: 400, lineHeight: 1.4, color: '#55595b' }}>Estimated rate includes liability coverage based on your [Make Model]. Comprehensive and collision is provided in most cases. Click "Continue" to learn more.</p>
+                  <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+                </div>
+                {/* Root full card */}
+                <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'inline-flex', alignSelf: 'flex-start', background: '#f5a623', borderRadius: 4, padding: '4px 8px' }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                  </div>
+                  <img src="Assets/Root logo.png" alt="Root" style={{ height: 28, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Est mo payment</span>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    </div>
+                    <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginTop: 8 }}>$161.85</p>
+                  </div>
+                  <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4, color: '#000' }}>Apply with the same vehicle and driver information from your Credit Karma profile to increase the likelihood of getting this rate</p>
+                  <p style={{ fontSize: 13, fontWeight: 400, lineHeight: 1.4, color: '#55595b' }}>Estimated rate includes liability coverage based on your [Make Model]. Comprehensive and collision is provided in most cases. Click "Continue" to learn more.</p>
+                  <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+                </div>
+                {/* Progressive compact card */}
+                <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <img src="Assets/Progressive logo small.png" alt="Progressive" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'inline-flex', background: '#f5a623', borderRadius: 4, padding: '2px 6px', marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                    </div>
+                    <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, margin: 0 }}>Progressive</p>
+                  </div>
+                  <span style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', flexShrink: 0 }}>Check rate</span>
+                </div>
+              </div>
+
+              {/* Section divider */}
+              <div style={{ height: 8, background: '#edf1f3' }}/>
+
+              {/* Other offers section */}
+              <div style={{ padding: '32px 16px 8px' }}>
+                <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Other offers </p>
+              </div>
+
+              {/* Kemper card */}
+              <div style={{ padding: '16px' }}>
+                <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <img src="Assets/Kemper.png" alt="Kemper" style={{ height: 48, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                  <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>SmartFinancial Insurance Agency</p>
+                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Save $$ with Kemper licensed agency</p>
+                  <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Get your quote</button>
+                </div>
+              </div>
+
+              {/* Jerry card */}
+              <div style={{ padding: '0 16px 16px' }}>
+                <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <img src="Assets/Jerry.png" alt="Jerry" style={{ height: 36, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                  <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Never Overpay Again!</p>
+                  <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Get your quote</button>
+                </div>
+              </div>
+
+              {/* Disclaimer */}
+              <div style={{ padding: '16px 16px 24px', borderTop: '1px solid #e9eef0' }}>
+                <p style={{ fontSize: 11, color: '#55595b', lineHeight: 1.4, textAlign: 'center' }}>Credit Karma Insurance Services, LLC (dba Karma Insurance Services LLC; CA resident license #0172748)</p>
+              </div>
+            </div>
+            <BottomTabBar/>
+          </div>
+        );
+      }
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+          <div style={{ flexShrink: 0, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff' }}>
+            <button type="button" onClick={onBack} aria-label="Back" style={{ width: 48, height: 48, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src="Assets/BACK.png" alt="Back" style={{ width: 20, height: 20, objectFit: 'contain' }}/>
+            </button>
+            <div style={{ display: 'flex' }}>
+              <div style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <img src="Assets/Bell Icon.png" alt="Notifications" style={{ width: 20, height: 20, objectFit: 'contain' }}/>
+                <div style={{ position: 'absolute', top: 11, right: 13, width: 6, height: 6, borderRadius: '50%', background: '#008600' }}/>
+              </div>
+              <div style={{ width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <img src="Assets/Kebab icon.png" alt="More" style={{ width: 20, height: 20, objectFit: 'contain' }}/>
+              </div>
+            </div>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }} className="scroll-content">
+            <div style={{ padding: '12px 16px 8px', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 13, color: '#55595b' }}>Advertiser disclosure</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#55595b" strokeWidth="1"/><path d="M7 6v4M7 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            </div>
+            <div style={{ padding: '0 16px 16px' }}>
+              <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>Personalized auto insurance offers</p>
+              <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Offer terms are based on your profile data. Offer order is based on carrier availability.</p>
+            </div>
+            <div style={{ padding: '0 16px 16px', display: 'flex', gap: 16 }}>
+              <div>
+                <p style={{ fontSize: 13, color: '#55595b', marginBottom: 2 }}>Vehicles</p>
+                <p style={{ fontSize: 20, fontWeight: 700 }}>2</p>
+              </div>
+              <div>
+                <p style={{ fontSize: 13, color: '#55595b', marginBottom: 2 }}>Driver</p>
+                <p style={{ fontSize: 20, fontWeight: 700 }}>1</p>
+              </div>
+              <div>
+                <p style={{ fontSize: 13, color: '#55595b', marginBottom: 2 }}>ZIP</p>
+                <p style={{ fontSize: 20, fontWeight: 700 }}>30315</p>
+              </div>
+            </div>
+            <div style={{ margin: '0 16px 16px', border: '2px solid #008600', borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ background: '#e3f1e6', padding: '8px 16px' }}>
+                <span style={{ fontSize: 15, fontWeight: 500, color: '#008600' }}>Limited time offer</span>
+              </div>
+              <div style={{ padding: 16 }}>
+                <img src="Assets/Progressive logo small.png" alt="Progressive" style={{ height: 28, objectFit: 'contain', marginBottom: 12 }}/>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, color: '#55595b' }}>Est mo payment</span>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#55595b" strokeWidth="1"/><path d="M7 6v4M7 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                </div>
+                <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 12 }}>$100.85</p>
+                <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Apply with the same vehicle and driver information from your Credit Karma profile to increase the likelihood of getting this rate</p>
+                <p style={{ fontSize: 12, color: '#6e7376', lineHeight: 1.4, marginBottom: 16 }}>Estimated rate includes liability coverage based on your [Make Model]. Comprehensive and collision is provided in most cases. Click &quot;Continue&quot; to learn more.</p>
+                <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+              </div>
+            </div>
+            <div style={{ padding: '0 16px 24px' }}>
+              <p style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer' }}>View other personalized offers</p>
+            </div>
+            <div style={{ height: 8, background: '#e9eef0' }}/>
+            <div style={{ padding: '24px 16px' }}>
+              <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Offers from top partners</p>
+              <div style={{ display: 'inline-block', background: '#f7f9fa', borderRadius: 50, padding: '6px 16px', fontSize: 13, fontWeight: 500, marginBottom: 16 }}>Auto insurance</div>
+              <div style={{ border: '1px solid #d9dfe2', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                <img src="Assets/Root logo.png" alt="Root" style={{ height: 40, objectFit: 'contain', marginBottom: 12 }}/>
+                <p style={{ fontSize: 17, fontWeight: 700, marginBottom: 8 }}>Root</p>
+                <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Root is one of the first companies to offer insurance directly to customers online or on the phone</p>
+                <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Get your quote</button>
+              </div>
+              <p style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', marginBottom: 16 }}>View more auto insurance offers</p>
+            </div>
+            <div style={{ height: 8, background: '#e9eef0' }}/>
+            <div style={{ padding: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                <img src="Assets/Car front icon.png" alt="" style={{ width: 24, height: 24, objectFit: 'contain' }}/>
+                <div>
+                  <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Your auto insurance profile</p>
+                  <p style={{ fontSize: 13, color: '#55595b', marginTop: 2 }}>2 vehicles • 1 driver • ZIP: 30315</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     /* ─── Q4 FY2026 Screen ─── */
-    function Q4FY2026Screen({ vehicleMonitoring, liteConnection, onDataCollectionComplete }) {
+    function Q4FY2026Screen({ vehicleMonitoring, liteConnection, driveScoreActive, onDataCollectionComplete, findPolicyExperimentVariant = 1, onFindPolicyTabActive }) {
       const [q4Tab, setQ4Tab] = useState(0);
       const [showDataFlow, setShowDataFlow] = useState(false);
+      const [findPolicyRoute, setFindPolicyRoute] = useState('hub');
       const tabs = ['Insurance', 'Find a policy'];
+
+      useEffect(() => {
+        onFindPolicyTabActive?.(q4Tab === 1);
+      }, [q4Tab, onFindPolicyTabActive]);
+
+      useEffect(() => {
+        if (q4Tab !== 1) setFindPolicyRoute('hub');
+      }, [q4Tab]);
+
+      useEffect(() => {
+        setFindPolicyRoute('hub');
+      }, [findPolicyExperimentVariant]);
 
       if (showDataFlow) {
         return <DataCollectionFlow onBack={() => setShowDataFlow(false)} onComplete={() => { setShowDataFlow(false); if (onDataCollectionComplete) onDataCollectionComplete(); }}/>;
       }
 
+      const showFindPolicySpoke = findPolicyRoute === 'autoSpoke' && q4Tab === 1;
+
       return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
+          {showFindPolicySpoke ? (
+            <Q4FindPolicyAutoSpoke onBack={() => setFindPolicyRoute('hub')} variant={findPolicyExperimentVariant} />
+          ) : (
+          <>
           <div style={{ padding: '0 16px 8px' }}>
             <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
@@ -3443,13 +3675,70 @@
 
                 {/* Drive score section */}
                 <div style={{ padding: '24px 16px' }}>
-                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Drive score</p>
-                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Monitor your drive score to get insights into your driving habits</p>
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
-                    <img src="Assets/↳ Connected Policy Lite – 04/Drive score illustration img.png" alt="Drive score" style={{ width: 180, height: 'auto', objectFit: 'contain' }}/>
-                  </div>
-                  <button style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 12 }}>Activate drive score</button>
-                  <p style={{ textAlign: 'center', fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer' }}>How it works</p>
+                  {driveScoreActive ? (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                        <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Drive Score</p>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      </div>
+                      <p style={{ fontSize: 40, fontWeight: 700, lineHeight: 1, marginBottom: 4 }}>92</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+                        <span style={{ fontSize: 13, color: '#008600', fontWeight: 500 }}>▲ 2 pts</span>
+                        <span style={{ fontSize: 13, color: '#55595b' }}>Checked daily</span>
+                      </div>
+                      {/* Mini chart */}
+                      <div style={{ height: 80, position: 'relative', marginBottom: 8 }}>
+                        <svg width="100%" height="80" viewBox="0 0 300 80" preserveAspectRatio="none">
+                          <polyline points="0,60 40,55 80,50 120,45 140,48 160,42 200,38 240,30 260,28 300,20" fill="none" stroke="#008600" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <circle cx="300" cy="20" r="5" fill="#fff" stroke="#008600" strokeWidth="2"/>
+                        </svg>
+                        <div style={{ position: 'absolute', right: 0, top: 0, fontSize: 11, color: '#55595b' }}>100</div>
+                        <div style={{ position: 'absolute', right: 0, bottom: 0, fontSize: 11, color: '#55595b' }}>60</div>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                        {['5/17', '5/19', '1/01', '6/03'].map(d => (
+                          <span key={d} style={{ fontSize: 11, color: '#55595b' }}>{d}</span>
+                        ))}
+                      </div>
+                      {/* See score details button */}
+                      <button style={{ width: '100%', height: 40, background: '#fff', color: '#000', border: '1px solid #d9dfe2', borderRadius: 6, fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 24 }}>See score details</button>
+
+                      {/* Drive Score factors */}
+                      <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Drive Score factors</p>
+                      <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Risky driving events this week that impacted your score</p>
+                      {[
+                        { factor: 'Phone usage', impact: 'High impact', events: '+22 events', status: 'Needs work', color: '#c74900' },
+                        { factor: 'Sharp turn', impact: 'High impact', events: '+3 events', status: 'Good', color: '#008600' },
+                        { factor: 'Rapid acceleration', impact: 'Medium impact', events: '+0 event', status: 'Excellent', color: '#008600' },
+                        { factor: 'Hard braking', impact: 'Low impact', events: '+0 event', status: 'Excellent', color: '#008600' },
+                        { factor: 'Speeding', impact: 'Low impact', events: '+4 events', status: 'Fair', color: '#c74900' },
+                      ].map((f, i, arr) => (
+                        <div key={f.factor} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < arr.length - 1 ? '1px solid #e9eef0' : 'none' }}>
+                          <div>
+                            <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15, marginBottom: 2 }}>{f.factor}</p>
+                            <p style={{ fontSize: 13, color: '#55595b' }}>{f.impact}</p>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15, marginBottom: 2 }}>{f.events}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                              <div style={{ width: 8, height: 8, borderRadius: '50%', background: f.color }}/>
+                              <span style={{ fontSize: 13, color: '#55595b' }}>{f.status}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Drive score</p>
+                      <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>Monitor your drive score to get insights into your driving habits</p>
+                      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                        <img src="Assets/↳ Connected Policy Lite – 04/Drive score illustration img.png" alt="Drive score" style={{ width: 180, height: 'auto', objectFit: 'contain' }}/>
+                      </div>
+                      <button style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 12 }}>Activate drive score</button>
+                      <p style={{ textAlign: 'center', fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer' }}>How it works</p>
+                    </>
+                  )}
                 </div>
 
                 {/* Get deeper insights — lite connection */}
@@ -3472,42 +3761,227 @@
                 )}
               </>
             ) : (
-              /* ── Find a policy tab — reuse CurrentState's Find a policy ── */
+              /* ── Find a policy tab — hub (variant 1: icon hub · variant 2: list hub) + spoke for Auto insurance ── */
+              findPolicyExperimentVariant === 1 ? (
               <>
-                <div style={{ display: 'flex', justifyContent: 'space-around', padding: '20px 16px' }}>
-                  {[
-                    { icon: 'Assets/Car front icon.png', label: 'Auto' },
-                    { icon: 'Assets/↳ Connected Policy Lite – 04/Home icon.png', label: 'Home' },
-                    { icon: 'Assets/↳ Connected Policy Lite – 04/Heart icon.png', label: 'Life' },
-                  ].map(cat => (
-                    <div key={cat.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#008600', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <img src={cat.icon} alt={cat.label} style={{ width: 28, height: 28, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}/>
-                      </div>
-                      <span style={{ fontSize: 13, fontWeight: 500 }}>{cat.label}</span>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ padding: '0 16px 16px' }}>
-                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>Personalized auto insurance offers</p>
-                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Offer terms are based on your profile data.</p>
-                </div>
-                <div style={{ margin: '0 16px 16px', border: '2px solid #008600', borderRadius: 12, overflow: 'hidden' }}>
-                  <div style={{ background: '#e3f1e6', padding: '8px 16px' }}>
-                    <span style={{ fontSize: 15, fontWeight: 500, color: '#008600' }}>Limited time offer</span>
+                {/* ── Recommended auto insurance offer section ── */}
+                <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Recommended auto insurance offer </p>
+                    <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4 }}>
+                      This offer for you is based on your credit profile, and your{' '}
+                      <span style={{ color: '#008600', textDecoration: 'underline', cursor: 'pointer' }}>2017 Kia Soul</span>
+                    </p>
                   </div>
-                  <div style={{ padding: 16 }}>
-                    <img src="Assets/Progressive.png" alt="Progressive" style={{ height: 24, objectFit: 'contain', marginBottom: 12 }}/>
-                    <p style={{ fontSize: 13, color: '#55595b', marginBottom: 4 }}>Est mo payment</p>
-                    <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 12 }}>$100.85</p>
-                    <button style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                    <span style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Advertiser disclosure</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  </div>
+                  {/* Filter pills */}
+                  <div className="h-scroll" style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '8px 0' }}>
+                    {[
+                      { label: 'Basic', price: 'from $100/mo', selected: true },
+                      { label: 'Choice', price: 'from $188/mo', selected: false },
+                      { label: 'Recommended', price: 'from $280/mo', selected: false },
+                    ].map(pill => (
+                      <div key={pill.label} style={{
+                        flexShrink: 0, border: '1px solid #6e7677', borderRadius: 6,
+                        padding: '8px 16px', cursor: 'pointer', fontFamily: 'inherit',
+                        background: pill.selected ? '#c9e5cf' : '#fff',
+                      }}>
+                        <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.4, margin: 0, whiteSpace: 'pre', color: pill.selected ? '#000' : '#55595b' }}>{pill.label} </p>
+                        <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.4, margin: 0, whiteSpace: 'pre', color: pill.selected ? '#000' : '#55595b' }}>{pill.price}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Elevated Progressive card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <div style={{ display: 'inline-flex', alignSelf: 'flex-start', background: '#f5a623', borderRadius: 4, padding: '4px 8px' }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                    </div>
+                    <img src="Assets/Progressive logo small.png" alt="Progressive" style={{ height: 28, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                    <div style={{ display: 'flex', gap: 16 }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Est mo payment</span>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                        </div>
+                        <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginTop: 8 }}>$100.01</p>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Coverage</span>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                        </div>
+                        <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginTop: 8 }}>Basic</p>
+                      </div>
+                    </div>
+                    <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4, color: '#000' }}>A package that meets state requirements for liability and other mandated coverages and may have higher deductibles</p>
+                    <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+                  </div>
+                </div>
+
+                {/* Section divider */}
+                <div style={{ height: 8, background: '#e9eef0' }}/>
+
+                {/* ── Other auto insurance offers section ── */}
+                <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Other auto insurance offers </p>
+                  {/* GEICO compact card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'inline-flex', background: '#f5a623', borderRadius: 4, padding: '2px 6px', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                      </div>
+                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, margin: 0 }}>GEICO</p>
+                    </div>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', flexShrink: 0 }}>Check rate</span>
+                  </div>
+                  {/* Root compact card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <img src="Assets/Root - small logo.png" alt="Root" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'inline-flex', background: '#f5a623', borderRadius: 4, padding: '2px 6px', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                      </div>
+                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, margin: 0 }}>Root</p>
+                    </div>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', flexShrink: 0 }}>Check rate</span>
+                  </div>
+                  {/* See all button */}
+                  <button type="button" style={{
+                    width: '100%', height: 48, background: '#fff', color: '#008600',
+                    border: '2px solid #008600', borderRadius: 6, fontSize: 17, fontWeight: 500,
+                    cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1.4,
+                  }}>See all auto insurance offers</button>
+                </div>
+
+                {/* Section divider */}
+                <div style={{ height: 8, background: '#e9eef0' }}/>
+
+                {/* ── Router section (Auto / Home / Life) ── */}
+                <div style={{ padding: '16px' }}>
+                  <div style={{ display: 'flex', gap: 16, justifyContent: 'space-around', paddingBottom: 8 }}>
+                    {[
+                      { icon: 'Assets/Car front icon.png', label: 'Auto', isAuto: true },
+                      { icon: 'Assets/↳ Connected Policy Lite – 04/Home icon.png', label: 'Home', isAuto: false },
+                      { icon: 'Assets/↳ Connected Policy Lite – 04/Heart icon.png', label: 'Life', isAuto: false },
+                    ].map(cat => (
+                      <button key={cat.label} type="button" onClick={() => cat.isAuto && setFindPolicyRoute('autoSpoke')} style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1,
+                        background: 'none', border: 'none', cursor: cat.isAuto ? 'pointer' : 'default', fontFamily: 'inherit', padding: 0,
+                      }}>
+                        <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#008600', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img src={cat.icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}/>
+                        </div>
+                        <span style={{ fontSize: 15, fontWeight: 500, color: '#000', textAlign: 'center' }}>{cat.label}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </>
+              ) : (
+              <>
+                {/* ── Recommended auto insurance offer section (no filter pills) ── */}
+                <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Recommended auto insurance offer </p>
+                    <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4 }}>
+                      This offer for you is based on your credit profile, and your{' '}
+                      <span style={{ color: '#008600', textDecoration: 'underline', cursor: 'pointer' }}>2017 Kia Soul</span>
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                    <span style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>Advertiser disclosure</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  </div>
+                  {/* Elevated Progressive card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <div style={{ display: 'inline-flex', alignSelf: 'flex-start', background: '#f5a623', borderRadius: 4, padding: '4px 8px' }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                    </div>
+                    <img src="Assets/Progressive logo small.png" alt="Progressive" style={{ height: 28, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Est mo payment</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#55595b" strokeWidth="1"/><path d="M8 7v5M8 4.5v.5" stroke="#55595b" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      </div>
+                      <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginTop: 8 }}>$100.85</p>
+                    </div>
+                    <p style={{ fontSize: 17, fontWeight: 400, lineHeight: 1.4, color: '#000' }}>Apply with the same vehicle and driver information from your Credit Karma profile to increase the likelihood of getting this rate</p>
+                    <p style={{ fontSize: 13, fontWeight: 400, lineHeight: 1.4, color: '#55595b' }}>Estimated rate includes liability coverage based on your [Make Model]. Comprehensive and collision is provided in most cases. Click "Continue" to learn more.</p>
+                    <button type="button" style={{ width: '100%', height: 48, background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Continue</button>
+                  </div>
+                </div>
+
+                {/* Section divider */}
+                <div style={{ height: 8, background: '#e9eef0' }}/>
+
+                {/* ── Other auto insurance offers section ── */}
+                <div style={{ padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Other auto insurance offers </p>
+                  {/* GEICO compact card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'inline-flex', background: '#f5a623', borderRadius: 4, padding: '2px 6px', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                      </div>
+                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, margin: 0 }}>GEICO</p>
+                    </div>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', flexShrink: 0 }}>Check rate</span>
+                  </div>
+                  {/* Root compact card */}
+                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.4)', padding: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <img src="Assets/Root - small logo.png" alt="Root" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}/>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'inline-flex', background: '#f5a623', borderRadius: 4, padding: '2px 6px', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
+                      </div>
+                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, margin: 0 }}>Root</p>
+                    </div>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', flexShrink: 0 }}>Check rate</span>
+                  </div>
+                  {/* See all button */}
+                  <button type="button" style={{
+                    width: '100%', height: 48, background: '#fff', color: '#008600',
+                    border: '2px solid #008600', borderRadius: 6, fontSize: 17, fontWeight: 500,
+                    cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1.4,
+                  }}>See all auto insurance offers</button>
+                </div>
+
+                {/* Section divider */}
+                <div style={{ height: 8, background: '#e9eef0' }}/>
+
+                {/* ── Router section (Auto / Home / Life) ── */}
+                <div style={{ padding: '16px' }}>
+                  <div style={{ display: 'flex', gap: 16, justifyContent: 'space-around', paddingBottom: 8 }}>
+                    {[
+                      { icon: 'Assets/Car front icon.png', label: 'Auto', isAuto: true },
+                      { icon: 'Assets/↳ Connected Policy Lite – 04/Home icon.png', label: 'Home', isAuto: false },
+                      { icon: 'Assets/↳ Connected Policy Lite – 04/Heart icon.png', label: 'Life', isAuto: false },
+                    ].map(cat => (
+                      <button key={cat.label} type="button" onClick={() => cat.isAuto && setFindPolicyRoute('autoSpoke')} style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flex: 1,
+                        background: 'none', border: 'none', cursor: cat.isAuto ? 'pointer' : 'default', fontFamily: 'inherit', padding: 0,
+                      }}>
+                        <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#008600', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img src={cat.icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}/>
+                        </div>
+                        <span style={{ fontSize: 15, fontWeight: 500, color: '#000', textAlign: 'center' }}>{cat.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+              )
             )}
           </div>
 
           <BottomTabBar/>
+          </>
+          )}
         </div>
       );
     }
@@ -3526,6 +4000,13 @@
       const [showSettings, setShowSettings] = useState(true);
       const [vehicleMonitoring, setVehicleMonitoring] = useState(false);
       const [liteConnection, setLiteConnection] = useState(false);
+      const [driveScoreActive, setDriveScoreActive] = useState(false);
+      const [q4FindPolicyExperimentVisible, setQ4FindPolicyExperimentVisible] = useState(false);
+      const [q4FindPolicyExperimentVariant, setQ4FindPolicyExperimentVariant] = useState(1);
+
+      useEffect(() => {
+        if (activeTab !== 'q4fy2026') setQ4FindPolicyExperimentVisible(false);
+      }, [activeTab]);
 
       const openChat = (message) => {
         setPrevScreen(screen);
@@ -3634,7 +4115,7 @@
                 <div className="sim-canvas">
                   <div className="phone-bezel">
                     <div className="phone-screen">
-                      <Q4FY2026Screen vehicleMonitoring={vehicleMonitoring} liteConnection={liteConnection} onDataCollectionComplete={() => setVehicleMonitoring(true)}/>
+                      <Q4FY2026Screen vehicleMonitoring={vehicleMonitoring} liteConnection={liteConnection} driveScoreActive={driveScoreActive} onDataCollectionComplete={() => setVehicleMonitoring(true)} findPolicyExperimentVariant={q4FindPolicyExperimentVariant} onFindPolicyTabActive={setQ4FindPolicyExperimentVisible}/>
                     </div>
                   </div>
                 </div>
@@ -3642,23 +4123,27 @@
                   <div className="sim-sidebar">
                     <div className="sim-sidebar-title">Settings</div>
                     <div className="sim-sidebar-section">Q4 FY2026</div>
-                    <div className="sim-sidebar-label">Vehicle monitoring</div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                      <span style={{ fontSize: 13, color: vehicleMonitoring ? '#008600' : '#55595b' }}>{vehicleMonitoring ? 'On' : 'Off'}</span>
-                      <div onClick={() => setVehicleMonitoring(!vehicleMonitoring)} style={{
-                        width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
-                        background: vehicleMonitoring ? '#008600' : '#d9dfe2',
-                        position: 'relative', transition: 'background 200ms ease',
-                      }}>
-                        <div style={{
-                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
-                          position: 'absolute', top: 2,
-                          left: vehicleMonitoring ? 22 : 2,
-                          transition: 'left 200ms ease',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                        }}/>
-                      </div>
-                    </div>
+                    {q4FindPolicyExperimentVisible && (
+                      <>
+                        <div className="sim-sidebar-label" style={{ textTransform: 'none', letterSpacing: 'normal' }}>Experiment</div>
+                        <div role="radiogroup" aria-label="experiment" style={{ marginBottom: 20 }}>
+                          {[1, 2].map((v) => (
+                            <label key={v} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, cursor: 'pointer', fontSize: 14 }}>
+                              <input
+                                type="radio"
+                                name="q4-find-policy-experiment"
+                                checked={q4FindPolicyExperimentVariant === v}
+                                onChange={() => setQ4FindPolicyExperimentVariant(v)}
+                                style={{ width: 18, height: 18, accentColor: '#008600', cursor: 'pointer' }}
+                              />
+                              <span>{v === 1 ? 'Variant 1' : 'Variant 2'}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    {!q4FindPolicyExperimentVisible && (
+                    <>
                     <div className="sim-sidebar-label">Lite connection</div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
                       <span style={{ fontSize: 13, color: liteConnection ? '#008600' : '#55595b' }}>{liteConnection ? 'On' : 'Off'}</span>
@@ -3676,6 +4161,42 @@
                         }}/>
                       </div>
                     </div>
+                    <div className="sim-sidebar-label">Vehicle monitoring</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                      <span style={{ fontSize: 13, color: vehicleMonitoring ? '#008600' : '#55595b' }}>{vehicleMonitoring ? 'On' : 'Off'}</span>
+                      <div onClick={() => setVehicleMonitoring(!vehicleMonitoring)} style={{
+                        width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
+                        background: vehicleMonitoring ? '#008600' : '#d9dfe2',
+                        position: 'relative', transition: 'background 200ms ease',
+                      }}>
+                        <div style={{
+                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                          position: 'absolute', top: 2,
+                          left: vehicleMonitoring ? 22 : 2,
+                          transition: 'left 200ms ease',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                        }}/>
+                      </div>
+                    </div>
+                    <div className="sim-sidebar-label">Drive score</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                      <span style={{ fontSize: 13, color: driveScoreActive ? '#008600' : '#55595b' }}>{driveScoreActive ? 'On' : 'Off'}</span>
+                      <div onClick={() => setDriveScoreActive(!driveScoreActive)} style={{
+                        width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
+                        background: driveScoreActive ? '#008600' : '#d9dfe2',
+                        position: 'relative', transition: 'background 200ms ease',
+                      }}>
+                        <div style={{
+                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                          position: 'absolute', top: 2,
+                          left: driveScoreActive ? 22 : 2,
+                          transition: 'left 200ms ease',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                        }}/>
+                      </div>
+                    </div>
+                    </>
+                    )}
                   </div>
                 )}
               </>
