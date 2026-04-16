@@ -4525,9 +4525,9 @@
       /* ── List View ── */
       return (
         <div style={{ height: '100%', overflowY: 'auto' }}>
-          <div style={{ padding: '40px 48px', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+          <div style={{ padding: '40px 48px', width: '100%' }}>
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, width: '100%' }}>
               <div>
                 <h1 style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>PRDs</h1>
                 <p style={{ fontSize: 17, color: '#55595b', lineHeight: 1.4 }}>Product requirements linked to the insurance vision</p>
@@ -4538,7 +4538,7 @@
             </div>
 
             {/* Filters */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', width: '100%' }}>
               {[
                 { label: 'Quarter', value: filterQuarter, setter: setFilterQuarter, opts: quarters },
                 { label: 'Product Area', value: filterArea, setter: setFilterArea, opts: areas },
@@ -4558,7 +4558,7 @@
             </div>
 
             {/* Stats bar */}
-            <div style={{ display: 'flex', gap: 24, padding: '12px 0', borderBottom: '1px solid #e9eef0', marginBottom: 24, fontSize: 13, color: '#55595b' }}>
+            <div style={{ display: 'flex', gap: 24, padding: '12px 0', borderBottom: '1px solid #e9eef0', marginBottom: 24, fontSize: 13, color: '#55595b', width: '100%' }}>
               <span><strong style={{ color: '#000' }}>{counts.total}</strong> PRDs</span>
               <span><strong style={{ color: '#000' }}>{counts.inProgress}</strong> In Progress</span>
               {counts.atRisk > 0 && <span style={{ color: '#c74900' }}><strong>{counts.atRisk}</strong> At Risk</span>}
