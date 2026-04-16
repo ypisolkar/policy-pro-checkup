@@ -4823,7 +4823,7 @@
           {/* Top nav bar */}
           <div className="sim-topbar">
             <div className="sim-topbar-logo" onClick={() => setActiveTab('prds')} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>PRD's<span style={{ background: activeTab === 'prds' ? '#008600' : '#e3f1e6', color: activeTab === 'prds' ? '#fff' : '#008600', fontSize: 11, fontWeight: 600, borderRadius: 4, padding: '2px 6px', lineHeight: 1.15, transition: 'all 150ms ease' }}>New</span></div>
-            <div style={{ display: 'flex', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+            <div style={{ display: 'flex', position: 'absolute', left: showSettings ? 'calc((100% - 300px) / 2)' : '50%', transform: 'translateX(-50%)', transition: 'left 200ms ease' }}>
               {[
                 { id: 'currentState', label: 'Q3 FY2026', icon: null },
                 { id: 'q4fy2026', label: 'Q4 FY2026', icon: null },
