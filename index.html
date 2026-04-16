@@ -812,43 +812,6 @@
                   </div>
                 </div>
 
-                {/* Section divider */}
-                <div style={{ width: '100%', height: 8, background: '#e9eef0' }}/>
-
-                {/* Discover section */}
-                <div style={{ padding: '32px 16px 4px' }}>
-                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Discover</p>
-                  <p style={{ fontSize: 17, lineHeight: 1.4, marginTop: 4 }}>From monitoring to discounts</p>
-                </div>
-
-                {/* Nudge cards */}
-                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {/* Vehicle monitoring card */}
-                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0 1px 3px rgba(0,0,0,0.4)', display: 'flex', gap: 16, padding: 16, alignItems: 'flex-start' }}>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Vehicle monitoring</p>
-                      <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginTop: 4 }}>Market value, safety recalls, etc.</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                        <img src="Assets/Clock icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
-                        <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>1 min</span>
-                      </div>
-                    </div>
-                    <KDSButton size="small">Start</KDSButton>
-                  </div>
-
-                  {/* Earn lower rates card */}
-                  <div style={{ background: '#fff', borderRadius: 6, boxShadow: '0 1px 3px rgba(0,0,0,0.4)', display: 'flex', gap: 16, padding: 16, alignItems: 'flex-start' }}>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Earn a lower rates</p>
-                      <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginTop: 4 }}>Drive for ~30 days to see if you qualify for lower insurance rates</p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                        <img src="Assets/Clock icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
-                        <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>30 days</span>
-                      </div>
-                    </div>
-                    <KDSButton size="small">Start</KDSButton>
-                  </div>
-                </div>
               </>
             ) : (
             <>
@@ -1194,7 +1157,7 @@
                     <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Summary</p>
                     <Icons.Sparkle size={20} color="#55595b"/>
                   </div>
-                  <div style={{ padding: '0 16px' }}>
+                  <div style={{ padding: '0 16px 16px' }}>
                     <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>
                       Your coverage is looking great! You're well protected
                     </p>
@@ -1218,30 +1181,6 @@
                     </div>
                   </div>
 
-                  {/* Section divider */}
-                  <div style={{ height: 8, background: '#e9eef0' }}/>
-
-                  {/* Discover section */}
-                  <div style={{ padding: '32px 16px 0' }}>
-                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Discover</p>
-                    <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginBottom: 16 }}>From monitoring to discounts</p>
-                    {[
-                      { title: 'Vehicle monitoring', desc: 'Market value, safety recalls, etc.', time: '1 min', btn: 'Add' },
-                      { title: 'Earn a lower rates', desc: 'Drive for ~30 days to see if you qualify for lower insurance rates', time: '30 days', btn: 'Start' },
-                    ].map((card, i) => (
-                      <div key={i} style={{ border: '1px solid #d9dfe2', borderRadius: 12, padding: 16, marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>{card.title}</p>
-                          <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, marginBottom: 8 }}>{card.desc}</p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <img src="Assets/Clock icon.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain' }}/>
-                            <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>{card.time}</span>
-                          </div>
-                        </div>
-                        <KDSButton size="small">{card.btn}</KDSButton>
-                      </div>
-                    ))}
-                  </div>
                 </>
               ) : chip1 === 1 ? (
                 /* Claims */
