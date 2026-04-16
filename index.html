@@ -1633,6 +1633,80 @@
                 </div>
               )
             )}
+
+            {/* Section divider */}
+            <div style={{ height: 8, background: '#e9eef0' }}/>
+
+            {/* Upcoming section */}
+            <div style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <p style={{ flex: 1, fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Upcoming</p>
+                  <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15 }}>See all</span>
+                </div>
+                <p style={{ fontSize: 17, lineHeight: 1.4 }}>From renewals to rate factor changes</p>
+              </div>
+              <div>
+                {[
+                  { month: 'May', day: '15', title: 'Insurance payment due', desc: 'Liberty mutual auto: 3228' },
+                  { month: 'Jun', day: '3', title: 'Insurance payment due', desc: 'Liberty mutual auto: 3228' },
+                  { month: 'Jul', day: '29', title: 'Scheduled maintenance due', desc: '2008 Jeep Grand cherokee' },
+                ].map((item, i, arr) => (
+                  <div key={i}>
+                    <div style={{ padding: '24px 0', display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', flexShrink: 0, textAlign: 'center' }}>
+                        <div style={{ background: '#e9eef0', borderBottom: '1px solid #d9dfe2', padding: '2px 12px' }}>
+                          <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>{item.month}</span>
+                        </div>
+                        <div style={{ padding: '4px 12px' }}>
+                          <span style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>{item.day}</span>
+                        </div>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{item.title}</p>
+                        <p style={{ fontSize: 15, lineHeight: 1.4, marginTop: 4 }}>{item.desc}</p>
+                      </div>
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div style={{ height: 1, background: '#d9dfe2' }}/>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Section divider */}
+            <div style={{ height: 8, background: '#e9eef0' }}/>
+
+            {/* Documents section */}
+            <div style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <p style={{ flex: 1, fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Documents</p>
+                  <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15 }}>See all</span>
+                </div>
+                <p style={{ fontSize: 17, lineHeight: 1.4 }}>23 policy documents added</p>
+              </div>
+              <div className="h-scroll" style={{ display: 'flex', gap: 12, overflowX: 'auto', margin: '0 -16px', padding: '0 16px' }}>
+                {[
+                  { name: 'Uninsured/unde...', img: 'Assets/Document 1.png' },
+                  { name: 'Declaration pag...', img: 'Assets/Document 2.png' },
+                  { name: 'Cover letter.pdf', img: 'Assets/Document 1.png' },
+                  { name: 'Proof of ins...', img: 'Assets/Document 2.png' },
+                ].map((doc, i) => (
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0, cursor: 'pointer' }}>
+                    <div style={{ width: 103, height: 133, borderRadius: 4, border: '1px solid #d9dfe2', overflow: 'hidden', background: '#fff' }}>
+                      <img src={doc.img} alt={doc.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                    </div>
+                    <span style={{ fontSize: 13, lineHeight: 1.4, width: 103, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{doc.name}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+                <Icons.Plus size={16} color="#008600"/>
+                <span style={{ fontSize: 17, fontWeight: 500, color: '#008600', lineHeight: 1.4 }}>Add document</span>
+              </div>
+            </div>
             </>
             )}
           </div>
@@ -3913,7 +3987,7 @@
                     <div style={{ display: 'inline-flex', alignSelf: 'flex-start', background: '#f5a623', borderRadius: 4, padding: '4px 8px' }}>
                       <span style={{ fontSize: 13, fontWeight: 500, color: '#000', lineHeight: 1.15 }}>Limited time offer</span>
                     </div>
-                    <img src="Assets/Progressive logo small.png" alt="Progressive" style={{ height: 28, objectFit: 'contain', alignSelf: 'flex-start' }}/>
+                    <img src="Assets/Progressive.png" alt="Progressive" style={{ height: 28, objectFit: 'contain', alignSelf: 'flex-start' }}/>
                     <div style={{ display: 'flex', gap: 16 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -4100,6 +4174,451 @@
       );
     }
 
+    /* ─── PRDs Page ─── */
+    function PRDsPage() {
+      const [prdView, setPrdView] = useState('list');
+      const [selectedPrd, setSelectedPrd] = useState(null);
+      const [filterQuarter, setFilterQuarter] = useState('All');
+      const [filterArea, setFilterArea] = useState('All');
+      const [filterStatus, setFilterStatus] = useState('All');
+      const [sortBy, setSortBy] = useState('updated');
+      const [addStep, setAddStep] = useState(0);
+      const [addForm, setAddForm] = useState({ url: '', title: '', problem: '', solution: '', impact: '', metrics: ['', '', ''], risks: '', quarter: 'Q4 FY2026', area: 'Policy Pro', status: 'Draft', pm: '', design: '', eng: '' });
+
+      const prds = [
+        {
+          id: 1, title: 'Savings Opportunities Expansion', quarter: 'Q4 FY2026', area: 'Coverage', status: 'Draft',
+          pillar: 'Savings & Monetization', pm: 'Yashashree Pisolkar', design: 'Dakota Mulvihill', eng: 'Saurabh Chamedia',
+          problem: 'Savings opportunities have extremely limited reach — less than ~10% of ~250K connected policies qualify for a cheaper EO. No meaningful shopping experience for PGR holders or non-PGR users without cheaper EOs. Predicted rates, rate factor signals, and behavioral savings programs are underutilized, leaving the majority of users with a dead-end monitor tab.',
+          solution: 'Expand savings coverage to 50–60% through rate factor change nudges (credit score improvement, driving record improvement, vehicle depreciation/age), expanded predicted rate modeling for full coverage tiers, and switch-to-save nudges for users with 2+ years at the same insurer.',
+          impact: 'Increase savings opportunity coverage from ~10% to 50–60%, boost engagement with savings modules (CTR + interaction rate), increase Monitor tab 30-60-90 day repeat visitation, and grow downstream monetization.',
+          metrics: ['Savings eligibility ~10% → 50–60%', 'Monitor tab 30/60/90-day repeat visitation increase', 'Downstream monetization growth (EO clicks, RpU, CpU)'],
+          risks: ['Impact sizing pending analytics input', 'PGR compliance constraints limit shopping experience', 'Predicted rate model expansion to full coverage needs validation'],
+          milestones: [
+            { label: 'Problem validation & research', quarter: 'Q3 FY2026', done: true },
+            { label: 'Signal modeling & design', quarter: 'Q4 FY2026', done: false },
+            { label: 'Eng build & integration', quarter: 'Q4 FY2026', done: false },
+            { label: 'GA launch', quarter: 'Q1 FY2027', done: false },
+          ],
+          dependencies: [],
+          updates: [
+            { date: 'Apr 10', text: 'PRD updated with rate factor nudge variants and switch-to-save requirements' },
+            { date: 'Mar 30', text: 'Aligned XFN on 4 signal categories and 10 nudge variants' },
+            { date: 'Mar 15', text: 'Kickoff with analytics to scope savings eligibility expansion' },
+          ],
+          progress: 1, totalMilestones: 4, updated: '6 days ago', docUrl: 'https://docs.google.com/document/d/1u_-Rd3BUQbuviWcw4S0-YMIkpd8AA4b4lFQfDHBDlm4/edit?tab=t.0#heading=h.4463wx4wd4m8',
+        },
+        {
+          id: 2, title: 'DFY Insurance Guidance – Data Onboarding Layer', quarter: 'Q4 FY2026', area: 'Policy Pro', status: 'Draft',
+          pillar: 'AI Insurance Guidance', pm: 'Yashashree Pisolkar', design: 'Kaylee Kesler', eng: 'Utsav Mehta',
+          problem: 'Members lack clear, personalized guidance to answer key insurance questions — "Do I have the right coverage?", "Am I overpaying?", "Should I switch or stay?" — due to fragmented and shallow data, low reliability of connected policy data, high friction to connect, and low trust in personalization. The experience feels too light vs. traditional quote flows, limiting conversion, Monitor Tab engagement, and perceived value.',
+          solution: 'Build a robust data onboarding layer (phased P0/P1/P2) that consolidates policy overview, coverage details, behavioral signals, and household data into a unified, LLM-ready structure — enabling context-aware, personalized insurance guidance at scale through the AMA chat experience within the Monitor Tab. Prioritize pre-fill, inference, and lightweight prompts over long forms.',
+          impact: 'Enable 1:1 tailored insurance guidance at scale — powering coverage right-sizing, pricing optimization, switch-vs-stay recommendations, and renewal timing. Increase Monitor Tab engagement, conversion to better policies, and perceived value of the experience.',
+          metrics: ['Policy-matched member growth via Lite data capture', 'AMA chat engagement & personalization depth', 'Coverage optimization conversion rate'],
+          risks: ['Minimum viable dataset for meaningful AMA responses TBD', 'Handling missing or conflicting data across sources', '% of users that can reach P1/P2 enrichment unclear', 'Policy-level vs household-level data model decision pending'],
+          milestones: [
+            { label: 'P0 data POC & Monitor Tab foundation', quarter: 'Q4 FY2026', done: false },
+            { label: 'AMA Chat with light policy optimization', quarter: 'Q1 FY2027', done: false },
+            { label: 'Coverage analyzer (P2 dataset)', quarter: 'Q3 FY2027', done: false },
+            { label: 'DFY policy management (full data)', quarter: 'Q4 FY2027', done: false },
+          ],
+          dependencies: [0],
+          updates: [
+            { date: 'Mar 31', text: 'PRD drafted and shared for eng scoping' },
+            { date: 'Mar 11', text: 'Key initiatives and data prioritization defined for FY27' },
+          ],
+          progress: 0, totalMilestones: 4, updated: '16 days ago', docUrl: 'https://docs.google.com/document/d/1UaUsLEXTXg1vcHpwe5yRwxymdhK-Ull125z_L4iEnAM/edit?tab=t.0',
+        },
+        {
+          id: 3, title: 'Insurance AMA Chat MVP', quarter: 'Q4 FY2026', area: 'Policy Pro', status: 'Draft',
+          pillar: 'AI Insurance Guidance', pm: 'Yashashree Pisolkar', design: 'Kaylee Kesler', eng: 'Nitin Purohit',
+          problem: 'Members lack clear, personalized guidance to answer "Do I have the right coverage?", "Am I overpaying?", and "Should I switch or stay?" The Monitor Tab can show prices and policy snapshots but cannot provide 1:1 tailored guidance at scale — limiting conversion to better policies, tab engagement, and perceived value of the experience.',
+          solution: 'Introduce an Ask-Me-Anything AI chat experience within the Monitor Tab that delivers context-aware insurance guidance. The chat ingests Policy Lite, VMM, CK data, and lifecycle signals to personalize answers, detects missing data and progressively captures it through conversational UX, and uses contextual welcome messages with suggested prompt pills tailored to member signals (credit changes, vehicle depreciation, auto loans, address changes).',
+          impact: 'Deliver personalized insurance education and coverage guidance at scale, drive deeper engagement and policy activation through conversational UX, and lay the foundation for DFY coverage recommendations, renewal guidance, and policy switching.',
+          metrics: ['% MAU interacting with AMA entry points', 'Policy Lite activation rate via chat', 'Post-AMA shopping behavior & hub visitation'],
+          risks: ['Depends on Data Onboarding Layer (DFY) for personalization depth', 'Welcome message variant performance needs A/B testing', 'LLM guardrails for insurance-specific compliance TBD', 'Entry point placement on Monitor Tab needs validation'],
+          milestones: [
+            { label: 'PRD & eng scoping', quarter: 'Q4 FY2026', done: false },
+            { label: 'Chat UX design & entry point validation', quarter: 'Q4 FY2026', done: false },
+            { label: 'MVP build (education + guidance)', quarter: 'Q1 FY2027', done: false },
+            { label: 'Beta launch & A/B testing', quarter: 'Q1 FY2027', done: false },
+          ],
+          dependencies: [1],
+          updates: [
+            { date: 'Apr 10', text: 'PRD updated with welcome message variants and entry point options' },
+            { date: 'Mar 31', text: 'Draft shared for eng scoping — aligned on P0 scope' },
+          ],
+          progress: 0, totalMilestones: 4, updated: '6 days ago', docUrl: 'https://docs.google.com/document/d/1Zgny1GJgn4fIpkdqeQmsYNdzt1ZwuCuJufFTKzIIt4w/edit?tab=t.0',
+        },
+        {
+          id: 4, title: 'Policy Lite Funnel Optimizations', quarter: 'Q4 FY2026', area: 'Coverage', status: 'Draft',
+          pillar: 'Savings & Monetization', pm: 'Yashashree Pisolkar', design: 'Dakota Mulvihill', eng: 'Saurabh Chamedia',
+          problem: 'Policy Lite still has significant drop-off at entry and carrier selection (step 1), under-leveraged high-intent signals (Auto Insurance CAMM, EO policy purchasers), weak re-entry and re-engagement loops, and limited contextual triggers across surfaces — capping activation, missing in-session conversion of high-intent users, and limiting member impact and LTV.',
+          solution: 'Four optimization themes: (1) Carrier pre-fill + deep link using CAMM data to skip step 1 for ~1.3M auto insurance CAMMs, (2) post-EO purchase takeover to activate high-intent users on policy monitoring, (3) trigger-based activation hooks tied to renewal proximity, rate increases, credit changes, and driving violations, and (4) incomplete funnel recovery with save-progress and smart re-entry.',
+          impact: 'Increase Lite connection activation rate by +50% vs baseline, grow total active connections to 100K/month run rate (from ~40K) and 1.2M total (3.5x current).',
+          metrics: ['Lite activation rate +50% lift', 'Total active connections → 100K/month run rate', 'Total active connections → 1.2M (3.5x current)'],
+          risks: ['Incorrect carrier pre-fill — mitigated by editable field + confidence threshold', 'Over-triggering fatigue — mitigated by frequency caps + prioritization logic', 'Low perceived value vs full connection — mitigated by stronger value props'],
+          milestones: [
+            { label: 'PRD & experiment design', quarter: 'Q4 FY2026', done: true },
+            { label: 'Carrier pre-fill + takeover build', quarter: 'Q4 FY2026', done: false },
+            { label: 'Trigger engine + re-entry system', quarter: 'Q4 FY2026', done: false },
+            { label: 'A/B experiments & rollout', quarter: 'Q1 FY2027', done: false },
+          ],
+          dependencies: [],
+          updates: [
+            { date: 'Apr 7', text: 'PRD updated with experiment plan and 5 A/B test designs' },
+            { date: 'Mar 25', text: 'Aligned on 4 optimization themes and prioritization tiers' },
+          ],
+          progress: 1, totalMilestones: 4, updated: '9 days ago', docUrl: 'https://docs.google.com/document/d/1Kdu4SG1zy8FWxbzuE31NS5HudXvjPcWEzK790FU9ty8/edit?tab=t.0',
+        },
+      ];
+
+      const statusColors = {
+        'Draft': { bg: '#e9eef0', color: '#55595b' },
+        'In Progress': { bg: '#ffc402', color: '#000' },
+        'In Review': { bg: '#cde7ef', color: '#006a57' },
+        'Shipped': { bg: '#e3f1e6', color: '#008600' },
+        'At Risk': { bg: '#fce4e4', color: '#c74900' },
+      };
+
+      const quarters = ['All', 'Q3 FY2026', 'Q4 FY2026', 'Q1 FY2027'];
+      const areas = ['All', 'Policy Pro', 'Find a Policy', 'Drive Score', 'Coverage'];
+      const statuses = ['All', 'Draft', 'In Progress', 'In Review', 'Shipped', 'At Risk'];
+
+      const filtered = prds.filter(p =>
+        (filterQuarter === 'All' || p.quarter === filterQuarter) &&
+        (filterArea === 'All' || p.area === filterArea) &&
+        (filterStatus === 'All' || p.status === filterStatus)
+      ).sort((a, b) => {
+        if (sortBy === 'quarter') return quarters.indexOf(a.quarter) - quarters.indexOf(b.quarter);
+        if (sortBy === 'status') return statuses.indexOf(a.status) - statuses.indexOf(b.status);
+        return 0;
+      });
+
+      const counts = { total: prds.length, inProgress: prds.filter(p => p.status === 'In Progress').length, atRisk: prds.filter(p => p.status === 'At Risk').length, shipped: prds.filter(p => p.status === 'Shipped').length };
+
+      const StatusBadge = ({ status }) => {
+        const c = statusColors[status] || statusColors['Draft'];
+        return React.createElement('span', { style: { background: c.bg, color: c.color, fontSize: 12, fontWeight: 600, borderRadius: 4, padding: '3px 8px', lineHeight: 1.15, whiteSpace: 'nowrap' } }, status);
+      };
+
+      const QuarterBadge = ({ quarter }) => React.createElement('span', { style: { background: '#f7f9fa', color: '#55595b', fontSize: 12, fontWeight: 500, borderRadius: 4, padding: '3px 8px', lineHeight: 1.15, border: '1px solid #e9eef0', whiteSpace: 'nowrap' } }, quarter);
+
+      const ProgressBar = ({ done, total }) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#e9eef0', overflow: 'hidden' }}>
+            <div style={{ width: `${(done / total) * 100}%`, height: '100%', borderRadius: 2, background: done === total ? '#008600' : '#ffc402', transition: 'width 300ms ease' }}/>
+          </div>
+          <span style={{ fontSize: 12, color: '#55595b', whiteSpace: 'nowrap' }}>{done}/{total}</span>
+        </div>
+      );
+
+      /* ── Add PRD Flow ── */
+      if (prdView === 'add') {
+        return (
+          <div style={{ padding: '40px 48px', maxWidth: 720, margin: '0 auto', width: '100%' }}>
+            <button onClick={() => { setPrdView('list'); setAddStep(0); }} className="press-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, fontWeight: 500, color: '#55595b', fontFamily: 'inherit', padding: 0, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Icons.ChevronLeft size={16} color="#55595b"/> Back to PRDs
+            </button>
+            <h1 style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>Add a PRD</h1>
+            <p style={{ fontSize: 17, color: '#55595b', lineHeight: 1.4, marginBottom: 32 }}>Paste a Google Doc link and we'll generate a scannable summary.</p>
+
+            {addStep === 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <label style={{ fontSize: 15, fontWeight: 500 }}>Google Doc URL</label>
+                <input value={addForm.url} onChange={e => setAddForm({ ...addForm, url: e.target.value })} placeholder="https://docs.google.com/document/d/..." style={{ padding: '12px 16px', fontSize: 15, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none' }}/>
+                <button onClick={() => { setAddStep(1); setTimeout(() => setAddStep(2), 2200); }} className="press-btn" disabled={!addForm.url} style={{ background: addForm.url ? '#008600' : '#d9dfe2', color: '#fff', border: 'none', borderRadius: 6, padding: '12px 24px', fontSize: 17, fontWeight: 500, cursor: addForm.url ? 'pointer' : 'default', fontFamily: 'inherit', alignSelf: 'flex-start' }}>Generate Summary</button>
+              </div>
+            )}
+
+            {addStep === 1 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '64px 0', gap: 16 }}>
+                <div style={{ width: 40, height: 40, border: '3px solid #e9eef0', borderTop: '3px solid #008600', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
+                <p style={{ fontSize: 17, color: '#55595b' }}>Analyzing document...</p>
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+              </div>
+            )}
+
+            {addStep === 2 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ background: '#e3f1e6', borderRadius: 6, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Icons.Check size={16} color="#008600"/>
+                  <span style={{ fontSize: 15, color: '#008600', fontWeight: 500 }}>Summary generated — review and edit below</span>
+                </div>
+                {[
+                  { label: 'Title', key: 'title', type: 'input', placeholder: 'PRD title' },
+                  { label: 'Problem', key: 'problem', type: 'textarea', placeholder: 'What problem does this solve?' },
+                  { label: 'Proposed Solution', key: 'solution', type: 'textarea', placeholder: 'How will this be solved?' },
+                  { label: 'Customer Impact', key: 'impact', type: 'input', placeholder: 'Expected impact on members' },
+                  { label: 'Risks / Open Questions', key: 'risks', type: 'textarea', placeholder: 'Key risks or unknowns' },
+                ].map(field => (
+                  <div key={field.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{field.label}</label>
+                    {field.type === 'textarea' ? (
+                      <textarea value={addForm[field.key]} onChange={e => setAddForm({ ...addForm, [field.key]: e.target.value })} placeholder={field.placeholder} rows={3} style={{ padding: '12px 16px', fontSize: 15, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none', resize: 'vertical' }}/>
+                    ) : (
+                      <input value={addForm[field.key]} onChange={e => setAddForm({ ...addForm, [field.key]: e.target.value })} placeholder={field.placeholder} style={{ padding: '12px 16px', fontSize: 15, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none' }}/>
+                    )}
+                  </div>
+                ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5 }}>Key Metrics (up to 3)</label>
+                  {addForm.metrics.map((m, i) => (
+                    <input key={i} value={m} onChange={e => { const newM = [...addForm.metrics]; newM[i] = e.target.value; setAddForm({ ...addForm, metrics: newM }); }} placeholder={`Metric ${i + 1}`} style={{ padding: '12px 16px', fontSize: 15, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none' }}/>
+                  ))}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                  {[
+                    { label: 'Quarter', key: 'quarter', opts: quarters.slice(1) },
+                    { label: 'Product Area', key: 'area', opts: areas.slice(1) },
+                    { label: 'Status', key: 'status', opts: statuses.slice(1) },
+                  ].map(sel => (
+                    <div key={sel.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{sel.label}</label>
+                      <select value={addForm[sel.key]} onChange={e => setAddForm({ ...addForm, [sel.key]: e.target.value })} style={{ padding: '12px 16px', fontSize: 15, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none', background: '#fff' }}>
+                        {sel.opts.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                  {['pm', 'design', 'eng'].map(role => (
+                    <div key={role} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{role === 'pm' ? 'PM' : role === 'design' ? 'Design' : 'Eng'}</label>
+                      <input value={addForm[role]} onChange={e => setAddForm({ ...addForm, [role]: e.target.value })} placeholder="Name" style={{ padding: '12px 16px', fontSize: 15, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none' }}/>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                  <button onClick={() => { setPrdView('list'); setAddStep(0); }} className="press-btn" style={{ background: '#008600', color: '#fff', border: 'none', borderRadius: 6, padding: '12px 32px', fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Save PRD</button>
+                  <button onClick={() => { setPrdView('list'); setAddStep(0); }} className="press-btn" style={{ background: '#fff', color: '#55595b', border: '1px solid #d9dfe2', borderRadius: 6, padding: '12px 24px', fontSize: 17, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      /* ── Detail View ── */
+      if (prdView === 'detail' && selectedPrd !== null) {
+        const prd = prds.find(p => p.id === selectedPrd);
+        if (!prd) { setPrdView('list'); return null; }
+        const sc = statusColors[prd.status];
+        return (
+          <div style={{ padding: '40px 48px', maxWidth: 800, margin: '0 auto', width: '100%', overflowY: 'auto', height: '100%' }}>
+            <button onClick={() => setPrdView('list')} className="press-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, fontWeight: 500, color: '#55595b', fontFamily: 'inherit', padding: 0, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Icons.ChevronLeft size={16} color="#55595b"/> Back to PRDs
+            </button>
+
+            {/* Header */}
+            <div style={{ marginBottom: 32 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <StatusBadge status={prd.status}/>
+                <QuarterBadge quarter={prd.quarter}/>
+                <span style={{ fontSize: 12, color: '#55595b', marginLeft: 'auto' }}>Updated {prd.updated}</span>
+              </div>
+              <h1 style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>{prd.title}</h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+                <span style={{ fontSize: 15, color: '#55595b' }}><strong>PM:</strong> {prd.pm}</span>
+                <span style={{ fontSize: 15, color: '#55595b' }}><strong>Design:</strong> {prd.design}</span>
+                <span style={{ fontSize: 15, color: '#55595b' }}><strong>Eng:</strong> {prd.eng}</span>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => window.open(prd.docUrl, '_blank')} className="press-btn" style={{ background: '#008600', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 20px', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 2H3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V8.5M8 2h4m0 0v4m0-4L6.5 7.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  View PRD
+                </button>
+              </div>
+            </div>
+
+            {/* Vision Alignment */}
+            <div style={{ background: '#f0faf1', border: '1px solid #c8e6c9', borderRadius: 6, padding: 16, marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <Icons.Shield size={20} color="#008600"/>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#008600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Vision Pillar</p>
+                <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4 }}>{prd.pillar}</p>
+              </div>
+            </div>
+
+            {/* Full Summary */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginBottom: 32 }}>
+              {[
+                { label: 'Problem', text: prd.problem },
+                { label: 'Proposed Solution', text: prd.solution },
+                { label: 'Customer Impact', text: prd.impact },
+              ].map(s => (
+                <div key={s.label}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{s.label}</p>
+                  <p style={{ fontSize: 17, lineHeight: 1.5 }}>{s.text}</p>
+                </div>
+              ))}
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Key Metrics</p>
+                <ul style={{ margin: 0, paddingLeft: 20 }}>
+                  {prd.metrics.map((m, i) => <li key={i} style={{ fontSize: 17, lineHeight: 1.5, marginBottom: 4 }}>{m}</li>)}
+                </ul>
+              </div>
+              {prd.risks.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#c74900', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Risks / Open Questions</p>
+                  <ul style={{ margin: 0, paddingLeft: 20 }}>
+                    {prd.risks.map((r, i) => <li key={i} style={{ fontSize: 17, lineHeight: 1.5, marginBottom: 4, color: '#55595b' }}>{r}</li>)}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Progress */}
+            <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, padding: 24, marginBottom: 24 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>Milestones</p>
+              <ProgressBar done={prd.progress} total={prd.totalMilestones}/>
+              <div style={{ marginTop: 20 }}>
+                {prd.milestones.map((m, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: i < prd.milestones.length - 1 ? 0 : 0 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+                      <div style={{ width: 20, height: 20, borderRadius: '50%', background: m.done ? '#008600' : '#e9eef0', border: m.done ? 'none' : '2px solid #d9dfe2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {m.done && <Icons.Check size={12} color="#fff"/>}
+                      </div>
+                      {i < prd.milestones.length - 1 && <div style={{ width: 2, height: 32, background: '#e9eef0' }}/>}
+                    </div>
+                    <div style={{ paddingTop: 1, paddingBottom: i < prd.milestones.length - 1 ? 20 : 0 }}>
+                      <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15, color: m.done ? '#000' : '#55595b' }}>{m.label}</p>
+                      <p style={{ fontSize: 13, color: '#55595b', marginTop: 2 }}>{m.quarter}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Dependencies */}
+            {prd.dependencies.length > 0 && (
+              <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, padding: 24, marginBottom: 24 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>Dependencies</p>
+                {prd.dependencies.map(depId => {
+                  const dep = prds.find(p => p.id === depId + 1);
+                  if (!dep) return null;
+                  return (
+                    <div key={depId} onClick={() => setSelectedPrd(dep.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #e9eef0', cursor: 'pointer' }}>
+                      <StatusBadge status={dep.status}/>
+                      <span style={{ fontSize: 15, fontWeight: 500, flex: 1 }}>{dep.title}</span>
+                      <Icons.ChevronRight size={16} color="#55595b"/>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Status Updates */}
+            <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, padding: 24, marginBottom: 48 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 16 }}>Status Updates</p>
+              {prd.updates.map((u, i) => (
+                <div key={i} style={{ display: 'flex', gap: 12, marginBottom: i < prd.updates.length - 1 ? 16 : 0 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#55595b', whiteSpace: 'nowrap', minWidth: 48 }}>{u.date}</span>
+                  <p style={{ fontSize: 15, lineHeight: 1.4, margin: 0 }}>{u.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      /* ── List View ── */
+      return (
+        <div style={{ height: '100%', overflowY: 'auto' }}>
+          <div style={{ padding: '40px 48px', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+              <div>
+                <h1 style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>PRDs</h1>
+                <p style={{ fontSize: 17, color: '#55595b', lineHeight: 1.4 }}>Product requirements linked to the insurance vision</p>
+              </div>
+              <button onClick={() => setPrdView('add')} className="press-btn" style={{ background: '#008600', color: '#fff', border: 'none', borderRadius: 6, padding: '10px 20px', fontSize: 15, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+                <Icons.Plus size={14} color="#fff"/> Add PRD
+              </button>
+            </div>
+
+            {/* Filters */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+              {[
+                { label: 'Quarter', value: filterQuarter, setter: setFilterQuarter, opts: quarters },
+                { label: 'Product Area', value: filterArea, setter: setFilterArea, opts: areas },
+                { label: 'Status', value: filterStatus, setter: setFilterStatus, opts: statuses },
+              ].map(f => (
+                <select key={f.label} value={f.value} onChange={e => f.setter(e.target.value)} style={{ padding: '8px 12px', fontSize: 13, fontWeight: 500, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none', background: f.value !== 'All' ? '#008600' : '#fff', color: f.value !== 'All' ? '#fff' : '#000', cursor: 'pointer', appearance: 'none', paddingRight: 28, backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'10\' height=\'6\' viewBox=\'0 0 10 6\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M1 1l4 4 4-4\' stroke=\'' + (f.value !== 'All' ? '%23fff' : '%2355595b') + '\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}>
+                  {f.opts.map(o => <option key={o} value={o}>{o === 'All' ? f.label + ': All' : o}</option>)}
+                </select>
+              ))}
+              <div style={{ marginLeft: 'auto' }}>
+                <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: '8px 12px', fontSize: 13, fontWeight: 500, border: '1px solid #d9dfe2', borderRadius: 6, fontFamily: 'inherit', outline: 'none', background: '#fff', cursor: 'pointer', appearance: 'none', paddingRight: 28, backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'10\' height=\'6\' viewBox=\'0 0 10 6\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M1 1l4 4 4-4\' stroke=\'%2355595b\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}>
+                  <option value="updated">Recently updated</option>
+                  <option value="quarter">Quarter</option>
+                  <option value="status">Status</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Stats bar */}
+            <div style={{ display: 'flex', gap: 24, padding: '12px 0', borderBottom: '1px solid #e9eef0', marginBottom: 24, fontSize: 13, color: '#55595b' }}>
+              <span><strong style={{ color: '#000' }}>{counts.total}</strong> PRDs</span>
+              <span><strong style={{ color: '#000' }}>{counts.inProgress}</strong> In Progress</span>
+              {counts.atRisk > 0 && <span style={{ color: '#c74900' }}><strong>{counts.atRisk}</strong> At Risk</span>}
+              <span><strong style={{ color: '#008600' }}>{counts.shipped}</strong> Shipped</span>
+            </div>
+
+            {/* Card Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 48 }}>
+              {filtered.map(prd => (
+                <div key={prd.id} style={{ background: '#fff', border: '1px solid #d9dfe2', borderRadius: 8, padding: 24, display: 'flex', flexDirection: 'column', gap: 12, boxShadow: '0 1px 3px rgba(0,0,0,0.08)', transition: 'box-shadow 150ms ease', cursor: 'pointer', position: 'relative' }} onClick={() => { setSelectedPrd(prd.id); setPrdView('detail'); }}>
+                  {/* At risk indicator */}
+                  {prd.status === 'At Risk' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: '#c74900', borderRadius: '8px 8px 0 0' }}/>}
+                  {/* Top badges */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <StatusBadge status={prd.status}/>
+                    <QuarterBadge quarter={prd.quarter}/>
+                    <span style={{ fontSize: 12, color: '#55595b', marginLeft: 'auto' }}>{prd.updated}</span>
+                  </div>
+                  {/* Title */}
+                  <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.2, margin: 0 }}>{prd.title}</p>
+                  {/* Owners */}
+                  <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4, margin: 0 }}>{prd.pm} · {prd.design} · {prd.eng}</p>
+                  {/* Pillar */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Icons.Shield size={14} color="#008600"/>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#008600' }}>{prd.pillar}</span>
+                  </div>
+                  {/* Summary */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>Problem</p>
+                      <p style={{ fontSize: 14, lineHeight: 1.4, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{prd.problem}</p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>Solution</p>
+                      <p style={{ fontSize: 14, lineHeight: 1.4, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{prd.solution}</p>
+                    </div>
+                  </div>
+                  {/* Metrics */}
+                  <div>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Key Metrics</p>
+                    {prd.metrics.slice(0, 3).map((m, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 2 }}>
+                        <span style={{ fontSize: 10, color: '#55595b' }}>•</span>
+                        <span style={{ fontSize: 13, lineHeight: 1.4, color: '#55595b' }}>{m}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Actions */}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                    <button onClick={e => { e.stopPropagation(); window.open(prd.docUrl, '_blank'); }} className="press-btn" style={{ background: '#fff', color: '#008600', border: '1px solid #008600', borderRadius: 6, padding: '6px 14px', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>View PRD</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     /* ─── App ─── */
     function App() {
       const [screen, setScreen] = useState('myPolicies');
@@ -4146,7 +4665,7 @@
         <div className="sim-layout">
           {/* Top nav bar */}
           <div className="sim-topbar">
-            <div className="sim-topbar-logo">Show Code</div>
+            <div className="sim-topbar-logo" onClick={() => setActiveTab('prds')} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>PRD's<span style={{ background: activeTab === 'prds' ? '#008600' : '#e3f1e6', color: activeTab === 'prds' ? '#fff' : '#008600', fontSize: 11, fontWeight: 600, borderRadius: 4, padding: '2px 6px', lineHeight: 1.15, transition: 'all 150ms ease' }}>New</span></div>
             <div style={{ display: 'flex', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
               {[
                 { id: 'currentState', label: 'Q3 FY2026', icon: null },
@@ -4214,7 +4733,9 @@
 
           {/* Body: canvas + sidebar OR component library */}
           <div className="sim-body">
-            {activeTab === 'components' ? (
+            {activeTab === 'prds' ? (
+              <PRDsPage/>
+            ) : activeTab === 'components' ? (
               <ComponentLibrary theme={theme} setTheme={setTheme}/>
             ) : activeTab === 'currentState' ? (
               <>
