@@ -4269,6 +4269,548 @@
       );
     }
 
+    /* ─── Research Page wrapper (Ideas / Insights / Presentations tabs) ─── */
+    function ResearchPage() {
+      const RESEARCH_TABS = [
+        { id: 'ideas', label: 'Ideas' },
+        { id: 'insights', label: 'Insights' },
+        { id: 'presentations', label: 'Presentations' },
+      ];
+      const subFromHash = () => {
+        const parts = (window.location.hash || '').replace(/^#\/?/, '').split('/');
+        if (parts[0] !== 'research') return 'ideas';
+        const sub = parts[1];
+        return RESEARCH_TABS.some(t => t.id === sub) ? sub : 'ideas';
+      };
+      const [activeResearchTab, setActiveResearchTab] = useState(subFromHash);
+
+      useEffect(() => {
+        const next = '#/research/' + activeResearchTab;
+        if (window.location.hash !== next) window.history.replaceState(null, '', next);
+      }, [activeResearchTab]);
+
+      useEffect(() => {
+        const onHash = () => {
+          const parts = (window.location.hash || '').replace(/^#\/?/, '').split('/');
+          if (parts[0] !== 'research') return;
+          const sub = RESEARCH_TABS.some(t => t.id === parts[1]) ? parts[1] : 'ideas';
+          setActiveResearchTab(prev => prev === sub ? prev : sub);
+        };
+        window.addEventListener('hashchange', onHash);
+        window.addEventListener('popstate', onHash);
+        // Normalize #/research -> #/research/ideas on first mount
+        const parts = (window.location.hash || '').replace(/^#\/?/, '').split('/');
+        if (parts[0] === 'research' && !RESEARCH_TABS.some(t => t.id === parts[1])) {
+          window.history.replaceState(null, '', '#/research/ideas');
+        }
+        return () => { window.removeEventListener('hashchange', onHash); window.removeEventListener('popstate', onHash); };
+      }, []);
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, background: '#fafbfc' }}>
+          {/* Airtable-style tab bar */}
+          <div style={{
+            display: 'flex', alignItems: 'flex-end', gap: 0,
+            padding: '8px 16px 0', background: '#E9EEF0',
+            borderBottom: '1px solid #d9dfe2', flexShrink: 0,
+            fontFamily: 'inherit',
+          }}>
+            {RESEARCH_TABS.map((tab, i) => {
+              const isActive = activeResearchTab === tab.id;
+              return (
+                <React.Fragment key={tab.id}>
+                  <div
+                    onClick={() => setActiveResearchTab(tab.id)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '8px 16px', fontSize: 13, fontFamily: 'inherit',
+                      fontWeight: isActive ? 600 : 500,
+                      color: isActive ? '#1a1f22' : '#55595b',
+                      background: isActive ? '#fafbfc' : 'transparent',
+                      borderRadius: '6px 6px 0 0',
+                      cursor: 'pointer',
+                      border: isActive ? '1px solid #d9dfe2' : '1px solid transparent',
+                      borderBottom: isActive ? '1px solid #fafbfc' : '1px solid transparent',
+                      marginBottom: isActive ? -1 : 0,
+                      position: 'relative', zIndex: isActive ? 1 : 0,
+                      transition: 'background 120ms ease, color 120ms ease',
+                    }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = '#1a1f22'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = '#55595b'; }}
+                  >
+                    {tab.label}
+                    {isActive && (
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ marginLeft: 2 }}>
+                        <path d="M2 3.5L5 6.5L8 3.5" stroke="#7a8186" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
+                  {i < RESEARCH_TABS.length - 1 && !isActive && activeResearchTab !== RESEARCH_TABS[i+1].id && (
+                    <div style={{ width: 1, height: 14, background: '#c2c9cd', alignSelf: 'center', margin: '0 2px' }}/>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
+
+          {/* Tab content */}
+          <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+            {activeResearchTab === 'ideas' ? (
+              <ResearchIdeas/>
+            ) : activeResearchTab === 'insights' ? (
+              <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', color: '#9aa5ab', fontSize: 15 }}>Insights — coming soon</div>
+            ) : (
+              <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', color: '#9aa5ab', fontSize: 15 }}>Presentations — coming soon</div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    /* ─── Research Page (workshop ideation) ─── */
+    const WORKSHOP_DATA = {
+      "Marketplace Improvements": [
+        {"kind": "header", "text": "\"Guaranteed\" / exclusive offers"},
+        {"kind": "idea", "id": "mi-1", "theme": "CK guarantee program", "sticky": "Leverage branding to create a similar Guarantee program and further enhance it. CKG for insurance - we guarantee this is the best rate or ($X back / matching offer).", "authors": "[Sean Lin / Paulina Biernacki]"},
+        {"kind": "idea", "id": "mi-2", "theme": "Exclusive CK value", "sticky": "Making our offers feel exclusive / guaranteed / locked in so members feel there is unique value to purchasing via CK specifically. Brand affinity discounts - you only get this insurance discount because you purchased thru CK. We could save users $500 as soon as they connect their current policy in 30 seconds.", "authors": "[Paulina Biernacki / victoria.mcleod / Matt Quigley]"},
+        {"kind": "header", "text": "Signaling our wide partner network"},
+        {"kind": "idea", "id": "mi-3", "theme": "Inventory & partner visibility", "sticky": "Show how many partners we searched for offers with — huge issue of perception of lack of inventory on CK could be mitigated. Partner logos (esp big brand names) on loading screens to boost credibility. Do a better job creating a holistic marketplace experience across EOs, MA, etc. Greater member certainty that we compared offers across a very wide network to get the best value.", "authors": "[Paulina Biernacki / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "mi-4", "theme": "Upfront transparency", "sticky": "Create upfront transparency over fact that you can customize the policy further in partner application.", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "mi-5", "theme": "Signaling our wide partner network", "sticky": "Work with media alpha companies to iterate/add data to their offer tiles so our marketplace feels more competitive", "authors": "[Jade Wilburn]"},
+        {"kind": "idea", "id": "mi-6", "theme": "Signaling our wide partner network", "sticky": "Progress: Bringing coverages into the conversation (vs. competitor \"as low as\" messaging)", "authors": "[Dennis (Visitor)]"},
+        {"kind": "header", "text": "Signaling offer transparency + competitiveness"},
+        {"kind": "idea", "id": "mi-7", "theme": "Signaling offer transparency + competitiveness", "sticky": "Create true price competition on our platform to drive down the premium for our members", "authors": "[Sean Lin]"},
+        {"kind": "idea", "id": "mi-8", "theme": "Signaling offer transparency + competitiveness", "sticky": "\"Approval odds\" for insurance → \"Rate certainty odds\"", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "mi-9", "theme": "Signaling offer transparency + competitiveness", "sticky": "Reduce information overload and use truth focused messaging rather than marketing min coverage option as low as 29", "authors": "[Abhinav Tyagi]"},
+        {"kind": "header", "text": "End-to-end App Experience"},
+        {"kind": "idea", "id": "mi-10", "theme": "End-to-end App Experience", "sticky": "End to end holistic support and purchase experience — CK focuses primarily on comparison and purchase but members think broadly about managing the policy, education/guidance, etc.", "authors": "[Paulina Biernacki / Alanna (Visitor)]"},
+        {"kind": "idea", "id": "mi-11", "theme": "End-to-end App Experience", "sticky": "Policy folder (similar to wallet)", "authors": "[Roy Hsia]"},
+        {"kind": "idea", "id": "mi-12", "theme": "End-to-end App Experience", "sticky": "A full experience flow that takes new members from marketing into the product → lite data collection flow → show offers → fully connect policy for better offers", "authors": "[Jade Wilburn]"},
+        {"kind": "header", "text": "Bundling"},
+        {"kind": "idea", "id": "mi-13", "theme": "Bundle and save", "sticky": "Bundle and save — compare home and auto bundles with other bundles from providers, show total savings rather than one attribute (like auto) at a time. Bundled offers e.g. renters and auto.", "authors": "[Jesse Cunningham / Matt Quigley]"},
+        {"kind": "idea", "id": "mi-14", "theme": "Bundling UX", "sticky": "Bundled options for premium segment. Bundling while simply showing the cost breakdown between the two.", "authors": "[Abhinav Tyagi / victoria.mcleod]"},
+        {"kind": "header", "text": "Offer comparisons"},
+        {"kind": "idea", "id": "mi-15", "theme": "Comparison table/grid", "sticky": "Grid / table comparison — the #1 most desired thing members want for this step in the insurance journey. Side by side comparison tables breaking down what coverage is included for the price. Compare policy vs current policy table (or 2 policies if new). Layout: current policy + tiers 1/2/3 + 3 other relative insurances with relative coverage in comparison table form, with filter.", "authors": "[Paulina Biernacki / Jorey Jones]"},
+        {"kind": "idea", "id": "mi-16", "theme": "AI-powered comparison", "sticky": "GenAI contextualization for multiple offers across price and protection dimensions: \"Compare these offers for me\". AI policy comparison with visuals and data around what other similar members are picking. \"Help me compare these offers\" or \"Explain these offers to me\".", "authors": "[Mikhail Metrikin / Harshitha Gadam / Matt Quigley]"},
+        {"kind": "idea", "id": "mi-17", "theme": "Plain language comparison", "sticky": "Explain it to me like I'm 5 — what's in this quote vs this quote? Contextualizing offers / options / recommendations against your current policy.", "authors": "[Paulina Biernacki / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "mi-18", "theme": "Offer comparisons", "sticky": "Tinder for auto policies — calls out key differences in coverage and price, one offer at a time as not to upset Progressive ;)", "authors": "[Jesse Cunningham]"},
+        {"kind": "idea", "id": "mi-19", "theme": "Visual comparison", "sticky": "Easy comparison of multiple non-PGR offers with visual cues and a recommendation based on best policy for the price. Imagery input quote/policy comparison tool + configuration recommendation.", "authors": "[Mikhail Metrikin / Roy Hsia]"},
+        {"kind": "idea", "id": "mi-20", "theme": "Partner data for comparison", "sticky": "How do we get Progressive to share coverage details? Incentivize EO partners to provide what we need for comparison by leaning into retaining their policyholders when it's the best decision for the member.", "authors": "[Mikhail Metrikin]"},
+        {"kind": "header", "text": "Carrier badging, value props, & social proof"},
+        {"kind": "idea", "id": "mi-21", "theme": "Carrier differentiation", "sticky": "Boost reputability of MA with 3rd party badges/stamps of approval (ex: S&P). Focus on carrier differentiation (value props, reviews, etc) on offer tiles and offer detail pages. Highlight unique carrier features: 24/7 customer service, safe driving discounts, etc.", "authors": "[Harshitha Gadam / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "mi-22", "theme": "Pros/cons & trust signals", "sticky": "Be upfront about pros and cons of the insurance company (can be AI generated). Do members know that CK doesn't add money to the costs? Do members know that Root is a trustworthy company?", "authors": "[Harshitha Gadam / Matt Quigley]"},
+        {"kind": "idea", "id": "mi-23", "theme": "Social proof for carriers", "sticky": "Social proofing: stats on how many customers an insurance has helped in the last year, avg payout etc. People don't trust that the insurance company will take good care of them — HMW address that trust issue?", "authors": "[Jade Wilburn]"},
+        {"kind": "idea", "id": "mi-24", "theme": "Carrier badging, value props, & social proof", "sticky": "Additional social proof comparisons similar to current payment rating", "authors": "[Dakota Mulvihill]"},
+        {"kind": "header", "text": "Customer satisfaction rates"},
+        {"kind": "idea", "id": "mi-25", "theme": "Surface satisfaction data", "sticky": "Add customer satisfaction rates up front, especially for insurers that are less known. Help compare carrier quality (eg satisfaction rates / star rating).", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "mi-26", "theme": "Pros/cons & reviews", "sticky": "Show members pros and cons of different insurance companies (summarizing reviews, customer satisfaction data). Provide info about insurers' customer service / satisfaction rates — members are weary of insurance companies.", "authors": "[Paulina Biernacki]"},
+        {"kind": "header", "text": "Carrier reviews"},
+        {"kind": "idea", "id": "mi-27", "theme": "Carrier reviews", "sticky": "3rd party carrier reviews. Using 3rd party or member sourced ratings for various carriers across key areas: price, value, service/claims experience.", "authors": "[Roy Hsia / Dennis (Visitor)]"},
+        {"kind": "idea", "id": "mi-28", "theme": "Carrier reviews", "sticky": "Unbiased carrier reviews/editorial experiences with our partners", "authors": "[Victoria McLeod]"},
+        {"kind": "header", "text": "Pre-filling and reducing application friction"},
+        {"kind": "idea", "id": "mi-29", "theme": "Single universal application", "sticky": "Develop common application once member is ready to apply, then prefill all applications where they want to get quotes. One application → many offers with easy comparison, everything prefilled downfunnel across every carrier application. Users won't have to fill out any forms — everything auto-filled on both CK and partner sites.", "authors": "[Mikhail Metrikin / Matt Quigley]"},
+        {"kind": "idea", "id": "mi-30", "theme": "Pre-filling and reducing application friction", "sticky": "Lightbox for insurance - single application that the member fills out - data sent to partners. CK to provide contextual guidance along the way \"Why we ask\" D4D framework.", "authors": "[Jesse Cunningham]"},
+        {"kind": "idea", "id": "mi-31", "theme": "Pre-fill with member data", "sticky": "Use connected policy data to pre-fill applications. Pre-fill as much info as possible about the member. Magic docs for uploading policy → pre-filled info. Prefilled items with a \"help\" text field for any further questions. Pre-fill with photo option.", "authors": "[Paulina Biernacki / Roy Hsia / Jorey Jones]"},
+        {"kind": "idea", "id": "mi-32", "theme": "Reduce re-entry friction", "sticky": "Reduce / remove need for members to fill out applications multiple times — eliminate shopping friction. Ensure application flow is easily editable for pre-filled sections. Optional question flows that help personalize quotes and pre-fill the application.", "authors": "[Mikhail Metrikin / Paulina Biernacki]"},
+        {"kind": "idea", "id": "mi-33", "theme": "Automation & audit", "sticky": "Automation: we can automate almost all of this phase — we have more data than almost anyone else so our friction can be lower. Need to do full audit of everything we're prefilling and not prefilling today. Simplified and streamlined shopping experience makes members want to come back.", "authors": "[Dennis (Visitor) / Mikhail Metrikin / victoria.mcleod]"},
+        {"kind": "header", "text": "Intent-based marketplace segmentation"},
+        {"kind": "idea", "id": "mi-34", "theme": "High vs low intent segmentation", "sticky": "Segment members and marketplace experience by high vs low intent. Upfront EO offers for low intent members with an option for a full quote flow for high intent members. Have tailored experiences based on member intent.", "authors": "[Mikhail Metrikin / Jesse Cunningham]"},
+        {"kind": "idea", "id": "mi-35", "theme": "High intent flow", "sticky": "Full application flow for high intent members or those showing signals to apply — then prefill. Search one and done: one CK insurance profile that allows high intent members to shop RC2 offers specific to them, RC1 available to low intent members.", "authors": "[Mikhail Metrikin / Jesse Cunningham]"},
+        {"kind": "idea", "id": "mi-36", "theme": "Low friction fast path", "sticky": "\"Get me to offers as fast as possible\" CTA for members who don't want friction, directs to Media Alpha. Low/no friction quotes augmented with high certainty, highly customizable offers. Meet members where they are based on intent.", "authors": "[Anonymous (Visitor) / Mikhail Metrikin]"},
+        {"kind": "header", "text": "Promoting trust -- messaging & marketplace strategies"},
+        {"kind": "idea", "id": "mi-37", "theme": "Brand trust messaging", "sticky": "Increasing brand trust by showing member value — helping evaluate carrier reputability, surfacing pros and cons, guidance, transparency. Lean into objectivity in our marketplace, offers, recommendations. Leaning into messaging on why we can be trusted / lowest price / etc.", "authors": "[Paulina Biernacki / Mikhail Metrikin / Dennis]"},
+        {"kind": "idea", "id": "mi-38", "theme": "Price transparency builds trust", "sticky": "Sorting by lowest price and highlighting cheapest offer as top recommendation builds trust", "authors": "[Mikhail Metrikin]"},
+        {"kind": "header", "text": "Other product / business initiatives"},
+        {"kind": "idea", "id": "mi-39", "theme": "Business model diversification", "sticky": "Diversification / reduce reliance on single partner. What's the best way to thread the needle across biz models that leverages low friction EOs while unlocking product innovation + biases for inventory? Augmentation with agency / lead gen: greater inventory, more upfront rates, comparison shopping, unlock product innovation.", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "mi-40", "theme": "Agency model", "sticky": "Agency model supplement by AI servicing, quote generation and ongoing policy management. Brainstorm / unlock ability to go from coverage recommendation → multiple quotes at that custom coverage selection. For unauth traffic offer additional option like get call to receive quotes.", "authors": "[Abhinav Tyagi / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "mi-41", "theme": "Ongoing engagement", "sticky": "Create ongoing engagement/relationship with members to drive repeat business. Weekly/monthly challenges to motivate members to share data, activate, explore parts of the insurance tab. Value beyond the transaction: giving benefits when we aren't just pushing the next best offer. Timeline view — very engaging, leads to opportunities and questions, will get users coming back.", "authors": "[Dennis / Anonymous (Visitor) / Matt Quigley]"},
+        {"kind": "idea", "id": "mi-42", "theme": "Other product / business initiatives", "sticky": "Insurance \"housekeeping\" -- what can I do once every 3 weeks to ensure I'm taking adequate steps toward personal finance goals: refresh rates to compare against my current policy, check driving score", "authors": "[Grant Labedz (Visitor)]"},
+        {"kind": "header", "text": "Marketplace coverage selection improvements"},
+        {"kind": "idea", "id": "mi-43", "theme": "Explain coverage buckets", "sticky": "More explanation of what the coverage selection buckets mean on CK. Better education on terms like \"Basic\" and \"Choice\" especially in regards to insurance minimums. Explain the difference between the three coverage buckets.", "authors": "[Paulina Biernacki / Jade Wilburn / Matt Quigley]"},
+        {"kind": "idea", "id": "mi-44", "theme": "Customization & accuracy", "sticky": "Help members customize coverage in CK — feels more personalized + more accurate quotes. May be more motivated to complete the purchase on CK as well.", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "mi-45", "theme": "Consistency & dynamic quotes", "sticky": "Have similar naming conventions across all our partners for coverage buckets. Quotes dynamically change based on changes to personal information I provide/change (eg multiple drivers, value of car).", "authors": "[Abhinav Tyagi / victoria.mcleod]"},
+        {"kind": "header", "text": "Data protection / trust"},
+        {"kind": "idea", "id": "mi-46", "theme": "CP - no credit impact", "sticky": "Message on monitor surface reassuring members that connecting their policy won't affect their credit", "authors": "[Jesse Cunningham]"},
+        {"kind": "idea", "id": "mi-47", "theme": "Privacy/data protection", "sticky": "Assure members that we will never sell their info in key places (Find a Policy, application flow etc.). Visual badges and explanations about privacy/data security on pages where we ask for member data — connected policy entry points, EO consent pages, etc. Third party security badge/validation to show we protect your data + do not spam you + connecting your policy does not affect credit. Have value prop around data privacy within onboarding — we only use this to find you better policies/get you more savings.", "authors": "[Jesse Cunningham / Paulina Biernacki / Harshitha Gadam / Devanshi Mittal]"},
+        {"kind": "idea", "id": "mi-48", "theme": "No spam", "sticky": "Data protection // no spam messaging on data collection flow screens. Address spam with verbiage such as 'You will not be spammed if you connect your policy'. Explore 'no spam' messaging claims with legal.", "authors": "[Paulina Biernacki / Harshitha Gadam]"},
+      ],
+      "AI Powered Guidance": [
+        {"kind": "header", "text": "Continuous coaching / agent experience"},
+        {"kind": "idea", "id": "ai-1", "theme": "CK as a digital insurance agent", "sticky": "CK as an end-to-end digital insurance agent / coach / trusted companion — assesses coverage, proactively suggests ways to optimize policy and insurer, tells the member the best coverage and provider, and provides holistic support throughout the entire insurance journey", "authors": "[Jesse Cunningham / Paulina Biernacki / Abhinav Tyagi / Anonymous (Visitor)]"},
+        {"kind": "idea", "id": "ai-2", "theme": "AI-powered coverage coaching", "sticky": "AI Insurance Agent that can answer \"what if\" questions, ask about specific CK offers, understand what's covered. Gen AI insights on savings/coverage level at purchasing step for reassurance. Insurance professional / financial focused AI characteristics", "authors": "[Jesse Cunningham / Harshitha Gadam / Roy Hsia]"},
+        {"kind": "idea", "id": "ai-3", "theme": "Proactive savings monitoring", "sticky": "Position CK as a digital independent agent who will always get you the best option and then keep monitoring for savings", "authors": "[Mikhail Metrikin]"},
+        {"kind": "header", "text": "AI Chat/LLM-focused experience"},
+        {"kind": "idea", "id": "ai-4", "theme": "AMA / chat for purchase guidance", "sticky": "AMA guidance for questions that arise during purchase; An AMA or AI button on the marketplace for asking questions", "authors": "[Paulina Biernacki / Matt Quigley]"},
+        {"kind": "idea", "id": "ai-5", "theme": "AI chat for switching & savings", "sticky": "AI chat-based experience that guides you through switching policies & gives reminders (e.g., it's easy, you will get refunded on your current policy). \"Want to find ways to save on insurance?\" CTA → Chat experience", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "ai-6", "theme": "AI Chat/LLM-focused experience", "sticky": "AI common questions available to the member in context - chat experience", "authors": "[Jesse Cunningham]"},
+        {"kind": "idea", "id": "ai-7", "theme": "AI Chat/LLM-focused experience", "sticky": "Coverage explainability forward GenAI / AMA experience. Higher personalization by feeding in vehicle and connected policy data", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "ai-8", "theme": "AI Chat/LLM-focused experience", "sticky": "Ask me anything to help members understand their coverage; GenAI + directly link members to carrier agents and port over their info/questions so they aren't starting from scratch", "authors": "[Jade Wilburn]"},
+        {"kind": "idea", "id": "ai-9", "theme": "AI Chat/LLM-focused experience", "sticky": "Pave the path for AI / LLM top of funnel entries from outside and within the app", "authors": "[Matt Quigley]"},
+        {"kind": "idea", "id": "ai-10", "theme": "AI Chat/LLM-focused experience", "sticky": "Integration with ChatGPT or other ways to integrate AI Chat experience", "authors": "[Paulina Biernacki]"},
+      ],
+      "Policy Health Checkup": [
+        {"kind": "header", "text": "Policy health checkup & Coverage analysis"},
+        {"kind": "idea", "id": "ph-1", "theme": "Personalized coverage recommendations", "sticky": "CK should have an opinion on what coverage level a member has and articulate it clearly — based on member data (car, state, location) recommend the most cost-efficient and safe option, with a 'done for you' experience", "authors": "[Abhinav Tyagi / Jesse Cunningham / Harshitha Gadam / Roy Hsia]"},
+        {"kind": "idea", "id": "ph-2", "theme": "Personalized coverage recommendations", "sticky": "Coverage advisor: recommend the right level of minimum coverage to adequately protect assets, with goldilocks options (low-cost vs best protection vs blend) and context around how each would look for the member", "authors": "[Mikhail Metrikin / Yashashree Pisolkar]"},
+        {"kind": "idea", "id": "ph-3", "theme": "Right-sizing coverage", "sticky": "Help members right-size their policy by finding the balance of cost and protection — introduce price + protection value dimensions, generate coverage profiles optimized for different goals, with a starting template + ability to configure based on personal needs and real-time evaluation", "authors": "[Mikhail Metrikin / Yashashree Pisolkar / Roy Hsia]"},
+        {"kind": "idea", "id": "ph-4", "theme": "Coverage explanation & guidance", "sticky": "Guided experience (active vs passive) to help members understand tradeoffs in coverage types, pros + cons of different policy options, with a specific recommendation for which is best for them", "authors": "[Mikhail Metrikin / Paulina Biernacki]"},
+        {"kind": "idea", "id": "ph-5", "theme": "Coverage explanation & guidance", "sticky": "Policy guidance that breaks down insurance step by step so it doesn't feel overwhelming — help members understand their needs and what is important for their situation", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "ph-6", "theme": "Coverage explanation & guidance", "sticky": "Contextualizing what different coverage means and why you should select it — help members understand coverage aspects important for their situation (state, lifestyle)", "authors": "[Abhinav Tyagi / Paulina Biernacki]"},
+        {"kind": "idea", "id": "ph-7", "theme": "State minimums & contextual factors", "sticky": "Surface state minimum required coverage during shopping — if we know what state you're in, pull in those minimums for members to consider", "authors": "[Mikhail Metrikin / Jade Wilburn]"},
+        {"kind": "idea", "id": "ph-8", "theme": "State minimums & contextual factors", "sticky": "Could members upload leases or mortgages so we can recommend appropriate insurance policies based on their assets?", "authors": "[Jade Wilburn]"},
+        {"kind": "idea", "id": "ph-9", "theme": "Policy optimization", "sticky": "Show insights about coverage — have an opinion on what members should have covered and what they should be paying. Analyze policy for add-ons they could do without. My Policies reimagined: education-focused vs revenue-focused, editorial-style offers vs marketplace format", "authors": "[Jesse Cunningham / Roy Hsia]"},
+        {"kind": "idea", "id": "ph-10", "theme": "Policy optimization", "sticky": "Leverage telematics and VMM (Lexis) data sets to advise on right coverage. Expand on existing policy health checkup concepts.", "authors": "[Victoria McLeod / Dennis (Visitor)]"},
+        {"kind": "header", "text": "Coverage jargon"},
+        {"kind": "idea", "id": "ph-11", "theme": "Coverage jargon", "sticky": "Glossary / jargon translator / AI helper - content that dumbs down insurance jargon and explains terms in plain English. Remember people don't know what even basic insurance terms mean - we need to meet them where they are.", "authors": "Harshil Shah / Roy Hsia / Dennis (Visitor) / Paulina Biernacki / Victoria McLeod"},
+        {"kind": "idea", "id": "ph-12", "theme": "Coverage jargon", "sticky": "Breaking down each claim type and its meaning: PIP, MEdPay, UM, Collision, Comprehensive, Bodily injury", "authors": "Jorey Jones"},
+        {"kind": "idea", "id": "ph-13", "theme": "Coverage jargon", "sticky": "Dual mode Language Toggle - UI Pattern: \"Simple ↔ Detailed\" toggle. Simple Mode: plain language. Detailed Mode: legal definitions, limits, exclusions", "authors": "Ram Sonkar"},
+        {"kind": "idea", "id": "ph-14", "theme": "Coverage jargon", "sticky": "Help with understanding which coverage terms are most critical in the event of an accident", "authors": "Mikhail Metrikin"},
+        {"kind": "header", "text": "Translating coverage into real-life scenarios"},
+        {"kind": "idea", "id": "ph-15", "theme": "Translating coverage into real-life scenarios", "sticky": "Breakdown of real-life scenarios so people understand why they need a certain coverage amount; clearer explanation of how coverage terms apply to real world (is 25K property damage sufficient, or 50K??)", "authors": "Jade Wilburn / Anonymous (Visitor)"},
+        {"kind": "idea", "id": "ph-16", "theme": "Translating coverage into real-life scenarios", "sticky": "Add data visualization and imagery to help members better understand coverage details and potential scenarios", "authors": "Jade Wilburn"},
+        {"kind": "idea", "id": "ph-17", "theme": "Translating coverage into real-life scenarios", "sticky": "Explanations for how coverage selection impacts the quotes they are seeing", "authors": "victoria.mcleod"},
+        {"kind": "idea", "id": "ph-18", "theme": "Translating coverage into real-life scenarios", "sticky": "Price-to-coverage value explainability: I have no idea if $500K in liability vs $250K is worth it for an extra $45/month", "authors": "Anonymous (Visitor)"},
+        {"kind": "idea", "id": "ph-19", "theme": "Translating coverage into real-life scenarios", "sticky": "'What if' scenario breakdowns: if you get into a wreck with current/selected policy, here's what happens and the amount you pay vs covered. Add scenario breakdowns based on how much they would pay. Tools that help project 'what if' scenarios for potential claims.", "authors": "Jorey Jones / Harshil Shah / Paulina Biernacki"},
+        {"kind": "idea", "id": "ph-20", "theme": "Translating coverage into real-life scenarios", "sticky": "Projection tool or video that helps understand how insurance works in real-life when it's time to make a claim", "authors": "Paulina Biernacki"},
+        {"kind": "idea", "id": "ph-21", "theme": "Translating coverage into real-life scenarios", "sticky": "Policy coverage projection tool - how my policy works in real life scenarios", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "ph-22", "theme": "Translating coverage into real-life scenarios", "sticky": "Coverage analyzer (combine with their health insurance coverage) to see if they have enough medical insurance when something happens", "authors": "Roy Hsia"},
+        {"kind": "header", "text": "Claims guidance"},
+        {"kind": "idea", "id": "ph-23", "theme": "Claims guidance", "sticky": "Step by step guidance of what to do in an accident + where they can find the needed documentation", "authors": "Harshitha Gadam"},
+        {"kind": "idea", "id": "ph-24", "theme": "Claims guidance", "sticky": "Personalized guidance on when you should vs should not file a claim; could surface data on how premiums change when claims are filed. Trade-offs of filing a claim is a big area people don't have knowledge about - help estimate cost of filing vs handling outside insurance", "authors": "Chris Brajer / Anonymous (Visitor) / victoria.mcleod"},
+        {"kind": "idea", "id": "ph-25", "theme": "Claims guidance", "sticky": "Support on how to handle claims and violations for the connected policy", "authors": "[Aditya Digumarthi]"},
+        {"kind": "header", "text": "Rate transparency & factor education"},
+        {"kind": "idea", "id": "ph-26", "theme": "Rate transparency & factor education", "sticky": "Help members understand what factors are impacting their insurance rate (age, location, credit score, vehicle age, marital status, driving record, etc.) and what they can control to lower it", "authors": "Harshil Shah / Victoria McLeod / Jade Wilburn / Paulina Biernacki"},
+        {"kind": "idea", "id": "ph-27", "theme": "Rate transparency & factor education", "sticky": "Help me understand when the best time to shop for insurance is", "authors": "Harshil Shah"},
+        {"kind": "idea", "id": "ph-28", "theme": "Rate transparency & factor education", "sticky": "\"Why did my rate go up\" insights - contextualize rate increases driven by macro (rates went up across the board regardless of YOUR last 6 months) vs personal factors", "authors": "Harshitha Gadam / victoria.mcleod"},
+        {"kind": "idea", "id": "ph-29", "theme": "Rate transparency & factor education", "sticky": "Rate meter - show how rate may change based on info provided vs assumptions. Predicted rate changes from life events (credit score change, move, etc.)", "authors": "Jorey Jones / victoria.mcleod"},
+        {"kind": "idea", "id": "ph-30", "theme": "Rate transparency & factor education", "sticky": "Sometimes the customer didn't do anything wrong - market or other drivers in the area can increase your rate. Can we do a better job level-setting expectations?", "authors": "Jade Wilburn"},
+        {"kind": "idea", "id": "ph-31", "theme": "Rate transparency & factor education", "sticky": "Clarify what does affect your insurance rates and what doesn't — address misinformation", "authors": "[Jade Wilburn]"},
+        {"kind": "idea", "id": "ph-32", "theme": "Rate transparency & factor education", "sticky": "Provide transparency of price (how it's calculated and comparison with people in similar situation) and explain why you need certain coverages", "authors": "Roy Hsia"},
+        {"kind": "header", "text": "Education - Other"},
+        {"kind": "idea", "id": "ph-33", "theme": "Education - Other", "sticky": "Educational stories on the dashboard and/or marketplace. Education in general - our product experience is built around the end of the journey, but most people will start with Google and ChatGPT.", "authors": "Matt Quigley"},
+        {"kind": "idea", "id": "ph-34", "theme": "Education - Other", "sticky": "A Monitor tab experience could serve as a hub for reducing opacity of insurance as a whole - educational, helpful, not pushy but peeling back the shroud of ambiguity", "authors": "victoria.mcleod"},
+        {"kind": "idea", "id": "ph-35", "theme": "Education - Other", "sticky": "Leverage audio (eg. podcast) or video to learn about insurance and the process - opportunity especially in the research phase", "authors": "Paulina Biernacki / Jade Wilburn"},
+        {"kind": "idea", "id": "ph-36", "theme": "Education - Other", "sticky": "Pair more educational messaging/guidance with our usual RTB's in ToF content: answering common FAQ's, clarifying misconceptions", "authors": "[Dakota Mulvihill]"},
+        {"kind": "idea", "id": "ph-37", "theme": "Education - Other", "sticky": "Real member testimonials of how they've saved in marketing videos on short-form platforms like TikTok and IG reels", "authors": "[Jade Wilburn]"},
+      ],
+      "Proactive Monitoring": [
+        {"kind": "header", "text": "Automated savings monitoring / alerts"},
+        {"kind": "idea", "id": "pm-1", "theme": "Real-time savings monitoring", "sticky": "Real time savings insights; rate monitoring and ability to surface more offers; chart showing trends in embedded offer rates with alerts when it drops; leverage connected policy (or 'lite' version) to help members find out if there is a better deal out there", "authors": "[Harshitha Gadam / Dennis / Anonymous (Visitor) / Paulina Biernacki]"},
+        {"kind": "idea", "id": "pm-2", "theme": "Proactive savings alerts", "sticky": "Savings alerts for better value for same coverage or better; celebrate when member has the lowest rate but also alert when they could save; background shopping with weekly/monthly reports on what is driving pricing and any switch/save recommendations", "authors": "[Paulina Biernacki / Jesse Cunningham / Dennis (Visitor)]"},
+        {"kind": "idea", "id": "pm-3", "theme": "Reassurance messaging", "sticky": "Members are reassured they have the best rate -- we tell them when they should NOT switch and when they should", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "pm-4", "theme": "Automated savings monitoring / alerts", "sticky": "Alerts/nudge → 'Make the most of your policy. See what you're not utilizing'", "authors": "[Harshitha Gadam]"},
+        {"kind": "idea", "id": "pm-5", "theme": "Connected policy value prop", "sticky": "Continuous coaching on rate factor changes and what to watch out for; pitch the connected policy value prop and consider upleveling the program to something branded to drive adoption", "authors": "[Yashashree Pisolkar / Anonymous (Visitor)]"},
+        {"kind": "header", "text": "Alerts for when to start shopping"},
+        {"kind": "idea", "id": "pm-6", "theme": "Renewal reminders", "sticky": "Send reminders when it's almost time for renewal along with insurance options; reminder a few weeks before policy renews to consider savings and switching; reminder of when monthly/semi-annual payment is coming so members can start thinking about it", "authors": "[Jade Wilburn / Harshitha Gadam / Sean Lin]"},
+        {"kind": "idea", "id": "pm-7", "theme": "Alerts for when to start shopping", "sticky": "Tailored retargeting messages for active consents w/cached offers -- personalize details relevant to their existing policy", "authors": "[victoria.mcleod]"},
+        {"kind": "idea", "id": "pm-8", "theme": "Alerts for when to start shopping", "sticky": "Automatic discount watch - pull in & surface partner discounts that the member qualifies for", "authors": "[Dakota Mulvihill]"},
+        {"kind": "idea", "id": "pm-9", "theme": "Life event & profile change triggers", "sticky": "Marketing triggers on various parameters such as credit score change, state premium change etc. \"We noticed this aspect of your profile changed... now it's a great time to shop!\"; alert members to new opportunities (savings, life event changes that may lead to lower rates) so they aren't just shopping reactively", "authors": "[Abhinav Tyagi / Paulina Biernacki]"},
+        {"kind": "idea", "id": "pm-10", "theme": "Violation & driving record triggers", "sticky": "Send reminders ahead of violations being dropped off so members have adequate time to shop around; ensure high coverage of alerts for all events that may trigger savings (credit increases, driving record improvements)", "authors": "[Harshil Shah / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "pm-11", "theme": "Violation & driving record triggers", "sticky": "Harnessing driving records data to alert members to potential savings + to offer more accurate rates", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "pm-12", "theme": "Insurance savings assistant", "sticky": "\"Insurance savings assistant\": prominent focus on Insurance tab on life events or triggers that can lead to savings. Go big on motivating carrier switching at renewal on FAP based on life events. Half year or yearly savings summary or how much you've overpaid.", "authors": "[Mikhail Metrikin / Roy Hsia]"},
+        {"kind": "idea", "id": "pm-13", "theme": "Insurance savings assistant", "sticky": "Identify all triggers for potential savings and layer them into policy monitoring features (life event changes, VMM profile change, new tradeline, etc.) to create richer experience with more savings opportunities", "authors": "[Mikhail Metrikin]"},
+        {"kind": "header", "text": "Alerts for rate hike increases"},
+        {"kind": "idea", "id": "pm-14", "theme": "Alerts for rate hike increases", "sticky": "Campaigns (stories, push notifications) when user's premium changes", "authors": "[Matt Quigley]"},
+        {"kind": "idea", "id": "pm-15", "theme": "Alerts for rate hike increases", "sticky": "Use public rate filing data to alert members when carriers are planning price increases. e.g. \"GEICO filed a 10% increase for Michigan\"", "authors": "[Dennis]"},
+        {"kind": "idea", "id": "pm-16", "theme": "Alerts for rate hike increases", "sticky": "When we know that your premium will go up at renewal based on your Connected Policy (we get this from Canopy), make that the hero message on FAP", "authors": "[Mikhail Metrikin]"},
+      ],
+      "Data Collection & Personalization": [
+        {"kind": "header", "text": "Ask members questions"},
+        {"kind": "idea", "id": "dc-1", "theme": "Progressive data collection", "sticky": "Ask for more data when it will be useful; provide general insurance options and allow members to give more detailed info for more tailored options", "authors": "[Dennis / Jade Wilburn]"},
+        {"kind": "idea", "id": "dc-2", "theme": "Coverage prioritization questionnaire", "sticky": "A \"what's important to you\" questionnaire -- do you care most about price? coverage? Ask members questions to help contextualize what types of coverage they should consider", "authors": "[Harshitha Gadam / Paulina Biernacki]"},
+        {"kind": "idea", "id": "dc-3", "theme": "Quote accuracy via member questions", "sticky": "Address quote accuracy concerns by asking members questions → data shared with partners. Ask members questions so we can get them more accurate quotes -- less rate drift when they go to purchase the policy", "authors": "[Paulina Biernacki]"},
+        {"kind": "idea", "id": "dc-4", "theme": "Ask members questions", "sticky": "Additional steps members could/should take to improve their ability to unlock lower rates (e.g. credit score improvement)", "authors": "[victoria.mcleod]"},
+        {"kind": "idea", "id": "dc-5", "theme": "Ask members questions", "sticky": "Create flywheel to encourage members to share more data with us on regular basis", "authors": "[Sean Lin]"},
+        {"kind": "header", "text": "Offer contextualization"},
+        {"kind": "idea", "id": "dc-6", "theme": "Offer contextualization", "sticky": "Insight on why specific offer / offers are being suggested to a member", "authors": "[Jorey Jones]"},
+        {"kind": "idea", "id": "dc-7", "theme": "Offer contextualization", "sticky": "Contextualization around why we are asking certain questions and what the member can expect in terms of output", "authors": "[Anonymous (Visitor)]"},
+        {"kind": "idea", "id": "dc-8", "theme": "Offer contextualization", "sticky": "Indicators that this offer is truly personalized to you", "authors": "[Harshitha Gadam]"},
+        {"kind": "header", "text": "Integrate data from different sources"},
+        {"kind": "idea", "id": "dc-9", "theme": "Integrate data from different sources", "sticky": "For off platform acquisition - collect contact data and ensure pre-fill experiences", "authors": "[Dennis]"},
+        {"kind": "idea", "id": "dc-10", "theme": "Integrate data from different sources", "sticky": "Capturing member / insurance data via traditional quote application flow", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "dc-11", "theme": "Integrate data from different sources", "sticky": "Purchasing policy data to immediately unlock scale", "authors": "[victoria.mcleod]"},
+        {"kind": "idea", "id": "dc-12", "theme": "Cross-vertical data", "sticky": "Can we tie in data points from other verticals like Cards; if we see you travel or shop a lot, we can suggest relevant insurance \"perks\". Use member data the way our partners would if they had it.", "authors": "[Jade Wilburn / Matt Quigley]"},
+        {"kind": "idea", "id": "dc-13", "theme": "Personalized guidance via data", "sticky": "Tie in relevant examples to insurance options (e.g. your car is worth $xx so if you got into an accident, your insurance would only cover XYZ). Connect members and their application info to carrier agents for personalized guidance.", "authors": "[Jade Wilburn]"},
+        {"kind": "header", "text": "Social proof and member benchmarking"},
+        {"kind": "idea", "id": "dc-14", "theme": "Peer benchmarking", "sticky": "Compare my policy to members similar to me and rank by percentile. What are other CK members in your area paying? Show what types of coverage are commonly selected based on address & vehicle information.", "authors": "[Harshil Shah / Jade Wilburn / Paulina Biernacki / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "dc-15", "theme": "\"Members like you\" signals", "sticky": "Offers signaled to member based on their insurance profile. \"Members like you with vehicles like yours have X,Y,Z coverage\". Insurance profile set with an \"average rate\" calculator or insight based on inputs/changes.", "authors": "[Jorey Jones / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "dc-16", "theme": "\"Members like you\" signals", "sticky": "\"Members like you have X coverage type\" to create confidence or optimization opportunities for protection layer", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "dc-17", "theme": "Social proof for confidence", "sticky": "Provide comparative insights on other shoppers to increase member confidence. Social proofing when a claim event happens, stating how important coverage is for financial stability. CK members with similar circumstances typically get this insurance amount.", "authors": "[Harshitha Gadam / Sean (Visitor) / Jade Wilburn]"},
+        {"kind": "idea", "id": "dc-18", "theme": "Satisfaction & claims social proof", "sticky": "Social proof claim data - average spend/claim amount when accident happens compared to current coverage. \"83% of CK members who chose this provider keep it for more than 2 years\".", "authors": "[Sean Lin / Jesse Cunningham]"},
+      ],
+      "Switching Strategies": [
+        {"kind": "header", "text": "Switching - reduce friction"},
+        {"kind": "idea", "id": "sw-1", "theme": "Encouraging tone", "sticky": "Encouraging tone for messaging about switching carriers simply; something to indicate that switching is not super hard", "authors": "[Paulina Biernacki / Harshitha Gadam]"},
+        {"kind": "idea", "id": "sw-2", "theme": "Demystifying switching", "sticky": "Demystify what happens during switching via real life examples: it's easier than you think, you'll likely get a refund from your previous carrier, and you can switch in the middle of your policy. Reinforce no carrier switching costs / penalties. Emphasize that there's no penalty to switch mid-policy — a lot of members have a misconception around this.", "authors": "[Victoria McLeod / Mikhail Metrikin / Mikhail Metrikin]"},
+        {"kind": "idea", "id": "sw-3", "theme": "Switching - reduce friction", "sticky": "Fast switching badge", "authors": "[Sean Lin]"},
+        {"kind": "idea", "id": "sw-4", "theme": "Switching - reduce friction", "sticky": "Remove the friction of switching providers. Like LinkedIn easy apply — CK should cancel old policy and enroll in new policy with equivalent coverage (H3?)", "authors": "[Jesse Cunningham]"},
+        {"kind": "idea", "id": "sw-5", "theme": "Motivation via savings hooks", "sticky": "Members have an aversion to shopping for insurance because the process is painful. Need to motivate them via savings hooks. CTA with the question \"Do you think you are paying too much for insurance?\"", "authors": "[Mikhail Metrikin / Matt Quigley]"},
+        {"kind": "idea", "id": "sw-6", "theme": "Data-driven savings claims", "sticky": "Model driven odds of savings during renewal using predicted rates. Explore connected policy data to make claims about savings upon switching e.g. \"members who switch carriers save X% on average\"", "authors": "[Mikhail Metrikin / Paulina Biernacki]"},
+        {"kind": "idea", "id": "sw-7", "theme": "Education & social proof for switching", "sticky": "Educational/member stories about switching and how much they saved to push members from their inertia. Help members understand how easy it is to switch — what comparisons could we make to other financial actions they might have already taken?", "authors": "[Jade Wilburn]"},
+        {"kind": "idea", "id": "sw-8", "theme": "Life event-driven switching", "sticky": "Motivate changes to existing policy based on life events (bought a home, had a child, etc.). Help switching feel less overwhelming / tedious — how can we simplify this process?", "authors": "[Grant Labedz (Visitor) / Paulina Biernacki]"},
+        {"kind": "header", "text": "Automated switching / policy changes"},
+        {"kind": "idea", "id": "sw-9", "theme": "Automated switching / policy changes", "sticky": "Automated insurance switching on behalf of member if coverage preferences are confirmed and better price is available", "authors": "[Yashashree Pisolkar]"},
+        {"kind": "idea", "id": "sw-10", "theme": "Automated switching / policy changes", "sticky": "Connected Policy positioning as \"set it and forget it: just connect and we'll do the work for you\" and tell you if you should renew with your carrier when the time comes", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "sw-11", "theme": "Automated switching / policy changes", "sticky": "If we can connect to other major events (trips, etc); we can offer dynamic policy adjustments to save during times when insurance isn't likely to matter (e.g. drop to min coverage when going on a cruise)", "authors": "[Dennis (Visitor)]"},
+        {"kind": "header", "text": "Signaling offer transparency + competitiveness"},
+        {"kind": "idea", "id": "sw-12", "theme": "Signaling offer transparency + competitiveness", "sticky": "Create true price competition on our platform to drive down the premium for our members", "authors": "[Sean Lin]"},
+        {"kind": "idea", "id": "sw-13", "theme": "Signaling offer transparency + competitiveness", "sticky": "\"Approval odds\" for insurance → \"Rate certainty odds\"", "authors": "[Mikhail Metrikin]"},
+        {"kind": "idea", "id": "sw-14", "theme": "Signaling offer transparency + competitiveness", "sticky": "Reduce information overload and use truth focused messaging rather than marketing min coverage option as low as 29", "authors": "[Abhinav Tyagi]"},
+      ],
+    };
+
+    function ResearchIdeas() {
+      const SHEETS = Object.keys(WORKSHOP_DATA);
+      const [activeSheet, setActiveSheet] = useState(SHEETS[0]);
+      const [orders, setOrders] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('research.orders') || '{}'); } catch (e) { return {}; }
+      });
+      const [notes, setNotes] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('research.notes') || '{}'); } catch (e) { return {}; }
+      });
+      const [expandedNoteId, setExpandedNoteId] = useState(null);
+      const [dragId, setDragId] = useState(null);
+      const [dragOverId, setDragOverId] = useState(null);
+
+      useEffect(() => { try { localStorage.setItem('research.orders', JSON.stringify(orders)); } catch(e){} }, [orders]);
+      useEffect(() => { try { localStorage.setItem('research.notes', JSON.stringify(notes)); } catch(e){} }, [notes]);
+
+      // Build a rendered list for the active sheet:
+      // - preserve header positions from source data
+      // - within each group, use orders[sheet][groupIndex] if present, else source order
+      const source = WORKSHOP_DATA[activeSheet];
+      // Split source into groups: [{header, ideas: [...]}, ...]
+      const groups = [];
+      let current = null;
+      for (const item of source) {
+        if (item.kind === 'header') {
+          current = { header: item.text, ideas: [] };
+          groups.push(current);
+        } else if (item.kind === 'idea' && current) {
+          current.ideas.push(item);
+        }
+      }
+      // Apply saved orders
+      const savedOrder = orders[activeSheet] || {};
+      const orderedGroups = groups.map((g, gi) => {
+        const savedIds = savedOrder[gi];
+        if (!savedIds) return g;
+        const byId = Object.fromEntries(g.ideas.map(i => [i.id, i]));
+        const ordered = [];
+        for (const id of savedIds) if (byId[id]) { ordered.push(byId[id]); delete byId[id]; }
+        // Append any new ideas not in saved order
+        for (const id of Object.keys(byId)) ordered.push(byId[id]);
+        return { header: g.header, ideas: ordered };
+      });
+
+      // Map idea id -> groupIndex for drag validation
+      const idToGroup = {};
+      orderedGroups.forEach((g, gi) => g.ideas.forEach(i => { idToGroup[i.id] = gi; }));
+
+      function handleDragStart(e, id) {
+        setDragId(id);
+        try { e.dataTransfer.effectAllowed = 'move'; } catch(err){}
+      }
+      function handleDragOver(e, id) {
+        if (!dragId) return;
+        // Only allow drop if same group
+        if (idToGroup[dragId] !== idToGroup[id]) return;
+        e.preventDefault();
+        if (dragOverId !== id) setDragOverId(id);
+      }
+      function handleDrop(e, targetId) {
+        e.preventDefault();
+        if (!dragId || dragId === targetId) { setDragId(null); setDragOverId(null); return; }
+        const gi = idToGroup[dragId];
+        if (gi !== idToGroup[targetId]) { setDragId(null); setDragOverId(null); return; }
+        const ideas = orderedGroups[gi].ideas.map(i => i.id);
+        const srcIdx = ideas.indexOf(dragId);
+        const dstIdx = ideas.indexOf(targetId);
+        if (srcIdx < 0 || dstIdx < 0) { setDragId(null); setDragOverId(null); return; }
+        ideas.splice(srcIdx, 1);
+        ideas.splice(dstIdx, 0, dragId);
+        setOrders(prev => {
+          const sheetOrd = { ...(prev[activeSheet] || {}) };
+          sheetOrd[gi] = ideas;
+          return { ...prev, [activeSheet]: sheetOrd };
+        });
+        setDragId(null);
+        setDragOverId(null);
+      }
+      function handleDragEnd() { setDragId(null); setDragOverId(null); }
+
+      function updateNote(id, text) {
+        setNotes(prev => {
+          const next = { ...prev };
+          if (text && text.trim()) next[id] = text;
+          else delete next[id];
+          return next;
+        });
+      }
+
+      function resetSheet() {
+        if (!confirm('Reset order and notes for ' + activeSheet + '?')) return;
+        setOrders(prev => { const n = { ...prev }; delete n[activeSheet]; return n; });
+        setNotes(prev => {
+          const n = { ...prev };
+          const prefix = (WORKSHOP_DATA[activeSheet][1] && WORKSHOP_DATA[activeSheet].find(i=>i.kind==='idea')?.id || '').split('-')[0];
+          if (prefix) Object.keys(n).forEach(k => { if (k.startsWith(prefix + '-')) delete n[k]; });
+          return n;
+        });
+      }
+
+      const ideaCount = source.filter(i => i.kind === 'idea').length;
+
+      return (
+        <div style={{ display: 'flex', flex: 1, minHeight: 0, background: '#fafbfc' }}>
+          {/* Left sidebar: sheet list */}
+          <div style={{ width: 240, flexShrink: 0, borderRight: '1px solid #e9eef0', background: '#fff', padding: '16px 10px', overflowY: 'auto' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#7a8186', letterSpacing: 0.5, textTransform: 'uppercase', padding: '0 8px 10px' }}>Workshop sheets</div>
+            {SHEETS.map(name => {
+              const count = WORKSHOP_DATA[name].filter(i => i.kind === 'idea').length;
+              const isActive = activeSheet === name;
+              return (
+                <div key={name} onClick={() => { setActiveSheet(name); setExpandedNoteId(null); }} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '9px 10px', marginBottom: 2, borderRadius: 6, cursor: 'pointer',
+                  background: isActive ? '#e3f1e6' : 'transparent',
+                  color: isActive ? '#008600' : '#1a1f22',
+                  fontSize: 13, fontWeight: isActive ? 600 : 500,
+                  transition: 'all 120ms ease',
+                }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#f4f7f8'; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+                >
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 8 }}>{name}</span>
+                  <span style={{ fontSize: 11, color: isActive ? '#008600' : '#9aa5ab', fontWeight: 500, flexShrink: 0 }}>{count}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Main table area */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+            {/* Header bar */}
+            <div style={{ padding: '16px 24px', borderBottom: '1px solid #e9eef0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1f22' }}>{activeSheet}</div>
+                <div style={{ fontSize: 12, color: '#7a8186', marginTop: 2 }}>{ideaCount} ideas • drag rows to prioritize within groups • click 📝 to add notes</div>
+              </div>
+              <button onClick={resetSheet} style={{
+                fontSize: 12, padding: '6px 12px', border: '1px solid #d9dfe2', background: '#fff',
+                borderRadius: 6, cursor: 'pointer', color: '#55595b', fontFamily: 'inherit',
+              }}>Reset sheet</button>
+            </div>
+
+            {/* Table */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '0 24px 24px' }}>
+              {/* Column headers */}
+              <div style={{ display: 'flex', alignItems: 'center', padding: '12px 0 8px', fontSize: 11, fontWeight: 600, color: '#7a8186', textTransform: 'uppercase', letterSpacing: 0.5, borderBottom: '1px solid #e9eef0', position: 'sticky', top: 0, background: '#fafbfc', zIndex: 2 }}>
+                <div style={{ width: 28 }}></div>
+                <div style={{ width: 200, paddingRight: 12 }}>Theme</div>
+                <div style={{ flex: 1, paddingRight: 12 }}>Idea</div>
+                <div style={{ width: 200, paddingRight: 12 }}>Authors</div>
+                <div style={{ width: 40, textAlign: 'center' }}>Notes</div>
+              </div>
+
+              {orderedGroups.map((group, gi) => (
+                <div key={gi}>
+                  {/* Group header */}
+                  <div style={{
+                    padding: '14px 12px 8px', marginTop: gi === 0 ? 4 : 12,
+                    fontSize: 13, fontWeight: 600, color: '#1a1f22',
+                    background: '#f4f7f8', borderLeft: '3px solid #008600',
+                    borderRadius: '0 4px 4px 0', marginBottom: 2,
+                  }}>{group.header}</div>
+
+                  {group.ideas.map(idea => {
+                    const isDragging = dragId === idea.id;
+                    const isDragOver = dragOverId === idea.id && dragId && idToGroup[dragId] === gi;
+                    const hasNote = !!notes[idea.id];
+                    const isExpanded = expandedNoteId === idea.id;
+                    return (
+                      <React.Fragment key={idea.id}>
+                        <div
+                          draggable
+                          onDragStart={e => handleDragStart(e, idea.id)}
+                          onDragOver={e => handleDragOver(e, idea.id)}
+                          onDrop={e => handleDrop(e, idea.id)}
+                          onDragEnd={handleDragEnd}
+                          style={{
+                            display: 'flex', alignItems: 'flex-start',
+                            padding: '12px 0', borderBottom: '1px solid #eef2f4',
+                            opacity: isDragging ? 0.35 : 1,
+                            borderTop: isDragOver ? '2px solid #008600' : '2px solid transparent',
+                            transition: 'opacity 120ms ease',
+                            background: isDragOver ? 'rgba(0,134,0,0.03)' : 'transparent',
+                          }}
+                        >
+                          {/* Drag handle */}
+                          <div style={{ width: 28, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', cursor: 'grab', color: '#c2c9cd', fontSize: 14, paddingTop: 2, userSelect: 'none' }}>⋮⋮</div>
+                          {/* Theme */}
+                          <div style={{ width: 200, paddingRight: 12, fontSize: 12.5, fontWeight: 500, color: '#1a1f22', lineHeight: 1.4 }}>{idea.theme}</div>
+                          {/* Sticky / Idea */}
+                          <div style={{ flex: 1, paddingRight: 12, fontSize: 13, color: '#1a1f22', lineHeight: 1.5 }}>{idea.sticky}</div>
+                          {/* Authors */}
+                          <div style={{ width: 200, paddingRight: 12, fontSize: 11.5, color: '#7a8186', lineHeight: 1.4 }}>{idea.authors}</div>
+                          {/* Notes button */}
+                          <div style={{ width: 40, display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: 0 }}>
+                            <button
+                              onClick={() => setExpandedNoteId(isExpanded ? null : idea.id)}
+                              title={hasNote ? 'Edit note' : 'Add note'}
+                              style={{
+                                width: 28, height: 28, padding: 0,
+                                border: hasNote ? '1px solid #008600' : '1px solid #d9dfe2',
+                                background: hasNote ? '#e3f1e6' : '#fff',
+                                borderRadius: 6, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 14, fontFamily: 'inherit',
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                <path d="M11.5 2L14 4.5L5 13.5H2.5V11L11.5 2Z" stroke={hasNote ? '#008600' : '#7a8186'} strokeWidth="1.3" strokeLinejoin="round" fill={hasNote ? '#008600' : 'none'} fillOpacity={hasNote ? 0.15 : 0}/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                        {/* Inline note editor */}
+                        {isExpanded && (
+                          <div style={{ padding: '10px 12px 14px 40px', background: '#f9fbf9', borderBottom: '1px solid #eef2f4' }}>
+                            <div style={{ fontSize: 11, fontWeight: 600, color: '#008600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Your note</div>
+                            <textarea
+                              defaultValue={notes[idea.id] || ''}
+                              placeholder="Add your notes, evaluation, or next steps for this idea…"
+                              autoFocus
+                              onBlur={e => updateNote(idea.id, e.target.value)}
+                              style={{
+                                width: '100%', minHeight: 72, padding: 10,
+                                border: '1px solid #d9dfe2', borderRadius: 6,
+                                fontFamily: 'inherit', fontSize: 13, lineHeight: 1.5,
+                                resize: 'vertical', boxSizing: 'border-box',
+                                outline: 'none',
+                              }}
+                              onFocus={e => { e.target.style.borderColor = '#008600'; }}
+                              onBlurCapture={e => { e.target.style.borderColor = '#d9dfe2'; }}
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+                              <button onClick={() => setExpandedNoteId(null)} style={{
+                                fontSize: 12, padding: '5px 12px', border: '1px solid #d9dfe2',
+                                background: '#fff', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', color: '#55595b',
+                              }}>Close</button>
+                            </div>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     /* ─── PRDs Page ─── */
     function PRDsPage() {
       const [prdView, setPrdView] = useState('list');
@@ -4722,7 +5264,30 @@
       const [policyCount, setPolicyCount] = useState(1);
       const [chatContext, setChatContext] = useState(null);
       const [prevScreen, setPrevScreen] = useState('myPolicies');
-      const [activeTab, setActiveTab] = useState('policyPro');
+      // ── Hash-based routing: tab <-> URL hash ──
+      const TAB_TO_SLUG = { policyPro: 'vision', prds: 'prds', research: 'research', currentState: 'q3-fy2026', q4fy2026: 'q4-fy2026', components: 'components' };
+      const SLUG_TO_TAB = Object.fromEntries(Object.entries(TAB_TO_SLUG).map(([t, s]) => [s, t]));
+      const tabFromHash = () => {
+        const slug = (window.location.hash || '').replace(/^#\/?/, '').split('/')[0];
+        return SLUG_TO_TAB[slug] || 'policyPro';
+      };
+      const [activeTab, setActiveTab] = useState(tabFromHash);
+      useEffect(() => {
+        const slug = TAB_TO_SLUG[activeTab] || 'vision';
+        const currentFirst = (window.location.hash || '').replace(/^#\/?/, '').split('/')[0];
+        // Only overwrite if the first segment doesn't already match — preserves sub-routes like #/research/insights
+        if (currentFirst !== slug) window.history.pushState(null, '', '#/' + slug);
+      }, [activeTab]);
+      useEffect(() => {
+        const onHash = () => { const t = tabFromHash(); setActiveTab(prev => prev === t ? prev : t); };
+        window.addEventListener('hashchange', onHash);
+        window.addEventListener('popstate', onHash);
+        // Normalize root path on first load
+        if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#/') {
+          window.history.replaceState(null, '', '#/' + (TAB_TO_SLUG[activeTab] || 'vision'));
+        }
+        return () => { window.removeEventListener('hashchange', onHash); window.removeEventListener('popstate', onHash); };
+      }, []);
       const [theme, setTheme] = useState({ ...DEFAULT_THEME });
       const [policyDetail, setPolicyDetail] = useState(null);
       const [showSettings, setShowSettings] = useState(true);
@@ -4761,7 +5326,10 @@
         <div className="sim-layout">
           {/* Top nav bar */}
           <div className="sim-topbar">
-            <div className="sim-topbar-logo" onClick={() => setActiveTab('prds')} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>PRD's<span style={{ background: activeTab === 'prds' ? '#008600' : '#e3f1e6', color: activeTab === 'prds' ? '#fff' : '#008600', fontSize: 11, fontWeight: 600, borderRadius: 4, padding: '2px 6px', lineHeight: 1.15, transition: 'all 150ms ease' }}>New</span></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div className="sim-topbar-logo" onClick={() => setActiveTab('prds')} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>PRD's</div>
+              <div className="sim-topbar-logo" onClick={() => setActiveTab('research')} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>Research<span style={{ background: activeTab === 'research' ? '#008600' : '#e3f1e6', color: activeTab === 'research' ? '#fff' : '#008600', fontSize: 11, fontWeight: 600, borderRadius: 4, padding: '2px 6px', lineHeight: 1.15, transition: 'all 150ms ease' }}>New</span></div>
+            </div>
             <div style={{ display: 'flex', position: 'absolute', left: showSettings ? 'calc((100% - 300px) / 2)' : '50%', transform: 'translateX(-50%)', transition: 'left 200ms ease' }}>
               {[
                 { id: 'currentState', label: 'Q3 FY2026', icon: null },
@@ -4831,6 +5399,8 @@
           <div className="sim-body">
             {activeTab === 'prds' ? (
               <PRDsPage/>
+            ) : activeTab === 'research' ? (
+              <ResearchPage/>
             ) : activeTab === 'components' ? (
               <ComponentLibrary theme={theme} setTheme={setTheme}/>
             ) : activeTab === 'currentState' ? (
