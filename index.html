@@ -251,6 +251,10 @@
     .press-btn { transition: all 0.15s ease; }
     .press-btn:active { transform: scale(0.97); opacity: 0.85; }
 
+    /* Financial Assistant text input placeholder color */
+    .fa-input::placeholder { color: #55595b; opacity: 1; }
+    .fa-input::-webkit-input-placeholder { color: #55595b; }
+
     @keyframes typingDot {
       0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
       30% { opacity: 1; transform: translateY(-4px); }
@@ -444,6 +448,124 @@
     }
     .clib-detail-guidelines li:last-child { border-bottom: none; }
     .clib-detail-guidelines li::before { content: '\2022'; color: #008600; font-weight: 700; flex-shrink: 0; }
+
+    /* ─── Wireframe Mode ─── */
+    /* Applied to `.phone-screen.wireframe-on`; restyles everything inside into a grayscale wireframe. */
+
+    /* Flatten all colors to grayscale as a baseline */
+    .wireframe-on, .wireframe-on * {
+      color: #55595b !important;
+      border-color: #b8bfc3 !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    /* Flatten background colors (but preserve layout backgrounds as light gray) */
+    .wireframe-on *:not([data-wf-keep]):not(img):not(svg) {
+      background-color: transparent !important;
+      background-image: none !important;
+    }
+    /* Keep a soft card-bg for things that had one */
+    .wireframe-on .screen-root,
+    .wireframe-on .scroll-content {
+      background: #fff !important;
+    }
+
+    /* Text → gray bars: hide text, color the background rounded-rect.
+       Doubled class + :not chain for specificity over the *:not() background-reset above. */
+    .wireframe-on.wireframe-on p:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on span:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on h1:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on h2:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on h3:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on h4:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on h5:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on h6:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on a:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on li:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on td:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on th:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on label:not([data-wf-keep]):not(img):not(svg),
+    .wireframe-on.wireframe-on button:not([data-wf-keep]):not(img):not(svg) {
+      color: transparent !important;
+      background-color: #d9dfe2 !important;
+      background-image: none !important;
+      border-radius: 4px !important;
+      border-color: transparent !important;
+    }
+    /* But: if a button/span is just a wrapper for other elements (icons, imgs, nested content), don't bar it. */
+    .wireframe-on button:has(svg),
+    .wireframe-on button:has(img),
+    .wireframe-on span:has(svg),
+    .wireframe-on span:has(img),
+    .wireframe-on a:has(svg),
+    .wireframe-on a:has(img),
+    .wireframe-on h1:has(svg),
+    .wireframe-on h1:has(img),
+    .wireframe-on div:has(> svg),
+    .wireframe-on div:has(> img) {
+      background: transparent !important;
+    }
+
+    /* Preserve headers and nav labels as real text */
+    .wireframe-on [data-wf-keep],
+    .wireframe-on [data-wf-keep] * {
+      color: #1a1f22 !important;
+      background: transparent !important;
+      border-radius: 0 !important;
+    }
+    /* If a button or span wraps a [data-wf-keep] child, don't bar the wrapper either. */
+    .wireframe-on.wireframe-on button:has([data-wf-keep]),
+    .wireframe-on.wireframe-on span:has([data-wf-keep]),
+    .wireframe-on.wireframe-on a:has([data-wf-keep]),
+    .wireframe-on.wireframe-on p:has([data-wf-keep]),
+    .wireframe-on.wireframe-on div:has([data-wf-keep]) {
+      background-color: transparent !important;
+      color: inherit !important;
+    }
+
+    /* Hide input placeholders (they aren't text content, so the bar rule above doesn't cover them) */
+    .wireframe-on input::placeholder,
+    .wireframe-on textarea::placeholder {
+      color: transparent !important;
+    }
+    /* And turn inputs themselves into a bar */
+    .wireframe-on input[type="text"],
+    .wireframe-on input:not([type]),
+    .wireframe-on textarea {
+      color: transparent !important;
+      caret-color: transparent !important;
+    }
+
+    /* Icons (SVG) → circle-with-X placeholder.
+       Hide original SVG contents; render circle-X as background on the SVG element. */
+    .wireframe-on svg > * {
+      opacity: 0 !important;
+    }
+    .wireframe-on svg {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='none' stroke='%2355595b' stroke-width='1.5'/><line x1='5' y1='5' x2='19' y2='19' stroke='%2355595b' stroke-width='1.5'/><line x1='19' y1='5' x2='5' y2='19' stroke='%2355595b' stroke-width='1.5'/></svg>") !important;
+      background-size: contain !important;
+      background-repeat: no-repeat !important;
+      background-position: center !important;
+      background-color: transparent !important;
+      border: none !important;
+    }
+
+    /* Images, logos, avatars → rectangle-with-X placeholder. */
+    .wireframe-on img {
+      content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 30' preserveAspectRatio='none'><rect x='0.75' y='0.75' width='38.5' height='28.5' fill='white' stroke='%2355595b' stroke-width='1.5'/><line x1='0.75' y1='0.75' x2='39.25' y2='29.25' stroke='%2355595b' stroke-width='1.5'/><line x1='39.25' y1='0.75' x2='0.75' y2='29.25' stroke='%2355595b' stroke-width='1.5'/></svg>") !important;
+      background-color: #fff !important;
+      border-radius: 0 !important;
+    }
+
+    /* Preserve bezel, status bar, tab underline separators as thin gray lines */
+    .wireframe-on .status-bar,
+    .wireframe-on .status-bar * {
+      background: transparent !important;
+      color: #55595b !important;
+    }
+
+    /* (Removed global hover override — was too aggressive; default wireframe rules handle it.) */
   </style>
 </head>
 <body>
@@ -593,7 +715,7 @@
     function StatusBar() {
       return (
         <div style={{ height: 54, padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <span style={{ fontSize: 17, fontWeight: 600, fontFamily: '"SF Pro", -apple-system, system-ui, sans-serif' }}>9:41</span>
+          <span data-wf-keep style={{ fontSize: 17, fontWeight: 600, fontFamily: '"SF Pro", -apple-system, system-ui, sans-serif' }}>9:41</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Icons.Signal size={17}/>
             <Icons.Wifi size={16}/>
@@ -614,7 +736,7 @@
               background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
               minWidth: 0,
             }}>
-              <span style={{ fontSize: 15, fontWeight: 400, color: selected === i ? '#000' : '#55595b', whiteSpace: 'nowrap', padding: '8px 0', transition: 'color 250ms ease' }}>{label}</span>
+              <span data-wf-keep style={{ fontSize: 15, fontWeight: 400, color: selected === i ? '#000' : '#55595b', whiteSpace: 'nowrap', padding: '8px 0', transition: 'color 250ms ease' }}>{label}</span>
               <div style={{ height: 4, width: '100%', background: '#d9dfe2', borderRadius: 2 }}/>
             </button>
           ))}
@@ -650,7 +772,7 @@
             {tabs.map(t => (
               <div key={t.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, height: 44 }}>
                 <img src={t.img} alt={t.label} style={{ width: 24, height: 24, objectFit: 'contain' }}/>
-                <span style={{ fontSize: 13, fontWeight: 500, color: t.selected ? '#008600' : '#6e7376' }}>{t.label}</span>
+                <span data-wf-keep style={{ fontSize: 13, fontWeight: 500, color: t.selected ? '#008600' : '#6e7376' }}>{t.label}</span>
               </div>
             ))}
           </div>
@@ -708,24 +830,74 @@
       );
     }
 
-    function ChatInputBar({ placeholder = "What does my policy cover?", variant = "default", onSend }) {
+    function ChatInputBar({ placeholder = "Ask a question", variant = "default", onSend }) {
       const [val, setVal] = useState('');
       const handleSend = () => { if (val.trim() && onSend) { onSend(val.trim()); setVal(''); } };
-      return (
-        <div style={{
-          border: variant === 'comparison' ? '1px solid #000' : '2px solid #006a57',
-          borderRadius: 78, padding: 16,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-        }}>
-          {variant === 'comparison' && (
+
+      if (variant === 'comparison') {
+        return (
+          <div style={{
+            border: '1px solid #000',
+            borderRadius: 78, padding: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Icons.Plus size={20} color="#000"/>
             </div>
-          )}
-          <input type="text" value={val} onChange={e => setVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleSend(); }} placeholder={placeholder} style={{ fontSize: 17, color: '#000', flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', padding: 0 }}/>
-          <div onClick={handleSend} style={{ width: 24, height: 24, flexShrink: 0, cursor: 'pointer' }}>
-            <Icons.Send color="#008600"/>
+            <input type="text" value={val} onChange={e => setVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleSend(); }} placeholder={placeholder} style={{ fontSize: 17, color: '#000', flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', padding: 0 }}/>
+            <div onClick={handleSend} style={{ width: 24, height: 24, flexShrink: 0, cursor: 'pointer' }}>
+              <Icons.Send color="#008600"/>
+            </div>
           </div>
+        );
+      }
+
+      return (
+        <div style={{ position: 'relative', height: 48, width: '100%' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center',
+            height: 48, gap: 8,
+            padding: '12px 53px 12px 16px',
+            borderRadius: 9999,
+            background: '#fff',
+            border: '1px solid #2268f6',
+          }}>
+            <div style={{ width: 24, height: 23, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="24" height="23" viewBox="0 0 23.6285 22.854" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.8296 9.29973C10.5115 9.29961 10.1898 9.23171 9.88413 9.09605L3.72927 6.34276L4.59736 4.38454L10.7522 7.13784C10.8145 7.16642 10.875 7.15928 10.9301 7.11997C10.9852 7.07887 11.0101 7.02527 11.003 6.95738L10.2968 0.223337L12.419 0L13.1234 6.73047C13.2106 7.56486 12.8584 8.35815 12.1824 8.85306C11.7771 9.14947 11.306 9.29955 10.8296 9.29973Z" fill="#236CFF"/>
+                <path d="M15.1527 11.5574C15.5558 11.8556 16.0259 12.0114 16.5026 12.0155L16.5027 12.0119C16.8211 12.0146 17.1436 11.9512 17.4507 11.8162L23.6285 9.11481L22.777 7.14936L16.5991 9.85072C16.5366 9.87878 16.4762 9.87112 16.4214 9.83135C16.3666 9.79158 16.3422 9.73599 16.3498 9.66816L17.1109 2.94386L14.9907 2.70265L14.2296 9.42696C14.1354 10.2624 14.4809 11.0586 15.1527 11.5574Z" fill="#236CFF"/>
+                <path d="M18.437 22.4699L13.974 17.4008C13.4209 16.7723 13.247 15.9202 13.5138 15.1239C13.7788 14.3276 14.426 13.7526 15.2458 13.5847L21.8487 12.2351L22.2731 14.3365L15.6702 15.6862C15.6025 15.6999 15.5595 15.7388 15.5375 15.8047C15.5156 15.8706 15.5275 15.9279 15.5733 15.9801L20.0363 21.0493L18.437 22.4699Z" fill="#236CFF"/>
+                <path d="M5.961 22.8275L4.11681 21.7485L7.50801 15.9009C7.92877 15.1753 8.6793 14.7439 9.51536 14.7471C10.3514 14.7502 11.0987 15.1872 11.514 15.9159L14.8611 21.7889L13.0088 22.854L9.66171 16.981C9.59456 16.8628 9.42202 16.8604 9.35397 16.9798L5.96278 22.8275L5.961 22.8275Z" fill="#236CFF"/>
+                <path d="M2.10554 16.6739L3.67691 18.1254L3.67688 18.129L8.23782 13.1478C8.80301 12.5284 8.9917 11.6817 8.74229 10.8803C8.49287 10.079 7.85692 9.4915 7.04056 9.3077L0.465251 7.82967L0 9.92241L6.57535 11.3969C6.64101 11.4119 6.68504 11.4534 6.7057 11.518C6.72634 11.5843 6.71326 11.6431 6.66648 11.6927L2.10554 16.6739Z" fill="#236CFF"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              className="fa-input"
+              value={val}
+              onChange={e => setVal(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
+              placeholder={placeholder}
+              style={{ fontSize: 17, lineHeight: 1.4, color: '#000', flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'inherit', padding: 0 }}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleSend}
+            aria-label="Send"
+            className="press-btn"
+            style={{
+              position: 'absolute', right: 5, top: '50%', transform: 'translateY(-50%)',
+              width: 40, height: 40, borderRadius: '50%',
+              background: '#236cff', border: 'none', padding: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <svg width="17" height="14" viewBox="0 0 17.292 13.704" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.452 0L8.748 1.704L12.708 5.652H0V8.052H12.708L8.748 12L10.452 13.704L17.292 6.852L10.452 0Z" fill="white"/>
+            </svg>
+          </button>
         </div>
       );
     }
@@ -763,7 +935,7 @@
           <StatusBar/>
           {/* Header */}
           <div style={{ padding: '0 16px' }}>
-            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+            <p data-wf-keep style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           <TabGroup selected={0} onSelect={(i) => { if (i === 1) onTabChange('findPolicy'); if (i === 2) onTabChange('driveScore'); }}/>
 
@@ -1634,7 +1806,7 @@
                   { name: 'Proof of ins...', img: 'Assets/Document 2.png' },
                 ].map((doc, i) => (
                   <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0, cursor: 'pointer' }}>
-                    <div style={{ width: 103, height: 133, borderRadius: 4, border: '1px solid #d9dfe2', overflow: 'hidden', background: '#fff' }}>
+                    <div style={{ width: 103, height: 75, borderRadius: 4, border: '1px solid #d9dfe2', overflow: 'hidden', background: '#fff' }}>
                       <img src={doc.img} alt={doc.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
                     </div>
                     <span style={{ fontSize: 13, lineHeight: 1.4, width: 103, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{doc.name}</span>
@@ -1662,7 +1834,7 @@
         <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
           <div style={{ padding: '0 16px' }}>
-            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+            <p data-wf-keep style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           <TabGroup selected={1} onSelect={(i) => { if (i === 0) onTabChange('myPolicies'); if (i === 2) onTabChange('driveScore'); }}/>
 
@@ -1899,7 +2071,7 @@
               </div>
 
               {/* Title */}
-              <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>Policy comparison</p>
+              <p data-wf-keep style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>Policy comparison</p>
 
               {/* Subtitle */}
               <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 32, marginBottom: 8 }}>Liberty Mutual vs Geico bundle comparison</p>
@@ -2030,7 +2202,7 @@
         <div className="screen-root" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
           <div style={{ padding: '0 16px' }}>
-            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+            <p data-wf-keep style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           <TabGroup selected={2} onSelect={(i) => { if (i === 0) onTabChange('myPolicies'); if (i === 1) onTabChange('findPolicy'); }}/>
           <div className="scroll-content" style={{ flex: 1, overflowY: 'auto' }}>
@@ -2311,7 +2483,7 @@
     }
 
     /* ─── Simulator Sidebar ─── */
-    function SimSidebar({ policyCount, setPolicyCount }) {
+    function SimSidebar({ policyCount, setPolicyCount, wireframeMode, setWireframeMode }) {
       return (
         <div className="sim-sidebar">
           <div className="sim-sidebar-title">Settings</div>
@@ -2332,6 +2504,24 @@
                 marginLeft: n > 0 ? -1 : 0,
               }}>{n}</button>
             ))}
+          </div>
+
+          <div className="sim-sidebar-label">Wireframe mode</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            <span style={{ fontSize: 13, color: wireframeMode ? '#008600' : '#55595b' }}>{wireframeMode ? 'On' : 'Off'}</span>
+            <div onClick={() => setWireframeMode(!wireframeMode)} style={{
+              width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
+              background: wireframeMode ? '#008600' : '#d9dfe2',
+              position: 'relative', transition: 'background 200ms ease',
+            }}>
+              <div style={{
+                width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                position: 'absolute', top: 2,
+                left: wireframeMode ? 22 : 2,
+                transition: 'left 200ms ease',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }}/>
+            </div>
           </div>
         </div>
       );
@@ -2405,7 +2595,6 @@
     function PolicyProChat({ chatContext, onBack }) {
       const [messages, setMessages] = useState([]);
       const [isTyping, setIsTyping] = useState(false);
-      const [inputVal, setInputVal] = useState('');
       const [sidebarOpen, setSidebarOpen] = useState(false);
       const scrollRef = useRef(null);
       const initRef = useRef(false);
@@ -2455,7 +2644,6 @@
       const sendMessage = (text) => {
         if (!text.trim()) return;
         setMessages(prev => [...prev, { role: 'user', text: text.trim() }]);
-        setInputVal('');
         scrollToBottom();
         setTimeout(() => {
           setIsTyping(true);
@@ -2576,22 +2764,7 @@
 
           {/* Input bar */}
           <div style={{ flexShrink: 0, padding: '8px 16px 16px', borderTop: '1px solid #e9eef0', background: '#fff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#f7f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer' }}>
-                <Icons.Plus size={18} color="#55595b"/>
-              </div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', border: '1.5px solid #d9dfe2', borderRadius: 50, padding: '8px 12px', gap: 8 }}>
-                <input
-                  type="text" value={inputVal} onChange={e => setInputVal(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') sendMessage(inputVal); }}
-                  placeholder="Ask anything"
-                  style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 15, fontFamily: 'inherit', padding: 0 }}
-                />
-                <div onClick={() => sendMessage(inputVal)} style={{ width: 24, height: 24, flexShrink: 0, cursor: 'pointer' }}>
-                  <Icons.Send color="#008600"/>
-                </div>
-              </div>
-            </div>
+            <ChatInputBar placeholder="Ask anything" onSend={sendMessage}/>
           </div>
         </div>
       );
@@ -3071,7 +3244,7 @@
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <StatusBar/>
           <div style={{ padding: '0 16px' }}>
-            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+            <p data-wf-keep style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           {/* Tabs with sliding indicator */}
           <div style={{ position: 'relative', display: 'flex', paddingLeft: 16, paddingRight: 16 }}>
@@ -3841,7 +4014,7 @@
           ) : (
           <>
           <div style={{ padding: '0 16px' }}>
-            <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
+            <p data-wf-keep style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.15 }}>Insurance</p>
           </div>
           {/* Tabs with sliding indicator */}
           <div style={{ position: 'relative', display: 'flex', paddingLeft: 16, paddingRight: 16 }}>
@@ -5299,6 +5472,12 @@
       const [csDriveScore, setCsDriveScore] = useState(false);
       const [csVehicleMonitoring, setCsVehicleMonitoring] = useState(false);
       const [csCoverage, setCsCoverage] = useState(false);
+      const [wireframeMode, setWireframeMode] = useState(() => {
+        try { return localStorage.getItem('vp-wireframe-mode') === '1'; } catch { return false; }
+      });
+      useEffect(() => {
+        try { localStorage.setItem('vp-wireframe-mode', wireframeMode ? '1' : '0'); } catch {}
+      }, [wireframeMode]);
 
       useEffect(() => {
         if (activeTab !== 'q4fy2026') setQ4FindPolicyExperimentVisible(false);
@@ -5407,7 +5586,7 @@
               <>
                 <div className="sim-canvas">
                   <div className="phone-bezel">
-                    <div className="phone-screen">
+                    <div className={`phone-screen${wireframeMode ? ' wireframe-on' : ''}`}>
                       <CurrentStateScreen driveScoreActive={csDriveScore} vehicleMonitoringActive={csVehicleMonitoring} coverageActive={csCoverage}/>
                     </div>
                   </div>
@@ -5467,6 +5646,23 @@
                         }}/>
                       </div>
                     </div>
+                    <div className="sim-sidebar-label">Wireframe mode</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                      <span style={{ fontSize: 13, color: wireframeMode ? '#008600' : '#55595b' }}>{wireframeMode ? 'On' : 'Off'}</span>
+                      <div onClick={() => setWireframeMode(!wireframeMode)} style={{
+                        width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
+                        background: wireframeMode ? '#008600' : '#d9dfe2',
+                        position: 'relative', transition: 'background 200ms ease',
+                      }}>
+                        <div style={{
+                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                          position: 'absolute', top: 2,
+                          left: wireframeMode ? 22 : 2,
+                          transition: 'left 200ms ease',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                        }}/>
+                      </div>
+                    </div>
                   </div>
                 )}
               </>
@@ -5474,7 +5670,7 @@
               <>
                 <div className="sim-canvas">
                   <div className="phone-bezel">
-                    <div className="phone-screen">
+                    <div className={`phone-screen${wireframeMode ? ' wireframe-on' : ''}`}>
                       <Q4FY2026Screen vehicleMonitoring={vehicleMonitoring} liteConnection={liteConnection} driveScoreActive={driveScoreActive} onDataCollectionComplete={() => setVehicleMonitoring(true)} findPolicyExperimentVariant={q4FindPolicyExperimentVariant} onFindPolicyTabActive={setQ4FindPolicyExperimentVisible}/>
                     </div>
                   </div>
@@ -5555,6 +5751,23 @@
                         }}/>
                       </div>
                     </div>
+                    <div className="sim-sidebar-label">Wireframe mode</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                      <span style={{ fontSize: 13, color: wireframeMode ? '#008600' : '#55595b' }}>{wireframeMode ? 'On' : 'Off'}</span>
+                      <div onClick={() => setWireframeMode(!wireframeMode)} style={{
+                        width: 44, height: 24, borderRadius: 12, cursor: 'pointer',
+                        background: wireframeMode ? '#008600' : '#d9dfe2',
+                        position: 'relative', transition: 'background 200ms ease',
+                      }}>
+                        <div style={{
+                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                          position: 'absolute', top: 2,
+                          left: wireframeMode ? 22 : 2,
+                          transition: 'left 200ms ease',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                        }}/>
+                      </div>
+                    </div>
                     </>
                     )}
                   </div>
@@ -5564,7 +5777,7 @@
               <>
                 <div className="sim-canvas">
                   <div className="phone-bezel">
-                    <div className="phone-screen" style={{ position: 'relative' }}>
+                    <div className={`phone-screen${wireframeMode ? ' wireframe-on' : ''}`} style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', inset: 0, opacity: screen === 'myPolicies' || screen === 'addPolicy' || screen === 'policyDetails' ? 1 : 0, pointerEvents: screen === 'myPolicies' || screen === 'addPolicy' || screen === 'policyDetails' ? 'auto' : 'none', transition: 'opacity 200ms ease' }}>
                         <MyPoliciesScreen onTabChange={setScreen} chip1={chip1} setChip1={setChip1} policyCount={policyCount} openChat={openChat} onAddPolicy={() => setScreen('addPolicy')} onViewDetails={(idx, policies) => { setPolicyDetail(policies[idx]); setScreen('policyDetails'); }}/>
                       </div>
@@ -5591,7 +5804,7 @@
                     </div>
                   </div>
                 </div>
-                {showSettings && <SimSidebar policyCount={policyCount} setPolicyCount={setPolicyCount}/>}
+                {showSettings && <SimSidebar policyCount={policyCount} setPolicyCount={setPolicyCount} wireframeMode={wireframeMode} setWireframeMode={setWireframeMode}/>}
               </>
             )}
           </div>
