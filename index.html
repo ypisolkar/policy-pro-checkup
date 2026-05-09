@@ -572,7 +572,7 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
+    const { useState, useRef, useEffect, useLayoutEffect } = React;
 
     /* ─── SVG Icons ─── */
     const Icons = {
@@ -898,6 +898,190 @@
               <path d="M10.452 0L8.748 1.704L12.708 5.652H0V8.052H12.708L8.748 12L10.452 13.704L17.292 6.852L10.452 0Z" fill="white"/>
             </svg>
           </button>
+        </div>
+      );
+    }
+
+    /* ─── Coverage Suggestions (collapsible) ─── */
+    const COVERAGE_SUGGESTIONS_DEFAULT = [
+      {
+        title: 'Reduce rental car coverage',
+        body: "Rental reimbursement at $100/day, $3,000 max is unusually high—likely overkill unless you'd truly need a luxury rental for weeks.",
+        savings: '$234/yr',
+      },
+      {
+        title: 'Increase your deductable',
+        body: 'With your strong emergency fund, you can afford a $1,000 deductible.',
+        savings: '$286/yr',
+      },
+      {
+        title: 'Reduce 4Runner coverage',
+        body: "Your 2014 4Runner's value has depreciated. Consider reducing comprehensive coverage.",
+        savings: '$132/yr',
+      },
+    ];
+
+    const COVERAGE_COLLAPSED_HEIGHT = 250;
+    const COVERAGE_ANIM_MS = 320;
+    const COVERAGE_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
+
+    function CoverageSuggestionsSection({
+      savings = '$623',
+      suggestions = COVERAGE_SUGGESTIONS_DEFAULT,
+    }) {
+      const [expanded, setExpanded] = useState(false);
+      const [feedback, setFeedback] = useState(null);
+      const sectionRef = useRef(null);
+      const contentRef = useRef(null);
+      const [fullHeight, setFullHeight] = useState(0);
+
+      // Measure the full natural height of the content after every layout pass.
+      // This keeps the expanded max-height accurate even if the content size
+      // changes (e.g. feedback bar interaction).
+      useLayoutEffect(() => {
+        if (contentRef.current) {
+          const h = contentRef.current.scrollHeight;
+          if (h !== fullHeight) setFullHeight(h);
+        }
+      });
+
+      const handleToggle = () => {
+        // Kick off the smooth scroll in parallel with the collapse animation
+        // so the user lands on the collapsed state instead of being parked below it.
+        if (expanded) {
+          requestAnimationFrame(() => {
+            if (sectionRef.current && sectionRef.current.scrollIntoView) {
+              sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }
+        setExpanded(prev => !prev);
+      };
+
+      const Chevron = ({ rotated }) => (
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ transform: rotated ? 'rotate(180deg)' : 'rotate(0deg)', transition: `transform ${COVERAGE_ANIM_MS}ms ${COVERAGE_EASING}` }}>
+          <path d="M4 7.5l6 6 6-6" stroke="#008600" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      );
+
+      const ThumbsUp = ({ filled }) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? '#000' : 'none'}>
+          <path d="M7 11v9H4a1 1 0 01-1-1v-7a1 1 0 011-1h3z" stroke="#000" strokeWidth="1.5" strokeLinejoin="round"/>
+          <path d="M7 11l4-7c.3-.5.8-.8 1.4-.8.9 0 1.6.7 1.6 1.6V8h5.2c.9 0 1.6.8 1.4 1.7l-1.6 8.5c-.1.7-.7 1.2-1.4 1.2H7" stroke="#000" strokeWidth="1.5" strokeLinejoin="round"/>
+        </svg>
+      );
+
+      const ThumbsDown = ({ filled }) => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? '#000' : 'none'} style={{ transform: 'rotate(180deg)' }}>
+          <path d="M7 11v9H4a1 1 0 01-1-1v-7a1 1 0 011-1h3z" stroke="#000" strokeWidth="1.5" strokeLinejoin="round"/>
+          <path d="M7 11l4-7c.3-.5.8-.8 1.4-.8.9 0 1.6.7 1.6 1.6V8h5.2c.9 0 1.6.8 1.4 1.7l-1.6 8.5c-.1.7-.7 1.2-1.4 1.2H7" stroke="#000" strokeWidth="1.5" strokeLinejoin="round"/>
+        </svg>
+      );
+
+      // Resolve the clipping container's max-height. Until the first
+      // measurement is in, fall back to a large value when expanded so we
+      // never visually clip the content.
+      const expandedMax = fullHeight > 0 ? fullHeight : 9999;
+      const clipMaxHeight = expanded ? expandedMax : COVERAGE_COLLAPSED_HEIGHT;
+
+      return (
+        <div ref={sectionRef} style={{ padding: '32px 16px', background: '#fff', scrollMarginTop: 16 }}>
+          {/* Section header */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Coverage suggestions</p>
+            <p style={{ fontSize: 17, lineHeight: 1.4 }}>
+              Save up to <span style={{ fontWeight: 500 }}>{savings}</span> per year
+            </p>
+          </div>
+
+          {/* Clipped suggestion list — slides open/closed like an accordion */}
+          <div style={{ position: 'relative' }}>
+            <div style={{
+              maxHeight: clipMaxHeight,
+              overflow: 'hidden',
+              transition: `max-height ${COVERAGE_ANIM_MS}ms ${COVERAGE_EASING}`,
+              willChange: 'max-height',
+            }}>
+              <div ref={contentRef}>
+                {suggestions.map((s, i) => (
+                  <div key={i}>
+                    <div style={{ padding: '24px 0' }}>
+                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>{s.title}</p>
+                      <p style={{ fontSize: 15, lineHeight: 1.4, marginBottom: 12 }}>{s.body}</p>
+                      <p style={{ fontSize: 15, lineHeight: 1.4 }}>
+                        Potential savings: <span style={{ fontSize: 17, fontWeight: 500 }}>{s.savings}</span>
+                      </p>
+                    </div>
+                    {i < suggestions.length - 1 && <div style={{ height: 1, background: '#d9dfe2' }}/>}
+                  </div>
+                ))}
+
+                {/* AI feedback bar — always rendered so scrollHeight stays accurate; fades in/out with the section */}
+                <div
+                  aria-hidden={!expanded}
+                  style={{
+                    padding: '16px 0',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 16,
+                    opacity: expanded ? 1 : 0,
+                    pointerEvents: expanded ? 'auto' : 'none',
+                    transition: `opacity ${COVERAGE_ANIM_MS}ms ${COVERAGE_EASING}`,
+                  }}
+                >
+                  <p style={{ flex: 1, fontSize: 13, lineHeight: 1.4, color: '#565c5e' }}>
+                    Was this AI-generated content helpful?
+                  </p>
+                  <div style={{ display: 'flex', gap: 16, flexShrink: 0 }}>
+                    <button
+                      className="press-btn"
+                      onClick={() => setFeedback(feedback === 'up' ? null : 'up')}
+                      aria-label="Thumbs up"
+                      aria-pressed={feedback === 'up'}
+                      tabIndex={expanded ? 0 : -1}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+                    >
+                      <ThumbsUp filled={feedback === 'up'}/>
+                    </button>
+                    <button
+                      className="press-btn"
+                      onClick={() => setFeedback(feedback === 'down' ? null : 'down')}
+                      aria-label="Thumbs down"
+                      aria-pressed={feedback === 'down'}
+                      tabIndex={expanded ? 0 : -1}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}
+                    >
+                      <ThumbsDown filled={feedback === 'down'}/>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Gradient overlay — fades out when expanded so the transition stays smooth */}
+            <div style={{
+              position: 'absolute',
+              left: 0, right: 0, bottom: 0,
+              height: 170,
+              pointerEvents: 'none',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)',
+              opacity: expanded ? 0 : 1,
+              transition: `opacity ${COVERAGE_ANIM_MS}ms ${COVERAGE_EASING}`,
+            }}/>
+          </div>
+
+          {/* Show more / Show less button — moves with the unfolding panel */}
+          <div style={{ paddingTop: expanded ? 16 : 8, transition: `padding-top ${COVERAGE_ANIM_MS}ms ${COVERAGE_EASING}` }}>
+            <KDSButton
+              appearance="outline"
+              size="small"
+              fullWidth
+              icon={<Chevron rotated={expanded}/>}
+              onClick={handleToggle}
+            >
+              {expanded ? 'Show less' : 'Show more'}
+            </KDSButton>
+          </div>
         </div>
       );
     }
@@ -1262,47 +1446,27 @@
               chip1 === 0 ? (
                 /* Dashboard — reuse 1-policy Dashboard content */
                 <>
-                  <div style={{ padding: '0 16px' }}>
-                    <div style={{ height: 1, background: '#d9dfe2' }}/>
-                  </div>
-                  <div style={{ padding: '0 16px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                      <div style={{ padding: '16px 16px 16px 0', borderRight: '1px solid #d9dfe2' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Payment rating</span>
-                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Good</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                          <div style={{ paddingLeft: '65%' }}>
-                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
-                          </div>
-                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
-                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
-                            <div style={{ flex: 1, background: '#7fd000' }}/>
-                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
-                          </div>
-                        </div>
-                        <p style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See details</p>
-                      </div>
-                      <div style={{ padding: '16px 0 16px 16px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Coverage rating</span>
-                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Good</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                          <div style={{ paddingLeft: '60%' }}>
-                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
-                          </div>
-                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
-                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
-                            <div style={{ flex: 1, background: '#7fd000' }}/>
-                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
-                          </div>
-                        </div>
-                        <p onClick={() => openChat && openChat('See what you to do')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See details</p>
-                      </div>
-                    </div>
-                  </div>
+                  <div style={{ height: 8, background: '#e9eef0' }}/>
+                  <CoverageSuggestionsSection
+                    savings="$216"
+                    suggestions={[
+                      {
+                        title: 'Switch to annual payment',
+                        body: 'Paying your premium annually instead of monthly removes installment fees of $4–8 per month with most carriers.',
+                        savings: '$84/yr',
+                      },
+                      {
+                        title: 'Update your annual mileage',
+                        body: "Your reported mileage hasn't been updated since 2022. If you're driving less now, you may qualify for a low-mileage discount.",
+                        savings: '$72/yr',
+                      },
+                      {
+                        title: 'Enable paperless billing & autopay',
+                        body: 'Most carriers offer a small discount for paperless billing combined with autopay enrollment — easy savings with no coverage tradeoff.',
+                        savings: '$60/yr',
+                      },
+                    ]}
+                  />
                 </>
               ) : chip1 === 1 ? (
                 <div style={{ padding: '0 16px' }}>
@@ -1387,47 +1551,27 @@
               /* 2-POLICY EXPANDED — show 1-policy Dashboard */
               chip1 === 0 ? (
                 <>
-                  <div style={{ padding: '0 16px' }}>
-                    <div style={{ height: 1, background: '#d9dfe2' }}/>
-                  </div>
-                  <div style={{ padding: '0 16px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                      <div style={{ padding: '16px 16px 16px 0', borderRight: '1px solid #d9dfe2' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Payment rating</span>
-                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Fair</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                          <div style={{ paddingLeft: '55%' }}>
-                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
-                          </div>
-                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
-                            <div style={{ flex: 1, background: '#c74900', borderRadius: '99px 0 0 99px' }}/>
-                            <div style={{ flex: 1, background: '#ffca00' }}/>
-                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
-                          </div>
-                        </div>
-                        <p onClick={() => openChat && openChat('See alternatives')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See alternatives</p>
-                      </div>
-                      <div style={{ padding: '16px 0 16px 16px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Coverage rating</span>
-                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Needs work</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                          <div style={{ paddingLeft: '12%' }}>
-                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
-                          </div>
-                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
-                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
-                            <div style={{ flex: 1, background: '#7fd000' }}/>
-                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
-                          </div>
-                        </div>
-                        <p onClick={() => openChat && openChat('See what you to do')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See what to do</p>
-                      </div>
-                    </div>
-                  </div>
+                  <div style={{ height: 8, background: '#e9eef0' }}/>
+                  <CoverageSuggestionsSection
+                    savings="$432"
+                    suggestions={[
+                      {
+                        title: 'Bundle with your home policy',
+                        body: "You already have GEICO for home. Bundling auto with your home insurer typically unlocks 8–15% off both premiums.",
+                        savings: '$187/yr',
+                      },
+                      {
+                        title: 'Enroll in safe-driver tracking',
+                        body: "Your trip patterns suggest you'd qualify for top-tier discounts on usage-based programs like Snapshot or Drivewise.",
+                        savings: '$144/yr',
+                      },
+                      {
+                        title: 'Drop accident forgiveness',
+                        body: "You've had a clean record for 5+ years. The premium add-on is no longer cost-effective for your driving profile.",
+                        savings: '$101/yr',
+                      },
+                    ]}
+                  />
                 </>
               ) : chip1 === 1 ? (
                 <div style={{ padding: '0 16px' }}>
@@ -1571,110 +1715,11 @@
               chip1 === 0 ? (
                 /* Dashboard */
                 <>
-                  {/* Divider */}
-                  <div style={{ padding: '0 16px' }}>
-                    <div style={{ height: 1, background: '#d9dfe2' }}/>
-                  </div>
-                  {/* Dashboard key-value grid */}
-                  <div style={{ padding: '0 16px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                      {/* Payment rating */}
-                      <div style={{ padding: '16px 16px 16px 0', borderRight: '1px solid #d9dfe2' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Payment rating</span>
-                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Fair</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                          <div style={{ paddingLeft: '55%' }}>
-                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
-                          </div>
-                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
-                            <div style={{ flex: 1, background: '#c74900', borderRadius: '99px 0 0 99px' }}/>
-                            <div style={{ flex: 1, background: '#ffca00' }}/>
-                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
-                          </div>
-                        </div>
-                        <p onClick={() => openChat && openChat('See alternatives')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See alternatives</p>
-                      </div>
-                      {/* Coverage rating */}
-                      <div style={{ padding: '16px 0 16px 16px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>Coverage rating</span>
-                          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>Needs work</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
-                          <div style={{ paddingLeft: '12%' }}>
-                            <svg width="10" height="6" viewBox="0 0 10 6"><polygon points="5,6 0,0 10,0" fill="#000"/></svg>
-                          </div>
-                          <div style={{ display: 'flex', gap: 2, height: 6, borderRadius: 99, overflow: 'hidden' }}>
-                            <div style={{ flex: 1, background: '#ffca00', borderRadius: '99px 0 0 99px' }}/>
-                            <div style={{ flex: 1, background: '#7fd000' }}/>
-                            <div style={{ flex: 1, background: '#008600', borderRadius: '0 99px 99px 0' }}/>
-                          </div>
-                        </div>
-                        <p onClick={() => openChat && openChat('See what you to do')} style={{ fontSize: 15, fontWeight: 500, color: '#008600', cursor: 'pointer', lineHeight: 1.15, paddingTop: 8 }}>See what you to do</p>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Section divider */}
                   <div style={{ height: 8, background: '#e9eef0' }}/>
 
-                  {/* Savings opportunity */}
-                  <div style={{ padding: '32px 16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Savings opportunity</p>
-                      <Icons.Sparkle size={20} color="#55595b"/>
-                    </div>
-                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 8 }}>
-                      We've found savings for your 2008 Toyota 4Runner with comparable coverage
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 16 }}>
-                      <svg width="12" height="10" viewBox="0 0 12 10"><polygon points="6,10 0,0 12,0" fill="#008600"/></svg>
-                      <span style={{ fontSize: 15, fontWeight: 500, color: '#008600' }}>$50</span>
-                      <span style={{ fontSize: 15, color: '#55595b' }}>est monthly savings</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 4 }}>
-                      <div>
-                        <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4 }}>Current policy</p>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <img src="Assets/KDS Brand avatar-1.png" alt="GEICO" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }}/>
-                        <span style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.4 }}>GEICO</span>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>$249.00/mo</p>
-                      <span style={{ fontSize: 17, color: '#55595b' }}>→</span>
-                      <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Est $199.00/mo</p>
-                    </div>
-                    <KDSButton fullWidth size="small">Show offer</KDSButton>
-                  </div>
-
-                  {/* Section divider */}
-                  <div style={{ height: 8, background: '#e9eef0' }}/>
-
-                  {/* Coverage recommendations */}
-                  <div style={{ padding: '32px 16px' }}>
-                    <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginBottom: 16 }}>Coverage recommendations</p>
-                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>
-                      There are a couple of areas where you might be underprotected.
-                    </p>
-                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 12 }}>The biggest gaps are:</p>
-                    <ul style={{ marginLeft: 24, marginBottom: 12, listStyleType: 'disc' }}>
-                      <li style={{ fontSize: 17, lineHeight: 1.4 }}>Your liability coverage is lower than recommended for your profile</li>
-                    </ul>
-                    <p style={{ fontSize: 17, lineHeight: 1.4, marginBottom: 16 }}>I can walk you through what each of these means and how to fix them. Where would you like to start?</p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {['Walk me through what to do', 'Walk me through your plan', 'Explain'].map(text => (
-                        <button key={text} className="press-btn" onClick={() => openChat && openChat(text)} style={{
-                          background: '#008600', color: '#fff', border: 'none', borderRadius: 50,
-                          padding: '8px 16px', fontSize: 17, fontWeight: 400, cursor: 'pointer',
-                          fontFamily: 'inherit', textAlign: 'center', lineHeight: 1.4,
-                        }}>{text}</button>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Coverage suggestions */}
+                  <CoverageSuggestionsSection/>
                 </>
               ) : chip1 === 1 ? (
                 /* Drivers */
@@ -1749,7 +1794,7 @@
             <div style={{ height: 8, background: '#e9eef0' }}/>
 
             {/* Upcoming section */}
-            <div style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ padding: '32px 16px', display: 'flex', flexDirection: 'column', gap: 16, background: '#fff' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                   <p style={{ flex: 1, fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Upcoming</p>
@@ -1757,30 +1802,27 @@
                 </div>
                 <p style={{ fontSize: 17, lineHeight: 1.4 }}>From renewals to rate factor changes</p>
               </div>
-              <div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 {[
-                  { month: 'May', day: '15', title: 'Insurance payment due', desc: 'Liberty mutual auto: 3228' },
-                  { month: 'Jun', day: '3', title: 'Insurance payment due', desc: 'Liberty mutual auto: 3228' },
-                  { month: 'Jul', day: '29', title: 'Scheduled maintenance due', desc: '2008 Jeep Grand cherokee' },
-                ].map((item, i, arr) => (
-                  <div key={i}>
-                    <div style={{ padding: '24px 0', display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <div style={{ border: '1px solid #d9dfe2', borderRadius: 6, overflow: 'hidden', flexShrink: 0, textAlign: 'center' }}>
-                        <div style={{ background: '#e9eef0', borderBottom: '1px solid #d9dfe2', padding: '2px 12px' }}>
-                          <span style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>{item.month}</span>
-                        </div>
-                        <div style={{ padding: '4px 12px' }}>
-                          <span style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>{item.day}</span>
-                        </div>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>{item.title}</p>
-                        <p style={{ fontSize: 15, lineHeight: 1.4, marginTop: 4 }}>{item.desc}</p>
-                      </div>
-                    </div>
-                    {i < arr.length - 1 && (
-                      <div style={{ height: 1, background: '#d9dfe2' }}/>
-                    )}
+                  { date: 'May 15', title: 'Payment due', sub: '$104 • Geico auto' },
+                  { date: 'May 29', title: 'Maintenance', sub: '5K mile oil change' },
+                  { date: 'June 3', title: 'Rate update', sub: '1 incident drops off' },
+                  { date: 'June 15', title: 'Payment due', sub: '$104 • Geico auto' },
+                ].map((item, i) => (
+                  <div key={i} className="press-btn" style={{
+                    background: '#fff',
+                    padding: 16,
+                    borderRadius: 8,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                    cursor: 'pointer',
+                    minWidth: 0,
+                  }}>
+                    <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>{item.date}</p>
+                    <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15 }}>{item.title}</p>
+                    <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.sub}</p>
                   </div>
                 ))}
               </div>
