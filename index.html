@@ -1094,7 +1094,7 @@
       const clipMaxHeight = expanded ? expandedMax : COVERAGE_COLLAPSED_HEIGHT;
 
       return (
-        <div ref={sectionRef} style={{ padding: '32px 16px', background: '#fff', scrollMarginTop: 16 }}>
+        <div ref={sectionRef} style={{ padding: '0px 16px 32px', background: '#fff', scrollMarginTop: 16 }}>
           {/* Section header */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Coverage suggestions</p>
@@ -1593,7 +1593,7 @@
 
                 {/* Policy Pro + Add Policy row */}
                 <div style={{
-                  padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   ...(policyCount >= 2 ? { background: '#f7f9fa', borderTop: '1px solid #e9eef0', borderBottom: 'none', boxShadow: '0px -1px 4px rgba(0,0,0,0.25)', clipPath: 'inset(-4px 0px 0px 0px)', position: 'relative', zIndex: 3 } : {}),
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#006a57', borderRadius: 8, padding: '4px 8px' }}>
@@ -1620,7 +1620,7 @@
                 </div>
 
                 {/* Connected text */}
-                <div style={{ padding: '4px 16px 0', textAlign: 'center' }}>
+                <div style={{ padding: '8px 16px 0', textAlign: 'center' }}>
                   <p style={{ fontSize: 13, color: '#55595b', lineHeight: 1.4 }}>
                     {policyCount === 3 ? '3 polices connected  •  23 documents added' : policyCount === 2 ? '2 polices connected  •  16 documents added' : 'One policy connected  •  8 documents added'}
                   </p>
