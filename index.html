@@ -1843,6 +1843,18 @@
               </div>
             </div>
 
+            {/* Policy Check-up Section — Intuit AI proactive check-up */}
+            <div style={{ padding: '16px 0 24px', background: '#fff' }}>
+              <div style={{ padding: '0 16px', marginBottom: 16 }}>
+                <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Policy check-up</p>
+                <p style={{ fontSize: 17, lineHeight: 1.4, marginTop: 4 }}>Personalized insights based on your connected policy</p>
+              </div>
+              <PolicyCheckupSection openChat={openChat}/>
+            </div>
+
+            {/* Section divider */}
+            <div style={{ height: 8, background: '#e9eef0' }}/>
+
             {/* Filter chips — KDS variant with Insights AI tab */}
             <div className="h-scroll" style={{ display: 'flex', gap: 8, padding: '0 16px', marginBottom: 16 }}>
               {chips.map((c, i) => (
@@ -2185,18 +2197,6 @@
                 </div>
               )
             )}
-
-            {/* Section divider */}
-            <div style={{ height: 8, background: '#e9eef0' }}/>
-
-            {/* Policy Check-up Section — Intuit AI proactive check-up */}
-            <div style={{ padding: '32px 0', background: '#fff' }}>
-              <div style={{ padding: '0 16px', marginBottom: 16 }}>
-                <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Policy check-up</p>
-                <p style={{ fontSize: 17, lineHeight: 1.4, marginTop: 4 }}>Personalized insights based on your connected policy</p>
-              </div>
-              <PolicyCheckupSection openChat={openChat}/>
-            </div>
 
             {/* Section divider */}
             <div style={{ height: 8, background: '#e9eef0' }}/>
