@@ -1281,28 +1281,123 @@
     }
 
     /* ─── POLICY CHECK-UP SECTION ─── */
+    /* Thomas's profile: cost-conscious, 4+ yrs with Liberty Mutual, 2022 Toyota Camry (older/depreciating),
+       premium increasing, prefers self-service, no sales calls. 2 rate factor changes detected. */
     function PolicyCheckupSection({ openChat }) {
       const [phase, setPhase] = useState('idle'); // idle | analyzing | findings | summary
+      const [activeFinding, setActiveFinding] = useState(null); // index of expanded finding
       const [analyzeStep, setAnalyzeStep] = useState(0);
       const [progress, setProgress] = useState(0);
       const [displayedSavings, setDisplayedSavings] = useState(0);
 
+      const profile = {
+        name: 'Thomas',
+        carrier: 'Liberty Mutual',
+        vehicle: '2022 Toyota Camry',
+        vehicleValue: '$18,200',
+        yearsWithCarrier: 4,
+        premium: '$189/mo',
+        renewalDays: 36,
+        rateFactorChanges: [
+          { factor: 'Vehicle depreciation', direction: 'down', detail: 'Your Camry's value dropped 12% ($2,480) since last renewal — your collision/comp may be overpriced for the car's current worth.' },
+          { factor: 'Credit score improved', direction: 'up', detail: 'Your credit-based insurance score improved 38 pts — many carriers offer lower rates at your new tier.' },
+        ],
+      };
+
       const analyzerSteps = [
-        'Reviewing your coverage limits...',
-        'Checking for policy gaps...',
-        'Analyzing your household drivers...',
-        'Finding savings opportunities...',
-        'Comparing rates from 40+ carriers...',
+        'Reviewing your Liberty Mutual coverage...',
+        'Checking vehicle value vs. coverage limits...',
+        'Analyzing rate factor changes...',
+        'Scanning for multi-vehicle discounts...',
+        'Comparing quotes from 40+ carriers...',
       ];
 
       const findings = [
-        { id: 1, category: 'gap', severity: 'high', icon: '🛡️', title: 'Unlisted driver detected', description: 'Your household has 2 licensed drivers, but only 1 is listed on your policy. Unlisted regular drivers can lead to claim denials.', recommendation: 'Add your spouse as a named driver. Many carriers offer multi-driver discounts that could offset the added cost.', savings: null, details: ['Household member: Sarah Cunningham (spouse)', 'Estimated impact if unlisted driver in accident: claim denial up to $50,000', 'Multi-driver discount potential: 5–10% off premium'] },
-        { id: 2, category: 'gap', severity: 'medium', icon: '🚗', title: 'Multi-vehicle discount missing', description: 'You have 2 registered vehicles but only 1 is on this policy. Consolidating under one policy typically unlocks a 10–25% multi-vehicle discount.', recommendation: 'Add your 2024 Toyota RAV4 to this policy to unlock multi-vehicle savings.', savings: 28, details: ['Unlinked vehicle: 2024 Toyota RAV4', 'Current separate policy: GEICO ($156/mo)', 'Estimated combined savings: $28/mo ($336/yr)'] },
-        { id: 3, category: 'rightsize', severity: 'medium', icon: '⚖️', title: 'Liability limits may be too low', description: 'Your bodily injury limit is $50K/$100K. Based on your financial profile, experts recommend at least $100K/$300K to protect your assets.', recommendation: 'Increasing liability to $100K/$300K typically costs only $12–18/mo more but provides significantly better asset protection.', savings: null, details: ['Current: $50,000 per person / $100,000 per accident', 'Recommended: $100,000 per person / $300,000 per accident', 'Average cost increase: ~$15/mo'] },
-        { id: 4, category: 'savings', severity: 'low', icon: '💰', title: 'Bundle discount available', description: 'You have a connected home insurance policy. Bundling auto + home with the same carrier could save you up to $42/mo.', recommendation: 'We found 3 carriers offering competitive bundle rates. The best quote saves you $42/mo compared to your current combined premiums.', savings: 42, details: ['Current auto: $189/mo (Liberty Mutual)', 'Current home: $208/mo (GEICO)', 'Best bundle quote: $355/mo (Progressive) — saves $42/mo'] },
+        {
+          id: 1,
+          category: 'rightsize',
+          severity: 'high',
+          title: 'You may be over-insured on collision & comprehensive',
+          description: 'Your 2022 Camry is now worth ~$18,200 — down 12% since your last renewal. You\'re paying $500/$1,000 deductibles on coverage that may exceed the car\'s payout value.',
+          recommendation: 'Raising your deductible from $500 to $1,000 on collision, or dropping comprehensive entirely, could save you $34/mo without a meaningful coverage gap at this vehicle value.',
+          savings: 34,
+          details: [
+            'Current vehicle value: $18,200 (was $20,680 at last renewal)',
+            'Collision deductible: $500 → recommended $1,000',
+            'Comprehensive deductible: $500 → consider dropping',
+            'At current depreciation rate, full coverage cost-effectiveness declines each year',
+          ],
+          chatPrompts: [
+            'Should I drop comprehensive on a car worth $18K?',
+            'What happens if I raise my deductible to $1,000?',
+            'How does my car\'s value affect what I should cover?',
+          ],
+        },
+        {
+          id: 2,
+          category: 'savings',
+          severity: 'medium',
+          title: 'Your improved credit score qualifies you for lower rates',
+          description: 'Your credit-based insurance score improved 38 points since your last renewal. Liberty Mutual hasn\'t adjusted your rate, but competitors are quoting $22–31/mo less at your new tier.',
+          recommendation: 'We found 4 carriers quoting lower premiums with identical 100/300/100 coverage. Progressive and GEICO both quote under $160/mo — no phone call required to see details.',
+          savings: 28,
+          details: [
+            'Credit-based insurance score: up 38 pts',
+            'Current premium: $189/mo (Liberty Mutual)',
+            'Best quote: $158/mo (Progressive) — same 100/300/100 limits',
+            'Runner-up: $161/mo (GEICO)',
+            'No phone number required to review full quotes',
+          ],
+          chatPrompts: [
+            'Show me the full quote comparison',
+            'Will switching carriers affect my coverage during the gap?',
+            'Is Progressive reliable for claims?',
+          ],
+        },
+        {
+          id: 3,
+          category: 'gap',
+          severity: 'medium',
+          title: 'Multi-vehicle discount you\'re not using',
+          description: 'You have 2 registered vehicles but only the Camry is on this policy. Adding your second vehicle typically unlocks 10–25% off both.',
+          recommendation: 'Consolidating both vehicles under one policy could save an additional $19/mo and simplify your billing. Several carriers bundle this automatically.',
+          savings: 19,
+          details: [
+            'Second vehicle: 2020 Honda CR-V (separate policy)',
+            'Multi-vehicle discount range: 10–25%',
+            'Combined savings: ~$19/mo ($228/yr)',
+            'Most carriers auto-apply discount when both vehicles are on one policy',
+          ],
+          chatPrompts: [
+            'How do I add my second car to this policy?',
+            'Would it be cheaper to move both cars to a new carrier?',
+            'What\'s the multi-vehicle discount with Progressive?',
+          ],
+        },
+        {
+          id: 4,
+          category: 'savings',
+          severity: 'low',
+          title: 'Loyalty discount not applied',
+          description: 'You\'ve been with Liberty Mutual for 4 years, but their loyalty pricing isn\'t reflected in your current rate. Many carriers don\'t auto-apply this — a quick call or online request can activate it.',
+          recommendation: 'Contact Liberty Mutual to request a loyalty review before your renewal in 36 days. If they won\'t match, the competitor quotes above apply with no switching penalty.',
+          savings: 12,
+          details: [
+            'Years with Liberty Mutual: 4',
+            'Typical loyalty discount: 5–8% after 3+ years',
+            'Estimated savings if applied: ~$12/mo',
+            'Can be requested online or by phone',
+            'If denied, renewal is a natural switching point — no cancellation fees',
+          ],
+          chatPrompts: [
+            'Draft a message to Liberty Mutual requesting a loyalty review',
+            'What should I say when I call to ask for a discount?',
+            'Is it better to negotiate or just switch carriers?',
+          ],
+        },
       ];
 
-      const totalSavings = 70;
+      const totalSavings = findings.reduce((sum, f) => sum + (f.savings || 0), 0);
 
       // Analyzing phase timer
       useEffect(() => {
@@ -1330,72 +1425,118 @@
         return () => clearInterval(timer);
       }, [phase]);
 
-      const handleStart = () => { setAnalyzeStep(0); setProgress(0); setPhase('analyzing'); };
-      const handleReset = () => setPhase('idle');
+      const handleStart = () => { setAnalyzeStep(0); setProgress(0); setActiveFinding(null); setPhase('analyzing'); };
+      const handleReset = () => { setActiveFinding(null); setPhase('idle'); };
 
-      const badgeColors = { gap: { bg: '#fef0ec', color: '#cc2200' }, rightsize: { bg: '#fff8e1', color: '#b8860b' }, savings: { bg: '#e6f4ea', color: '#008600' } };
-      const badgeLabels = { gap: 'Coverage gap', rightsize: 'Right-size', savings: 'Savings' };
+      const badgeStyles = {
+        gap: { bg: '#fef0ec', color: '#cc2200', label: 'Coverage gap' },
+        rightsize: { bg: '#fff8e1', color: '#b8860b', label: 'Right-size' },
+        savings: { bg: '#e6f4ea', color: '#008600', label: 'Savings' },
+      };
 
-      const FindingCard = ({ finding, index }) => {
-        const [open, setOpen] = useState(false);
-        const bc = badgeColors[finding.category];
-        return React.createElement('div', {
-          className: 'chat-bubble-in',
-          style: { padding: 16, background: '#fff', borderRadius: 8, border: '1px solid #e9eef0', animationDelay: (index * 0.3) + 's', animationFillMode: 'both' }
-        },
-          React.createElement('div', { style: { display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10 } },
-            React.createElement('span', { style: { fontSize: 20, flexShrink: 0 } }, finding.icon),
-            React.createElement('div', { style: { flex: 1 } },
-              React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 } },
-                React.createElement('span', { style: { display: 'inline-flex', padding: '2px 8px', borderRadius: 12, fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.3, background: bc.bg, color: bc.color } }, badgeLabels[finding.category]),
-                finding.severity === 'high' && React.createElement('span', { style: { fontSize: 11, fontWeight: 500, color: '#cc2200' } }, 'Action needed')
-              ),
-              React.createElement('p', { style: { fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 } }, finding.title),
-              React.createElement('p', { style: { fontSize: 15, lineHeight: 1.4, color: '#55595b' } }, finding.description)
-            )
-          ),
-          React.createElement('div', { style: { padding: 12, background: '#f8f9fa', borderRadius: 6, borderLeft: '3px solid #236cff' } },
-            React.createElement('p', { style: { fontSize: 11, fontWeight: 500, color: '#236cff', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 4 } }, 'Intuit Assist recommendation'),
-            React.createElement('p', { style: { fontSize: 15, lineHeight: 1.4 } }, finding.recommendation)
-          ),
-          finding.savings && React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, padding: '8px 12px', background: '#e6f4ea', borderRadius: 6 } },
-            React.createElement('span', { style: { fontSize: 13, color: '#55595b' } }, 'Potential savings'),
-            React.createElement('span', { style: { fontSize: 15, fontWeight: 700, color: '#008600' } }, '$' + finding.savings + '/mo')
-          ),
-          finding.details && React.createElement('button', { onClick: () => setOpen(!open), style: { display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8, background: 'none', border: 'none', color: '#008600', fontSize: 13, fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer', padding: 0 } },
-            open ? 'Hide details' : 'See details',
-            React.createElement('span', { style: { display: 'inline-block', transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none', fontSize: 10 } }, '▼')
-          ),
-          open && finding.details && React.createElement('ul', { style: { listStyle: 'none', padding: 0, marginTop: 6 } },
-            finding.details.map((d, i) => React.createElement('li', { key: i, style: { fontSize: 13, color: '#55595b', padding: '3px 0 3px 14px', position: 'relative', lineHeight: 1.4 } },
-              React.createElement('span', { style: { position: 'absolute', left: 0, color: '#aaa' } }, '•'), d
-            ))
-          )
+      /* ─── Reusable: AMA Chat Hook (preseeded prompt chips inside findings) ─── */
+      const ChatHooks = ({ prompts }) => (
+        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <p style={{ fontSize: 11, fontWeight: 500, color: '#236cff', textTransform: 'uppercase', letterSpacing: 0.4 }}>Ask Policy Pro</p>
+          {prompts.map((prompt, i) => (
+            <div key={i} className="press-btn" onClick={() => openChat && openChat(prompt)}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: '#fff', border: '1px solid #236cff', borderRadius: 16, cursor: 'pointer' }}>
+              <Icons.Sparkle color="#236cff" size={14}/>
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#000', lineHeight: 1.15, flex: 1 }}>{prompt}</span>
+              <Icons.ChevronRight size={14} color="#236cff"/>
+            </div>
+          ))}
+        </div>
+      );
+
+      /* ─── Finding Detail View (expanded single finding) ─── */
+      const FindingDetailView = ({ finding }) => {
+        const bs = badgeStyles[finding.category];
+        return (
+          <div className="chat-bubble-in" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {/* Back to all findings */}
+            <div className="press-btn" onClick={() => setActiveFinding(null)}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 16, cursor: 'pointer' }}>
+              <span style={{ fontSize: 14, color: '#008600', transform: 'rotate(180deg)', display: 'inline-block' }}>›</span>
+              <span style={{ fontSize: 15, fontWeight: 500, color: '#008600' }}>All findings</span>
+            </div>
+
+            {/* Badge + title */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span style={{ display: 'inline-flex', padding: '2px 8px', borderRadius: 12, fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.3, background: bs.bg, color: bs.color }}>{bs.label}</span>
+              {finding.severity === 'high' && <span style={{ fontSize: 11, fontWeight: 500, color: '#cc2200' }}>Action needed</span>}
+            </div>
+            <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginBottom: 8 }}>{finding.title}</p>
+            <p style={{ fontSize: 15, lineHeight: 1.4, color: '#55595b', marginBottom: 16 }}>{finding.description}</p>
+
+            {/* Recommendation card */}
+            <div style={{ padding: 16, background: '#f7f9fa', borderRadius: 8, borderLeft: '3px solid #236cff', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <Icons.Sparkle color="#236cff" size={14}/>
+                <span style={{ fontSize: 13, fontWeight: 500, color: '#236cff' }}>Recommendation</span>
+              </div>
+              <p style={{ fontSize: 15, lineHeight: 1.4 }}>{finding.recommendation}</p>
+            </div>
+
+            {/* Savings callout */}
+            {finding.savings && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#e6f4ea', borderRadius: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 15, color: '#000' }}>Potential savings</span>
+                <span style={{ fontSize: 20, fontWeight: 700, color: '#008600' }}>${finding.savings}/mo</span>
+              </div>
+            )}
+
+            {/* Details list */}
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 13, fontWeight: 500, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.3, marginBottom: 8 }}>Details</p>
+              {finding.details.map((d, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, padding: '6px 0', borderBottom: i < finding.details.length - 1 ? '1px solid #f0f2f4' : 'none' }}>
+                  <span style={{ color: '#55595b', fontSize: 13, flexShrink: 0 }}>•</span>
+                  <span style={{ fontSize: 13, lineHeight: 1.4, color: '#55595b' }}>{d}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* AMA Chat hooks */}
+            <ChatHooks prompts={finding.chatPrompts}/>
+          </div>
         );
       };
 
-      // IDLE STATE
+      /* ─── IDLE STATE: Insight-led entrypoint ─── */
       if (phase === 'idle') {
         return (
           <div style={{ padding: '0 16px' }}>
-            <div className="press-btn" onClick={handleStart} style={{ background: '#fff', borderRadius: 8, boxShadow: '0 1px 2px rgba(0,0,0,0.2)', padding: 16, cursor: 'pointer' }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #236cff, #5b8def)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Icons.Sparkle color="#fff" size={20}/>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <div style={{ width: 6, height: 6, background: '#cc2200', borderRadius: '50%' }}/>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: '#236cff', lineHeight: 1.4 }}>Intuit Assist</span>
+            <div className="press-btn" onClick={handleStart} style={{ background: '#fff', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.12)', overflow: 'hidden', cursor: 'pointer' }}>
+              {/* Rate factor changes — insight-led, not marketing */}
+              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {profile.rateFactorChanges.map((rf, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: rf.direction === 'up' ? '#e6f4ea' : '#fff8e1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                      <span style={{ fontSize: 14 }}>{rf.direction === 'up' ? '↑' : '↓'}</span>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>{rf.factor}</p>
+                      <p style={{ fontSize: 13, lineHeight: 1.4, color: '#55595b', marginTop: 2 }}>{rf.detail}</p>
+                    </div>
                   </div>
-                  <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>Policy check-up available</p>
-                  <p style={{ fontSize: 15, lineHeight: 1.4, color: '#55595b' }}>
-                    We analyzed your connected policy and found <strong style={{ fontWeight: 500, color: '#000' }}>4 opportunities</strong> to optimize your coverage and save money.
+                ))}
+              </div>
+
+              {/* CTA area */}
+              <div style={{ padding: '12px 16px 16px', borderTop: '1px solid #e9eef0', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Icons.Sparkle color="#236cff" size={16}/>
+                  <p style={{ fontSize: 15, lineHeight: 1.4, flex: 1 }}>
+                    <strong style={{ fontWeight: 500 }}>2 rate factors changed</strong> since your last renewal — we found <strong style={{ fontWeight: 500, color: '#008600' }}>up to $93/mo</strong> in potential savings.
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-                    <button onClick={e => { e.stopPropagation(); handleStart(); }} style={{ height: 40, padding: '0 20px', background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontFamily: 'inherit', fontWeight: 500, fontSize: 15, cursor: 'pointer' }}>Start check-up</button>
-                    <span style={{ fontSize: 13, color: '#55595b' }}>~2 min</span>
-                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <button onClick={e => { e.stopPropagation(); handleStart(); }}
+                    style={{ height: 40, padding: '0 20px', background: '#008600', color: '#fff', border: 'none', borderRadius: 6, fontFamily: 'inherit', fontWeight: 500, fontSize: 15, cursor: 'pointer' }}>
+                    Run check-up
+                  </button>
+                  <span style={{ fontSize: 13, color: '#55595b' }}>~2 min • No phone calls</span>
                 </div>
               </div>
             </div>
@@ -1403,19 +1544,24 @@
         );
       }
 
-      // EXPANDED STATES (analyzing, findings, summary)
+      /* ─── EXPANDED STATES ─── */
       return (
         <div style={{ padding: '0 16px' }}>
-          <div style={{ background: '#fff', borderRadius: 8, boxShadow: '0 1px 2px rgba(0,0,0,0.2)', padding: 16 }}>
+          <div style={{ background: '#fff', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.12)', padding: 16 }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #e9eef0' }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #236cff, #5b8def)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Icons.Sparkle color="#fff" size={16}/>
               </div>
-              <div>
+              <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 17, fontWeight: 500, lineHeight: 1.15 }}>Policy check-up</p>
-                <p style={{ fontSize: 13, color: '#55595b' }}>{phase === 'analyzing' ? 'Analyzing your policy...' : phase === 'findings' ? '4 findings' : 'Complete'}</p>
+                <p style={{ fontSize: 13, color: '#55595b' }}>
+                  {phase === 'analyzing' ? 'Analyzing your policy...' : phase === 'findings' ? (activeFinding !== null ? findings[activeFinding].title : '4 findings • up to $' + totalSavings + '/mo savings') : 'Complete'}
+                </p>
               </div>
+              {phase !== 'analyzing' && (
+                <button onClick={handleReset} style={{ background: 'none', border: 'none', fontSize: 13, color: '#55595b', fontFamily: 'inherit', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>Reset</button>
+              )}
             </div>
 
             {/* ANALYZING */}
@@ -1432,56 +1578,83 @@
               </div>
             )}
 
-            {/* FINDINGS */}
-            {phase === 'findings' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div className="chat-bubble-in" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: '#f0f7ff', borderRadius: 8, border: '1px solid rgba(34,104,246,0.15)' }}>
-                  <span style={{ fontSize: 16 }}>ℹ️</span>
-                  <span style={{ fontSize: 15, fontWeight: 500, color: '#236cff' }}>4 items need your attention</span>
-                </div>
-                {findings.map((f, i) => React.createElement(FindingCard, { key: f.id, finding: f, index: i }))}
-                <div className="chat-bubble-in" style={{ animationDelay: '1.5s', animationFillMode: 'both' }}>
-                  <KDSButton fullWidth onClick={() => setPhase('summary')}>See your full results</KDSButton>
+            {/* FINDINGS — list or detail view */}
+            {phase === 'findings' && activeFinding === null && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {findings.map((f, i) => {
+                  const bs = badgeStyles[f.category];
+                  return (
+                    <div key={f.id} className="press-btn chat-bubble-in" onClick={() => setActiveFinding(i)}
+                      style={{ padding: 16, borderRadius: 8, border: '1px solid #e9eef0', cursor: 'pointer', animationDelay: (i * 0.15) + 's', animationFillMode: 'both', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                          <span style={{ display: 'inline-flex', padding: '2px 8px', borderRadius: 12, fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.3, background: bs.bg, color: bs.color }}>{bs.label}</span>
+                          {f.severity === 'high' && <span style={{ fontSize: 11, fontWeight: 500, color: '#cc2200' }}>Action needed</span>}
+                        </div>
+                        <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15, marginBottom: 4 }}>{f.title}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {f.savings && <span style={{ fontSize: 13, fontWeight: 700, color: '#008600' }}>Save ${f.savings}/mo</span>}
+                          <span style={{ fontSize: 13, color: '#55595b' }}>Tap for details</span>
+                        </div>
+                      </div>
+                      <Icons.ChevronRight size={20} color="#55595b"/>
+                    </div>
+                  );
+                })}
+                <div className="chat-bubble-in" style={{ animationDelay: '0.8s', animationFillMode: 'both', marginTop: 4 }}>
+                  <KDSButton fullWidth onClick={() => setPhase('summary')}>See full results</KDSButton>
                 </div>
               </div>
+            )}
+
+            {/* FINDINGS — single finding expanded */}
+            {phase === 'findings' && activeFinding !== null && (
+              <FindingDetailView finding={findings[activeFinding]}/>
             )}
 
             {/* SUMMARY */}
             {phase === 'summary' && (
               <div className="chat-bubble-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ textAlign: 'center', padding: '20px 16px', background: '#f0f7ff', borderRadius: 8, border: '1px solid rgba(34,104,246,0.1)' }}>
-                  <p style={{ fontSize: 36, marginBottom: 8 }}>✅</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.15, marginBottom: 4 }}>Check-up complete</p>
-                  <p style={{ fontSize: 15, color: '#55595b', lineHeight: 1.4 }}>We found 2 coverage gaps and 3 savings opportunities</p>
-                </div>
-                <div style={{ textAlign: 'center', padding: 16 }}>
-                  <p style={{ fontSize: 13, fontWeight: 500, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Estimated monthly savings</p>
+                {/* Savings hero */}
+                <div style={{ textAlign: 'center', padding: '20px 16px', background: '#f7f9fa', borderRadius: 8 }}>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>Estimated savings</p>
                   <p style={{ fontSize: 40, fontWeight: 700, color: '#008600', letterSpacing: -1 }}>
                     ${displayedSavings}<span style={{ fontSize: 17, color: '#55595b', fontWeight: 400 }}>/mo</span>
                   </p>
+                  <p style={{ fontSize: 13, color: '#55595b', marginTop: 4 }}>Based on 2 rate factor changes and your current coverage</p>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {findings.map(f => (
-                    <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', background: '#fff', borderRadius: 6, border: '1px solid #e9eef0' }}>
-                      <span style={{ fontSize: 18, flexShrink: 0 }}>{f.icon}</span>
+
+                {/* Findings recap — tappable to drill in */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: '#55595b', textTransform: 'uppercase', letterSpacing: 0.3 }}>Opportunities found</p>
+                  {findings.map((f, i) => (
+                    <div key={f.id} className="press-btn" onClick={() => { setPhase('findings'); setActiveFinding(i); }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px', background: '#fff', borderRadius: 6, border: '1px solid #e9eef0', cursor: 'pointer' }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: badgeStyles[f.category].color, flexShrink: 0 }}/>
                       <div style={{ flex: 1 }}>
                         <p style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.15 }}>{f.title}</p>
                         {f.savings && <p style={{ fontSize: 13, fontWeight: 500, color: '#008600' }}>Save ${f.savings}/mo</p>}
                       </div>
-                      <span style={{ color: '#008600', fontSize: 16, fontWeight: 700 }}>✓</span>
+                      <Icons.ChevronRight size={16} color="#55595b"/>
                     </div>
                   ))}
                 </div>
+
+                {/* CTAs */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <KDSButton fullWidth onClick={() => openChat && openChat('Shop better rates based on my check-up')}>Shop better rates</KDSButton>
-                  <KDSButton fullWidth appearance="text" onClick={() => openChat && openChat('Help me update my policy based on the check-up')}>Update your policy</KDSButton>
+                  <KDSButton fullWidth onClick={() => openChat && openChat('Show me the best quotes for my Camry with 100/300/100 coverage — no phone number required')}>Compare quotes — no phone calls</KDSButton>
+                  <KDSButton fullWidth appearance="text" onClick={() => openChat && openChat('Help me contact Liberty Mutual about my loyalty discount before my renewal in 36 days')}>Negotiate with Liberty Mutual</KDSButton>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                  <button onClick={() => openChat && openChat('Share my policy check-up with my agent')} style={{ background: 'none', border: 'none', color: '#008600', fontSize: 15, fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer' }}>Share check-up with your agent</button>
-                </div>
+
+                {/* AMA hooks */}
+                <ChatHooks prompts={[
+                  'Am I over-insured on my 2022 Camry?',
+                  'What should I do before my renewal in 36 days?',
+                  'Walk me through switching carriers step by step',
+                ]}/>
+
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, paddingTop: 12, borderTop: '1px solid #e9eef0' }}>
-                  <span style={{ fontSize: 11, color: '#55595b' }}>Powered by Intuit Assist</span>
-                  <button onClick={handleReset} style={{ background: 'none', border: 'none', color: '#55595b', fontSize: 11, fontFamily: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>Start over</button>
+                  <span style={{ fontSize: 11, color: '#55595b' }}>Powered by Intuit Assist • Self-service, no sales calls</span>
                 </div>
               </div>
             )}
@@ -1843,11 +2016,14 @@
               </div>
             </div>
 
-            {/* Policy Check-up Section — Intuit AI proactive check-up */}
-            <div style={{ padding: '16px 0 24px', background: '#fff' }}>
-              <div style={{ padding: '0 16px', marginBottom: 16 }}>
-                <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15 }}>Policy check-up</p>
-                <p style={{ fontSize: 17, lineHeight: 1.4, marginTop: 4 }}>Personalized insights based on your connected policy</p>
+            {/* Policy Check-up Section — Intuit AI proactive, insight-led */}
+            <div style={{ padding: '24px 0', background: '#fff' }}>
+              <div style={{ padding: '0 16px', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <p style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, flex: 1 }}>Policy check-up</p>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#55595b' }}>36 days to renewal</span>
+                </div>
+                <p style={{ fontSize: 15, lineHeight: 1.4, color: '#55595b' }}>2 rate factor changes detected since your last renewal</p>
               </div>
               <PolicyCheckupSection openChat={openChat}/>
             </div>
